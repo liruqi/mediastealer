@@ -1,0 +1,46 @@
+treechildren::-moz-tree-checkbox(unchecked) {
+	list-style-image: url(checkbox.png);
+	-moz-image-region: rect(13px 13px 26px 0px);
+}
+treechildren::-moz-tree-checkbox(checked) {
+	list-style-image: url(checkbox.png);
+	-moz-image-region: rect(0px 13px 13px 0px);
+}
+textbox[readonly="true"] {
+	color: grey;
+}
+#labelDefaultDir {
+    padding: 4px;
+}
+checkbox:hover {
+    color: green;
+}
+button:hover {
+    color: green;
+}
+#mediastealer {
+	font-family: arial;
+	font-size: 14px;
+	font-weight: bold;
+	color: #00f;
+}
+#mediastealer:hover {
+	font-family: arial;
+	font-size: 14px;
+	font-weight: bold;
+	color: #f00;
+    cursor: pointer;
+}
+#rulelist-warning {
+	font-family: arial;
+    font-weight: bold;
+}
+#upButton {
+    display: none;
+}
+#downButton {
+    display: none;
+}
+#stealer-dbgbox {
+    color: #00f;
+}

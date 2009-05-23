@@ -1,0 +1,121 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>关于Media Stealer</title>
+
+<STYLE type="text/css">
+<!--
+        .Trademark { font-family: verdana,arial,serif; font-size: 7pt; }
+        .Disclaimer { font-family: verdana,arial,serif; font-size: 7pt; font-style: italic; text-align: center; }
+        .DescriptionImage{ float: right; }
+        .Default { font-family: verdana,arial,serif; font-size: 10pt; }
+        .PageTitle { font-family: verdana,arial,serif; font-size: 16pt; font-weight: bold; }
+-->      
+</STYLE>
+
+</head>
+
+<body bgcolor="#FFFFFF" text="black" class="Default">
+
+<div align="center">
+
+<img src="chrome://stealer/skin/mediastealer.png" border="0" alt="Media Stealer" title="Media Stealer">
+
+<h1 class="PageTitle">关于Media Stealer</h1>
+</div>
+
+<hr>
+
+<p>
+可参考: <a href="about-en.html">English Version</a>
+</p>
+
+<p>
+<a name="whatis"></a>
+<strong><u>这是什么?</u></strong>
+</p>
+<p>
+Media Stealer是一个用于下载用HTTP协议传输的网络资源的火狐插件。对于一般用户，她可以作为在线的视频、音乐、FLASH文件(比如FLASH游戏)下载器。而对于熟悉HTTP请求和响应的高级用户，Media Stealer可以做更多的事情。
+</p>
+<p>
+Media Stealer原本的设计是专门用于下载FLASH视频的(flv文件格式的流媒体视频)，所以取名“Media Stealer”。不像其它的在线视频下载工具(例如开源的youtube-dl)和一些直接获取视频文件的网站，这个视频下载工具基本不需要考虑视频提供网站(如YouKu, Tudou, YouTube)的支持，只要是用HTTP请求的视频就可以(目前绝大部分的在线视频网站都是这样)。
+</p>
+<p>
+Media Stealer的特性包括:
+</p>
+<ul>
+<li>初级用户很容易上手使用
+<li>精确地监控和过滤HTTP请求和响应
+<li>为高级用户设计的强大的HTTP过滤配置
+<li>使用内置的下载管理器来监控下载进度，下载时不另外发送请求，不会影响正常的视频观看，缓冲到哪就下载多少。
+</ul>
+
+
+<p>
+<a name="beginners"></a>
+<strong><u>写给新手</u></strong>
+</p>
+<p>
+主窗口上有四个面板：Task，Options，Rules，Messages
+Task面板用于显示下载进度
+Options面板用于选择你要下载的文件类型。对于新手，只需要关心前两个面板。你只能够看下载进度、删除加载项目，但不能够控制它。这是HTTP协议的特点决定的。Options面板可以让你选择你感兴趣的内容：视频，音频，和FLASH，也可以查看和修改一些基本设置和文件下载路径。只要会英文都不难看懂。
+</p>
+
+
+<p>
+<a name="advanced"></a>
+<strong><u>写给高级用户</u></strong>
+</p>
+<p>
+
+<img class="DescriptionImage" src="chrome://stealer/skin/rule_editor.png" border="0" alt="Media Stealer" title="Media Stealer">
+
+你需要知道一些HTTP协议和Javascript中的正则表达式才能够做一些更细致的设置。对于不熟悉HTTP请求和响应的用户，我建议你先看看Debug面板信息或者安装另外一个叫firebug的火狐插件，来了解相关信息。规则面板是用于设置下载过滤规则的。前面三个规则是固定的，可以修改，不能够删除它们，因为它们是跟前面的文件类型设置关联的。可以双击或者点击Edit按钮来编辑规则。
+</p>
+<ol>
+<li>Description项目是你描述规则的几个字，这个是随意的，不会影响下载过程。</li>
+<li>URL项目是一个可以匹配资源url的正则表达式。如果你希望从一个指定的站点下载视频，可以设置此项目。例如，如果你想从黑豆(hd.tudou.com)上下载一个高清视频，例如这个url，http://125.39.48.17/mp4/021/159/131/21159131.f4v?18000&key=5c49da497c1128a28ba84249ec7d062422d102，你不难观察到这个url中有字串'mp4'或者'f4v'或者一个IP地址，于是你可以将此项目设置为'mp4'活着'f4v'，或者一个匹配IP地址的正则表达式(例如，"((2[0-4]\d|25[0-5]|[01]?\d\d?)\.){3}((2[0-4]\d|25[0-5]|[01]?\d\d?))" )。</li>
+<li>Content-Type是一个可以匹配HTTP相应的content-type内容的正则表达式。继续使用上面那个例子，这个项目设置为'octet-stream'.</li>
+<li>Directory就是你保存下载的文件的位置。</li>
+</ol>
+<p>
+有件事情需要提醒下：Media Stealer插件的功能不限于媒体数据下载，她也可以下载很多发送到你的浏览器上的内容。如果配置得好，可以做很多很 神奇的事情。 
+</p>
+<p>
+至于Messages面板，它是用来给那些阅读、调试、修改这个插件的源代码的人看的。非常方便。
+</p>
+
+<p>
+<a name="licensing"></a>
+<strong><u>证书</u></strong>
+</p>
+<p class="SectionBody">
+Media Stealer is licensed under the terms of the <a href="http://www.gnu.org/copyleft/gpl.html">GNU General Public License</a> Version 2 as published by the <a href="http://www.fsf.org">Free Software Foundation</a>.  This gives you legal permission to copy, distribute and/or modify Media Stealer under certain conditions.  Read the 'LICENSE' file in the Media Stealer distribution or read the <a href="http://www.gnu.org/copyleft/gpl.html">online version of the license</a> for more details.
+</p>
+
+<p>
+Media Stealer is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY, AND FITNESS FOR A PARTICULAR PURPOSE.
+</p>
+
+
+<p>
+<a name="downloading"></a>
+<strong><u>贡献者</u></strong>
+</p>
+<p>
+该火狐插件由<a href="http://blog.163.com/cxc200026/">physacco</a>和<a href="http://hi.baidu.com/barnabas">liruqi</a>二人开发.
+这里下载最新版本的Media Stealer: http://mediastealer.blogbus.com/
+</p>
+
+
+<hr>
+
+<br clear="all">
+<div class="Disclaimer">
+Media Stealer
+</div>
+
+</body>
+</html>

@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://stealer/skin/overlay.css" type="text/css"?>
+<?xul-overlay href="chrome://stealer/content/mainbox.xul"?>
+
+<overlay id="stealer-overlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+  <script type="application/javascript" src="chrome://stealer/content/core.js"/>
+  <script type="application/javascript" src="chrome://stealer/content/utils.js"/>
+  <script type="application/javascript" src="chrome://stealer/content/stealer.js"/>
+  <script type="application/javascript" src="chrome://stealer/content/overlay.js"/> 
+  <script type="application/javascript" src="chrome://stealer/content/editor.js"/>
+
+  <keyset id="mainKeyset">
+    <key id="key_toggle"
+         keycode="m"
+         modifiers="accel,shift"
+         oncommand="Stealer.onToggle();" />
+  </keyset>
+
+  <menupopup id="menu_ToolsPopup">
+    <menuitem id="stealer-switch-toggle"
+              type="checkbox"
+              label="Media Stealer         Ctrl+Shift+S"
+              accesskey="s"
+              oncommand="Stealer.onToggle();"/>
+  </menupopup>
+
+  <statusbar id="status-bar">
+    <statusbarpanel id="stealerStatusbar" 
+                    class="statusbarpanel-iconic" 
+                    tooltiptext="abc"
+                    image="chrome://stealer/skin/enable.png"
+                    onclick="Stealer.onStatusbarClick(event);"/>
+  </statusbar>
+
+  <vbox id="appcontent">
+    <splitter id="stealerPanelSplitter"
+              collapsed="true"
+              persist="height"/>
+    <vbox id="panel-parent1"
+          collapsed="true"
+          persist="height">
+      <vbox id="stealer-mainpanel"/>
+    </vbox>
+  </vbox>
+
+</overlay>

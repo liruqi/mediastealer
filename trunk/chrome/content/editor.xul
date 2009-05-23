@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://stealer/skin/stealer.css" type="text/css"?>
+<!DOCTYPE window SYSTEM "chrome://stealer/locale/stealer.dtd">
+
+<window id="stealer-detaillwindow" title="&title.label;" orient="horizontal"
+  xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul" >
+
+  <vbox width="400">
+    <groupbox>
+      <label value="&description.label;" style="header" />
+      <textbox id="editDes" />
+      <label value="&url.label;" style="header" />
+      <textbox id="editUrl" />
+      <label value="&oldct.label;" style="header" />
+      <textbox id="editCt" />
+      <hbox>
+        <label value="Directory" style="header" />
+        <label id="modiry-tip" value="(Please modify it in tabpage 'Options' for this rule)" style="display:none"/>
+      </hbox>
+      <hbox>
+        <textbox id="labelDir" flex="1" />
+        <button id="configButton" label="&config.label;" oncommand="detailWindow.config();"/>
+      </hbox>
+    </groupbox>
+    <hbox>
+      <spacer flex="1"/>
+      <button id="OKButton" label="&ok.label;" default="true" oncommand="if(detailWindow.save()){close();}"/>
+      <button id="discardButton" label="&discard.label;" oncommand="close();"/>
+    </hbox>
+    <spacer style="height: 5px"/>
+  </vbox>
+
+  <script type="application/javascript" src="chrome://stealer/content/editor.js"/>
+  <script type="application/javascript"><![CDATA[detailWindow.init();]]></script>
+</window>
