@@ -1,0 +1,23 @@
+<!ENTITY title.label "Media Stealer 1.0 beta">
+<!ENTITY enablefct.label "Enable Media Stealer">
+<!ENTITY rule.label "Registered rules">
+<!ENTITY enable.label "Active">
+<!ENTITY url.label "URL (*)">
+<!ENTITY oldct.label "Content-Type (*)">
+<!ENTITY reset.label "Reset">
+<!ENTITY showStatusBar.label "Show icon in Status Bar">
+<!ENTITY context.label "Use Media Stealer to reload">
+
+<!ENTITY save.label "Save">
+<!ENTITY new.label "Add">
+<!ENTITY edit.label "Edit">
+<!ENTITY delete.label "Remove">
+<!ENTITY up.label "Move up">
+<!ENTITY down.label "Move down">
+<!ENTITY ok.label "OK">
+<!ENTITY discard.label "Cancel">
+
+<!ENTITY showoptions.label "Options">
+<!ENTITY config.label "Config">
+<!ENTITY description.label "Description">
+

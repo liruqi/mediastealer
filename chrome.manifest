@@ -1,0 +1,7 @@
+content	stealer	chrome/content/
+overlay	chrome://browser/content/browser.xul	chrome://stealer/content/overlay.xul
+
+locale stealer en    chrome/locale/en/
+locale stealer en-US chrome/locale/en/
+
+skin stealer classic/1.0 chrome/skin/

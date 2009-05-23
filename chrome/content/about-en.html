@@ -1,0 +1,118 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+<title>About Media Stealer</title>
+
+<STYLE type="text/css">
+<!--
+        .Trademark { font-family: verdana,arial,serif; font-size: 7pt; }
+        .Disclaimer { font-family: verdana,arial,serif; font-size: 7pt; font-style: italic; text-align: center; }
+        .DescriptionImage{ float: right; }
+        .Default { font-family: verdana,arial,serif; font-size: 10pt; }
+        .PageTitle { font-family: verdana,arial,serif; font-size: 16pt; font-weight: bold; }
+-->      
+</STYLE>
+
+</head>
+
+<body bgcolor="#FFFFFF" text="black" class="Default">
+
+<div align="center">
+<img src="chrome://stealer/skin/mediastealer.png" border="0" alt="Media Stealer" title="Media Stealer">
+<h1 class="PageTitle">About Media Stealer</h1>
+</div>
+
+<hr>
+
+<p>
+See Also: <a href="about-zh.html">中文版</a>
+</p>
+
+<p>
+<a name="whatis"></a>
+<strong><u>What Is This?</u></strong>
+</p>
+<p>
+Media Stealer is a Firefox Add-on delicated to download Internet resource transfered by HTTP protocal. For primary users, it is designed to download online video, music and flash files(e.g. flash games). However, for advanced users who are familiar with HTTP request &amp; responce, Media Stealer can do much more.
+</p>
+<p>
+Media Stealer was originally designed to download flash media (espacilly the .flv format stream video), so given the name 'Media Stealer'. Unlike other online video download tools (e.g. youtube-dl) or online video retrieve website, the download function is independent of video providers (e.g. YouKu, Tudou, YouTube) as long as they use HTTP protocal.
+</p>
+<p>
+Some of the Media Stealer features include:
+</p>
+<ul>
+<li>Very easy to use for beginners and none professonals
+<li>Precisely monitor and filter any HTTP request and responce
+<li>Powerful detailed configurations provided for advanced users
+<li>Monitor download process with the builtin download manager, no more request will be sent, normal video watch cannot be interrupted, and you can download as much as you streaming.
+</ul>
+
+
+<p>
+<a name="beginners"></a>
+<strong><u>For Beginners</u></strong>
+</p>
+<p>
+Four panels in main window: Task, Options, Rules, Messages
+Task panel is to display downloading progress.
+Options panel is to select file type that you want to download.
+For beginners, the first two panels are what to need to concern. You can only read downloading progress in Task panel but not control it. This is due to the feature of HTTP protocal. The Options panel enable you to select your interested content type--Video, Audio and Flash, also read and change basic settings, and download directory. I thinks these options are clear to those who can read English.
+</p>
+
+
+<p>
+<a name="advanced"></a>
+<strong><u>For Advanced Users</u></strong>
+</p>
+<p>
+<img class="DescriptionImage" src="chrome://stealer/skin/rule_editor.png" border="0" alt="Media Stealer" title="Media Stealer">
+You need to have some knowledge about HTTP protocal and javascript regular expression to set more specific settings. For those who are not quite familiar with HTTP request and responce, I advice you to watch Debug panel or download another add-on named 'firebug' to learn more. Rules panel is about downloading filter rules. First 3 rules are static, you cannot remove them, but still you can modify them, for they are associated with previous Options. You can double click a rule or press Edit button to open a rule edit window.
+</p>
+<ol>
+<li>Description is some words you descript this rule. This is arbitrary and does not affect download process. </li>
+<li>URL is a regular expression can be matched in HTTP requeste resource url. This is set when you want to download content from a specific site. For example, if you only want to download HD video from heidou(hd.tudou.com), and a video url for example, http://125.39.48.17/mp4/021/159/131/21159131.f4v?18000&key=5c49da497c1128a28ba84249ec7d062422d102, you observe that string 'mp4' or 'f4v' or IP address in url, so you need to set this to 'mp4' or 'f4v', or a regular expression matching an IP address( e.g, "((2[0-4]\d|25[0-5]|[01]?\d\d?)\.){3}((2[0-4]\d|25[0-5]|[01]?\d\d?))" ). </li>
+<li>Content-Type is a regular expression can be matched in HTTP responce content-type. Take previous example, this can be set to 'octet-stream'.</li>
+<li>Directory is where you want to save your downloaded files.</li>
+</ol>
+<p>
+One thing I need to remind you is: functions of Media Stealer add-on is not limited to media data downloading. It can be used to download many other types of content that sent to your internet browser. You can do many amazing things if you configure it well. 
+</p>
+<p>
+As to the last Messages panel, it is for those who want to read, debug or modify the fucking source code of this add-on. It convient, kiss it.
+</p>
+
+<p>
+<a name="licensing"></a>
+<strong><u>Licensing</u></strong>
+</p>
+<p class="SectionBody">
+Media Stealer is licensed under the terms of the <a href="http://www.gnu.org/copyleft/gpl.html">GNU General Public License</a> Version 2 as published by the <a href="http://www.fsf.org">Free Software Foundation</a>.  This gives you legal permission to copy, distribute and/or modify Media Stealer under certain conditions.  Read the 'LICENSE' file in the Media Stealer distribution or read the <a href="http://www.gnu.org/copyleft/gpl.html">online version of the license</a> for more details.
+</p>
+
+<p>
+Media Stealer is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY, AND FITNESS FOR A PARTICULAR PURPOSE.
+</p>
+
+
+<p>
+<a name="downloading"></a>
+<strong><u>Credits</u></strong>
+</p>
+<p>
+This firefox add-on is developed by <a href="http://blog.163.com/cxc200026/">physacco</a> and <a href="http://hi.baidu.com/barnabas">liruqi</a>.
+You can check for new versions of Media Stealer at http://mediastealer.blogbus.com/
+</p>
+
+<hr>
+
+<br clear="all">
+<div class="Disclaimer">
+Media Stealer
+</div>
+
+</body>
+</html>
