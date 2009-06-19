@@ -1,0 +1,28 @@
+#!/bin/sh
+
+# File: mkxpi
+# This shell script is used to create .xpi package for MediaStealer.
+# Usage: ./mkxpi [outfile]
+# If outfile is omitted, the output file name is "mediastealer.xpi".
+
+hlpstr=Usage:\ mkxpi\ [outfile]
+verstr=mkxpi\ 0.1.0
+
+params=chrome\ defaults\ chrome.manifest\ install.rdf
+default=mediastealer.xpi
+options=-r
+exclude=-x\ */*.svn/*
+
+if (test $# = 0) then
+  out=$default
+elif (test $# = 1) then
+  case $1 in
+    --help|-h) echo $hlpstr && exit;;
+    --version) echo $verstr && exit;;
+    *) out=$1;;
+  esac
+else
+  printf "Too many parameters!\n$hlpstr\n" && exit
+fi
+
+zip $options $out $params $exclude
