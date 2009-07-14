@@ -261,6 +261,19 @@ HttpObserver.prototype = {
                      Components.interfaces.nsICache.ACCESS_READ, new CacheFetcher(this.Stealer, task));
             }
             else {
+                dir = Components.classes["@mozilla.org/file/local;1"]
+                    .createInstance(Components.interfaces.nsILocalFile);
+                alert(task.dir)
+                dir.initWithPath(task.dir);
+                if( !dir.exists() || !dir.isDirectory() ) {   // if it doesn't exist, set to HOME
+                    homeDir =  stealerConfig.home.path + (stealerConfig.home.path[0]=="/" ? "/": "\\");
+                    alert("Task directory " + task.dir + "not exist. Change to home directory " + homeDir);
+                    stealerConfig.defaultDir = homeDir;
+                    task.dir = homeDir;
+                    task.file = task.dir + task.filename;
+                }
+                //end of directory verification
+
                 var choice;
                 if(stealerConfig.alwaysConfirm)
                     choice = confirm("Content ["+task.type+"] found\nDo you want to download it to "+task.dir+" ?\n");
@@ -392,6 +405,7 @@ StreamListener.prototype = {
 
     onStartRequest: function(request, context) {
         try {
+            
             this.fd = Components.classes["@mozilla.org/file/local;1"]
                           .createInstance(Components.interfaces.nsILocalFile);
             try {
@@ -415,7 +429,7 @@ StreamListener.prototype = {
             this.originalListener.onStartRequest(request, context);
         }
         catch(e) {
-            //alert('onStartRequest:\n'+e.name+": "+e.message);
+            alert('onStartRequest:\n'+e.name+": "+e.message);
         }
     },
 
