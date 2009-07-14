@@ -14,16 +14,17 @@ function StealerConfig() {
     this.alwaysConfirm = true;
     this.defaultDir = "";
     this.rules = [];
+    this.home = Components.classes["@mozilla.org/file/directory_service;1"]
+                               .getService(Components.interfaces.nsIProperties)
+                               .get("Home", Components.interfaces.nsIFile);
 }
+
 StealerConfig.prototype = {
     load: function() {
         try{
             this.defaultDir = unescape(stealerBranch.getCharPref("defaultDir"));
             if(this.defaultDir == "") {
-                var home = Components.classes["@mozilla.org/file/directory_service;1"]
-                               .getService(Components.interfaces.nsIProperties)
-                               .get("Home", Components.interfaces.nsIFile);
-                this.defaultDir = home.path + (home.path[0]=="/" ? "/": "\\")
+                this.defaultDir = this.home.path + (this.home.path[0]=="/" ? "/": "\\")
             }
 
             this.enabled = stealerBranch.getBoolPref("enabled");
