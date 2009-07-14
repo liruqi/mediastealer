@@ -2,7 +2,11 @@
 // Objects defined in this file:
 //   stealerConfig: improtant
 //--------------------------------------------------------------------
-const JSON = Components.classes['@mozilla.org/dom/json;1'].createInstance(Components.interfaces.nsIJSON);
+var JSON = Components.classes['@mozilla.org/dom/json;1'].createInstance(Components.interfaces.nsIJSON);
+if (typeof(JSON) == "undefined") {  
+    Components.utils.import("resource://gre/modules/JSON.jsm");  
+}
+
 const stealerPrefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService);
 var stealerBranch = stealerPrefs.getBranch("extensions.stealer.");
 stealerBranch.QueryInterface(Components.interfaces.nsIPrefBranch2);
