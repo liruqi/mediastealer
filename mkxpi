@@ -26,3 +26,5 @@ else
 fi
 
 zip $options $out $params $exclude
+
+# "C:\Program Files\7-Zip\7z.exe" a -tzip -x!*.svn -r mediastealer.xpi chrome defaults chrome.manifest install.rdf
