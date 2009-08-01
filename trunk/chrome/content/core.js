@@ -263,7 +263,7 @@ HttpObserver.prototype = {
             else {
                 dir = Components.classes["@mozilla.org/file/local;1"]
                     .createInstance(Components.interfaces.nsILocalFile);
-                alert(task.dir)
+                //alert(task.dir)
                 dir.initWithPath(task.dir);
                 if( !dir.exists() || !dir.isDirectory() ) {   // if it doesn't exist, set to HOME
                     homeDir =  stealerConfig.home.path + (stealerConfig.home.path[0]=="/" ? "/": "\\");
