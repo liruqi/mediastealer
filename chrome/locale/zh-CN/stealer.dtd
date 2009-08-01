@@ -1,0 +1,73 @@
+<!ENTITY title.label "Media Stealer 1.0 beta">
+<!ENTITY enablefct.label "Enable Media Stealer">
+<!ENTITY rule.label "Registered rules">
+<!ENTITY enable.label "Active">
+<!ENTITY url.label "URL (*)">
+<!ENTITY oldct.label "Content-Type (*)">
+<!ENTITY reset.label "重置">
+<!ENTITY showStatusBar.label "显示状态栏图标">
+<!ENTITY context.label "Use Media Stealer to reload">
+
+<!-- main window -->
+<!ENTITY tab_tasks.label "任务">
+<!ENTITY tab_options.label "选项">
+<!ENTITY tab_rules.label "规则">
+<!ENTITY tab_messages.label "消息">
+
+
+<!ENTITY save.label "保存">
+<!ENTITY new.label "新建">
+<!ENTITY edit.label "编辑">
+<!ENTITY delete.label "删除">
+<!ENTITY up.label "上移">
+<!ENTITY down.label "下移">
+<!ENTITY apply.label "应用">
+<!ENTITY ok.label "确定">
+<!ENTITY discard.label "取消">
+
+<!-- tabpage Tasks -->
+<!ENTITY tasks_tree_file.label "文件">
+<!ENTITY tasks_tree_url.label "URL">
+<!ENTITY tasks_tree_type.label "类型">
+<!ENTITY tasks_tree_total.label "大小">
+<!ENTITY tasks_tree_progress.label "进度">
+<!ENTITY tasks_tree_status.label "状态">
+<!ENTITY tasks_tree_folder.label "路径">
+
+<!ENTITY tasks_context_open.label "打开">
+<!ENTITY tasks_context_open_folder.label "打开文件夹">
+<!ENTITY tasks_context_rename.label "重命名">
+<!ENTITY tasks_context_delete.label "删除">
+<!ENTITY tasks_context_delete_all.label "删除全部">
+<!ENTITY tasks_context_copy.label "复制此行">
+<!ENTITY tasks_context_copy_all.label "复制全部">
+
+<!-- tabpage Options -->
+<!ENTITY options_grp_type.label "资源类型">
+<!ENTITY options_type_video.label "视频 (video|flv|mp4|octet-stream)">
+<!ENTITY options_type_audio.label "音频 (mp3|wma|mpeg|ogg)">
+<!ENTITY options_type_flash.label "Flash (swf|flash|shockwave)">
+<!ENTITY options_type_dir.label "默认下载目录">
+<!ENTITY options_type_browse.label "浏览">
+
+<!ENTITY options_grp_opts.label "配置选项">
+<!ENTITY options_opts_enable.label "启用Media Stealer">
+<!ENTITY options_opts_confirm.label "当资源可用时提示">
+<!ENTITY options_opts_cache.label "允许从缓存取数据">
+<!ENTITY options_opts_statusbar.label "显示状态栏图标">
+
+<!-- tabpage Rules -->
+<!ENTITY rules_tree_warn.label "这张表是为专业人士准备的，如果你不清楚其涵义的话请不要修改。">
+<!ENTITY rules_tree_enabled.label "启用">
+<!ENTITY rules_tree_description.label "描述">
+<!ENTITY rules_tree_url.label "URL">
+<!ENTITY rules_tree_type.label "Content-Type">
+<!ENTITY rules_tree_dir.label "下载目录">
+
+<!-- for editor window-->
+<!ENTITY showoptions.label "选项">
+<!ENTITY config.label "Config">
+<!ENTITY description.label "描述">
+<!ENTITY directory.label "路径">
+<!ENTITY dir_mod_tip.label "(请在“选项”面板中修改此项)">
+

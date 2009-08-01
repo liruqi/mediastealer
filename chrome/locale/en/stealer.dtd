@@ -8,16 +8,67 @@
 <!ENTITY showStatusBar.label "Show icon in Status Bar">
 <!ENTITY context.label "Use Media Stealer to reload">
 
+<!-- main window -->
+<!ENTITY tab_tasks.label "Tasks">
+<!ENTITY tab_options.label "Options">
+<!ENTITY tab_rules.label "Rules">
+<!ENTITY tab_messages.label "Messages">
+
+
 <!ENTITY save.label "Save">
 <!ENTITY new.label "Add">
 <!ENTITY edit.label "Edit">
 <!ENTITY delete.label "Remove">
 <!ENTITY up.label "Move up">
 <!ENTITY down.label "Move down">
+<!ENTITY apply.label "Apply">
 <!ENTITY ok.label "OK">
 <!ENTITY discard.label "Cancel">
 
+<!-- tabpage Tasks -->
+<!ENTITY tasks_tree_file.label "File">
+<!ENTITY tasks_tree_url.label "URL">
+<!ENTITY tasks_tree_type.label "Type">
+<!ENTITY tasks_tree_total.label "Total">
+<!ENTITY tasks_tree_progress.label "Progress">
+<!ENTITY tasks_tree_status.label "Status">
+<!ENTITY tasks_tree_folder.label "Folder">
+
+<!ENTITY tasks_context_open.label "Open">
+<!ENTITY tasks_context_open_folder.label "Open Folder">
+<!ENTITY tasks_context_rename.label "Rename File">
+<!ENTITY tasks_context_delete.label "Delete">
+<!ENTITY tasks_context_delete_all.label "Delete All">
+<!ENTITY tasks_context_copy.label "Copy Row">
+<!ENTITY tasks_context_copy_all.label "Copy All Rows">
+
+<!-- tabpage Options -->
+<!ENTITY options_grp_type.label "Content-Type">
+<!ENTITY options_type_video.label "Video (video|flv|mp4|octet-stream)">
+<!ENTITY options_type_audio.label "Audio (mp3|wma|mpeg|ogg)">
+<!ENTITY options_type_flash.label "Flash (swf|flash|shockwave)">
+<!ENTITY options_type_dir.label "Download Directory">
+<!ENTITY options_type_browse.label "Browse">
+
+<!ENTITY options_grp_opts.label "Options">
+<!ENTITY options_opts_enable.label "Enable Media Stealer">
+<!ENTITY options_opts_confirm.label "Confirm when resource is available">
+<!ENTITY options_opts_cache.label "Fetch data from cache if it exists">
+<!ENTITY options_opts_statusbar.label "Show statusbar icon">
+
+<!-- tabpage Rules -->
+<!ENTITY rules_tree_warn.label "This table is intended for professonals. DO NOT modify the rules if you are not clear about them.">
+<!ENTITY rules_tree_enabled.label "Enabled">
+<!ENTITY rules_tree_description.label "Description">
+<!ENTITY rules_tree_url.label "URL">
+<!ENTITY rules_tree_type.label "Content-Type">
+<!ENTITY rules_tree_dir.label "Directory">
+
+
+<!-- for editor window-->
 <!ENTITY showoptions.label "Options">
 <!ENTITY config.label "Config">
 <!ENTITY description.label "Description">
+<!ENTITY directory.label "Directory">
+<!ENTITY dir_mod_tip.label "(Please modify it in tabpage 'Options' for this rule)">
 

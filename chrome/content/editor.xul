@@ -15,8 +15,8 @@
       <label value="&oldct.label;" style="header" />
       <textbox id="editCt" />
       <hbox>
-        <label value="Directory" style="header" />
-        <label id="modiry-tip" value="(Please modify it in tabpage 'Options' for this rule)" style="display:none"/>
+        <label value="&directory.label;" style="header" />
+        <label id="modiry-tip" value="&dir_mod_tip.label;" style="display:none"/>
       </hbox>
       <hbox>
         <textbox id="labelDir" flex="1" />
