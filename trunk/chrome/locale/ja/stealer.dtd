@@ -1,0 +1,74 @@
+<!ENTITY title.label "Media Stealer 1.0 beta">
+<!ENTITY enablefct.label "Media Stealerを有効にする">
+<!ENTITY rule.label "Registered rules">
+<!ENTITY enable.label "Active">
+<!ENTITY url.label "URL (*)">
+<!ENTITY oldct.label "MIMEタイプ (*)">
+<!ENTITY reset.label "リセット">
+<!ENTITY showStatusBar.label "ステータスバーにアイコンを表示する">
+<!ENTITY context.label "Media Stealerでリロードする">
+
+<!-- main window -->
+<!ENTITY tab_tasks.label "タスク">
+<!ENTITY tab_options.label "オプション">
+<!ENTITY tab_rules.label "ルール">
+<!ENTITY tab_messages.label "メッセージ">
+
+
+<!ENTITY save.label "セーブ">
+<!ENTITY new.label "新規">
+<!ENTITY edit.label "編集">
+<!ENTITY delete.label "削除">
+<!ENTITY up.label "上へ移動">
+<!ENTITY down.label "下へ移動">
+<!ENTITY apply.label "適用">
+<!ENTITY ok.label "はい">
+<!ENTITY discard.label "キャンセル">
+
+<!-- tabpage Tasks -->
+<!ENTITY tasks_tree_file.label "ファイル">
+<!ENTITY tasks_tree_url.label "URL">
+<!ENTITY tasks_tree_type.label "タイプ">
+<!ENTITY tasks_tree_total.label "総計">
+<!ENTITY tasks_tree_progress.label "進行度">
+<!ENTITY tasks_tree_status.label "ステータス">
+<!ENTITY tasks_tree_folder.label "フォルダ">
+
+<!ENTITY tasks_context_open.label "開く">
+<!ENTITY tasks_context_open_folder.label "フォルダを開く">
+<!ENTITY tasks_context_rename.label "ファイル名の変更">
+<!ENTITY tasks_context_delete.label "削除する">
+<!ENTITY tasks_context_delete_all.label "すべてを削除する">
+<!ENTITY tasks_context_copy.label "テキストをコピーする">
+<!ENTITY tasks_context_copy_all.label "すべてのテキストをコピーする">
+
+<!-- tabpage Options -->
+<!ENTITY options_grp_type.label "MIMEタイプ">
+<!ENTITY options_type_video.label "ビデオ (video|flv|mp4|octet-stream)">
+<!ENTITY options_type_audio.label "オーディオ (mp3|wma|mpeg|ogg)">
+<!ENTITY options_type_flash.label "フラッシュ (swf|flash|shockwave)">
+<!ENTITY options_type_dir.label "ファイルの保存先">
+<!ENTITY options_type_browse.label "参照">
+
+<!ENTITY options_grp_opts.label "オプション">
+<!ENTITY options_opts_enable.label "Media Stealerを有効にする">
+<!ENTITY options_opts_confirm.label "ダウンロードを行う前ユーザーに聞く">
+<!ENTITY options_opts_cache.label "できればキャッシュからデータを取得する">
+<!ENTITY options_opts_statusbar.label "ステータスバーにアイコンを表示する">
+
+<!-- tabpage Rules -->
+<!ENTITY rules_tree_warn.label "ここはプロオンリー。分からないならルールを編集しないで下さい。">
+<!ENTITY rules_tree_enabled.label "有効">
+<!ENTITY rules_tree_description.label "説明">
+<!ENTITY rules_tree_url.label "URL">
+<!ENTITY rules_tree_type.label "MIMEタイプ">
+<!ENTITY rules_tree_dir.label "ディレクトリ">
+
+
+<!-- for editor window-->
+<!ENTITY showoptions.label "オプション">
+<!ENTITY config.label "設定">
+<!ENTITY description.label "説明">
+<!ENTITY directory.label "ディレクトリ">
+<!ENTITY dir_mod_tip.label "（このルールはオプションのタブページで変更して下さい）">
+
