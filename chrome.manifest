@@ -4,5 +4,7 @@ overlay	chrome://browser/content/browser.xul	chrome://stealer/content/overlay.xu
 locale stealer en    chrome/locale/en/
 locale stealer en-US chrome/locale/en/
 locale stealer zh-CN chrome/locale/zh-CN/
+locale stealer zh-TW chrome/locale/en/
+locale stealer ja-JP chrome/locale/ja/
 
 skin stealer classic/1.0 chrome/skin/

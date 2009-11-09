@@ -1,0 +1,8 @@
+1.1.0
+
+这是一个bug fix版本
+* 增加了界面静态文本的中文简体和日语locale支持
+* 修正了Task面板右键菜单“删除”和“删除全部”菜单项失效的问题
+- Reason: 变量名拼写错误，title写成了titile
+* 移除了站点屏蔽(excludeSite)功能
+* 更改了一些重要的Javascript Object的命名

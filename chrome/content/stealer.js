@@ -43,9 +43,9 @@ MediaStealerController.prototype = {
     },
     init: function() {
         try {
-            var HttpObserver = Application.storage.get("observer", null);
-            if(HttpObserver)
-                HttpObserver.setController(this);
+            var httpObserver = Application.storage.get("observer", null);
+            if(httpObserver)
+                httpObserver.setController(this);
             else {
                 //alert("Media StealerController.init():\nHttpObserver not registered!");
             }
@@ -258,7 +258,7 @@ MediaStealerController.prototype = {
             // for prompt
             var prompts = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
                     .getService(Components.interfaces.nsIPromptService);
-            var titile = "Stealer";
+            var title = "Stealer";
             var question = "Really want to delete this task?";
             var checkstr = "Also remove downloaded file";
             var check = {value: true};
@@ -287,7 +287,7 @@ MediaStealerController.prototype = {
             }
         }
         catch(e) {
-            //alert("onDeleteTask:\n"+e.name+": "+e.message);
+            alert("onDeleteTask:\n"+e.name+": "+e.message);
         }
     },
     onDeleteAllTask: function() {
@@ -295,7 +295,7 @@ MediaStealerController.prototype = {
             // for prompt
             var prompts = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
                     .getService(Components.interfaces.nsIPromptService);
-            var titile = "Stealer";
+            var title = "Stealer";
             var question = "Really want to delete all the tasks?";
             var checkstr = "Also remove downloaded files";
             var check = {value: false};
