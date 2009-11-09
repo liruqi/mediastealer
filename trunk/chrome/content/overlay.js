@@ -10,7 +10,7 @@ StealerGateKeeper.prototype = {
     },
     enter: function() {
         // register http observer
-        this.observer = new HttpObserver();
+        this.observer = new StealerHttpObserver();
         var observerService = Components.classes["@mozilla.org/observer-service;1"]
                            .getService(Components.interfaces.nsIObserverService);
         observerService.addObserver(this.observer, "http-on-modify-request", false);

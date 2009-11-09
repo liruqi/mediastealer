@@ -1,8 +1,8 @@
 //--------------------------------------------------------------------
 // Three objects are defined in this file:
-//   HttpObserver
-//   StreamListener
-//   CacheFetcher
+//   StealerHttpObserver
+//   StealerStreamListener
+//   StealerCacheFetcher
 //--------------------------------------------------------------------
 function Task() {}
 Task.prototype = {
@@ -81,8 +81,8 @@ Task.prototype = {
 }
 
 //--------------------------------------------------------------------
-function HttpObserver() {}
-HttpObserver.prototype = {
+function StealerHttpObserver() {}
+StealerHttpObserver.prototype = {
     Stealer: null,
     setController: function(controller) {
         this.Stealer = controller;
@@ -121,12 +121,6 @@ HttpObserver.prototype = {
             this.Stealer.dbgPrintln(msg); */
 
             var task = new Task();  // file, url, type, size, stat ; dir, xlen
-
-            /*for (var i = 0; i < this.excludeSite.length; i++) {
-                var rule = this.excludeSite[i];
-                if(new RegExp(rule.url,"i").exec(uri) && new RegExp(rule.ct,"i").exec(ct))
-                    return;
-            }*/
 
             for (var i = 0; i < stealerConfig.rules.length; i++) {
                 var rule = stealerConfig.rules[i];
@@ -217,8 +211,8 @@ HttpObserver.prototype = {
         return originName;
     },
 
-    doTask: function(task, HttpChannel, query_cache) {
-        // HttpChannel: [xpconnect wrapped nsIHttpChannel]
+    doTask: function(task, httpChannel, query_cache) {
+        // httpChannel: [xpconnect wrapped nsIHttpChannel]
         // query_cache: boolean, whether need to query cache
         try {
             var httpCacheSession;
@@ -251,14 +245,14 @@ HttpObserver.prototype = {
             }
 
             task.id = this.make_taskid();
-            var originName = this.resolveOriginName(HttpChannel);
+            var originName = this.resolveOriginName(httpChannel);
             var file = this.make_name(originName, task.id);
             task.filename = file;  /////
             task.file = task.dir + task.filename;  ///
            
             if(query_cache) {
                 httpCacheSession.asyncOpenCacheEntry(task.url,
-                     Components.interfaces.nsICache.ACCESS_READ, new CacheFetcher(this.Stealer, task));
+                     Components.interfaces.nsICache.ACCESS_READ, new StealerCacheFetcher(this.Stealer, task));
             }
             else {
                 dir = Components.classes["@mozilla.org/file/local;1"]
@@ -280,9 +274,9 @@ HttpObserver.prototype = {
                 else
                     choice = true;
                 if(choice) {
-                    var newListener = new StreamListener(this.Stealer, task);
-                    HttpChannel.QueryInterface(Components.interfaces.nsITraceableChannel);
-                    newListener.originalListener = HttpChannel.setNewListener(newListener);
+                    var newListener = new StealerStreamListener(this.Stealer, task);
+                    httpChannel.QueryInterface(Components.interfaces.nsITraceableChannel);
+                    newListener.originalListener = httpChannel.setNewListener(newListener);
 
                     task.curr = 0;
                     task.stat = "Transferring";
@@ -300,7 +294,7 @@ HttpObserver.prototype = {
             }
         }
         catch(e) {
-            //alert("HttpObserver.doTask:\n"+e.name+": "+e.message);
+            //alert("StealerHttpObserver.doTask:\n"+e.name+": "+e.message);
         }
     },
     make_name: function(old_name, task_id) {
@@ -321,6 +315,7 @@ HttpObserver.prototype = {
         return time + "." + rand;
     },
     getTimestamp: function() {
+        // return current time in format of 'YYMMDDhhmmss'
         var t = new Date();
         var Y = String(t.getYear() + 1900);
         var M = t.getMonth() + 1;
@@ -335,11 +330,15 @@ HttpObserver.prototype = {
         s = (s < 10) ? ("0"+String(s)) : String(s);
         return Y + M + D + h + m + s;
     },
-    excludeSite: [ {url:"tvie", ct:""} ]
-}// HttpObserver.prototype
+    QueryInterface: function (aIID) {
+        if (aIID.equals(Components.interfaces.nsIHttpObserver) || aIID.equals(Components.interfaces.nsISupports))
+            return this;
+        throw Components.results.NS_NOINTERFACE;
+    }
+}// StealerHttpObserver.prototype
 
 //--------------------------------------------------------------------
-function StreamListener(stealer, task) {
+function StealerStreamListener(stealer, task) {
     this.Stealer = stealer;
     this.task = task;
 
@@ -352,7 +351,7 @@ function StreamListener(stealer, task) {
     this.originalListener = null;
 }
 
-StreamListener.prototype = {
+StealerStreamListener.prototype = {
 
     onDataAvailable: function(request, context, inputStream, offset, count) {
         try {
@@ -387,7 +386,7 @@ StreamListener.prototype = {
                 this.percent++;
             }
 
-            // flush stack if stack grows too big
+            // flush stack if it grows too big
             if(this.curr_stack > 0x400000) {    // 4 megabytes
                 var stack_cnt = this.stack.length;
                 for(var i = 0; i < stack_cnt; i++) {
@@ -465,25 +464,21 @@ StreamListener.prototype = {
     },
 
     QueryInterface: function (aIID) {
-        if (aIID.equals(Components.interfaces.nsIStreamListener) ||
-                    aIID.equals(Components.interfaces.nsISupports)) {
+        if (aIID.equals(Components.interfaces.nsIStreamListener) || aIID.equals(Components.interfaces.nsISupports))
             return this;
-        }
-        else {
-            throw Components.results.NS_NOINTERFACE;
-        }
+        throw Components.results.NS_NOINTERFACE;
     }
-}// StreamListener.prototype
+}// StealerStreamListener.prototype
 
 //--------------------------------------------------------------------
-function CacheFetcher(stealer, task) {
+function StealerCacheFetcher(stealer, task) {
     this.Stealer = stealer;
     this.task = task;
 }
-CacheFetcher.prototype = {
+StealerCacheFetcher.prototype = {
     onCacheEntryAvailable: function(descriptor, accessGranted, status) {
         try {
-            if (descriptor != null) {
+            if(descriptor != null) {
                 var head = descriptor.getMetaDataElement("response-head");
                 head.match(new RegExp(/Content-Type: (.*)(\n)?/i));
                 this.content_type = RegExp.$1;
@@ -493,7 +488,7 @@ CacheFetcher.prototype = {
                 if(new RegExp(this.task.type, "i").exec(this.content_type)) {
                     var choice;
                     if(stealerConfig.alwaysConfirm) {
-                        var msg= "【Cached】URI: "+this.task.url+"\n==> "+this.task.file+"\nIs it OK?";
+                        var msg= "[*Cached*] URI: "+this.task.url+"\n==> "+this.task.file+"\nIs it OK?";
                         choice = confirm(msg);
                     }
                     else
@@ -514,7 +509,7 @@ CacheFetcher.prototype = {
                         message    += "  Type: " + "Cached\n";
                         this.Stealer.dbgPrintln(message);
          
-                        this.dl(descriptor);  // fetch it!
+                        this.fetch(descriptor);  // fetch it!
                     }
                 }
             }
@@ -523,8 +518,7 @@ CacheFetcher.prototype = {
             //alert('onCacheEntryAvailable:\n'+e.name+': '+e.message);
         }
     },
-
-    dl: function(descriptor) {
+    fetch: function(descriptor) {
         //set up for output file
         var fd = Components.classes["@mozilla.org/file/local;1"]
                         .createInstance(Components.interfaces.nsILocalFile);
@@ -559,13 +553,10 @@ CacheFetcher.prototype = {
         this.Stealer.dbgPrintln("Time: " + new Date().toLocaleString());
         this.Stealer.dbgPrintln("**********  Download finished  **********\n");
     },
-
     QueryInterface: function(aIID) {
-        if(aIID.equals(Components.interfaces.nsICacheListener) ||
-           aIID.equals(Components.interfaces.nsISupports)) {
+        if(aIID.equals(Components.interfaces.nsICacheListener) || aIID.equals(Components.interfaces.nsISupports))
             return this;
-        }
         throw Components.results.NS_NOINTERFACE;
     }
-}// CacheFetcher.prototype
+}// StealerCacheFetcher.prototype
 //--------------------------------------------------------------------
