@@ -898,9 +898,12 @@ MediaStealerController.prototype = {
             enableCheck.setAttribute("checked", stealerConfig.enabled ? "true" : "false");
             this.initStatusbar(stealerConfig.showStatusbar, stealerConfig.enabled);
         }
-        else {
-            Stealer.onToggle();
-        }
+        //else {
+        //    Stealer.onToggle();
+        //}
+        // Right clicking on the status bar of firefox 4 pops up an important context menu.
+        // So I comment the `else' branch to disable my event handler.
+        // 2011.2.15
     },
     //------------------------  界面状态管理（三态切换） ----------------------------
     //-------------------------------------------------------------------------------
