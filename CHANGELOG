@@ -1,3 +1,10 @@
+1.2.1
+
+* Review the source code to get it work on Firefox 4.0.*;
+* Temporarily disable right-click context menu on statusbar icon;
+* Remove 'octet-stream' from default video resource rule;
+* Mark the version as 1.2.1.
+
 1.1.0
 
 这是一个bug fix版本
