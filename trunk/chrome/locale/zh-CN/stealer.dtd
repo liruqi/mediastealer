@@ -1,4 +1,4 @@
-<!ENTITY title.label "Media Stealer 1.1.0">
+<!ENTITY title.label "Media Stealer 1.2.1">
 <!ENTITY enablefct.label "Enable Media Stealer">
 <!ENTITY rule.label "Registered rules">
 <!ENTITY enable.label "Active">
@@ -44,7 +44,7 @@
 
 <!-- tabpage Options -->
 <!ENTITY options_grp_type.label "资源类型">
-<!ENTITY options_type_video.label "视频 (video|flv|mp4|octet-stream)">
+<!ENTITY options_type_video.label "视频 (video|flv|mp4)">
 <!ENTITY options_type_audio.label "音频 (mp3|wma|mpeg|ogg)">
 <!ENTITY options_type_flash.label "Flash (swf|flash|shockwave)">
 <!ENTITY options_type_dir.label "默认下载目录">
