@@ -1,7 +1,6 @@
-#后期开发计划
-#Plans for future development
+后期开发计划
 
-= Introduction =
+= Plans for future development =
 
 后期主要是维护了。主要是打算完善一个在线的规则列表功能，类似于 autoproxy 的 gfwlist.txt。让用户的使用变得透明。
 
