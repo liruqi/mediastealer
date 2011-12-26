@@ -4,8 +4,11 @@
 //   StealerStreamListener
 //   StealerCacheFetcher
 //--------------------------------------------------------------------
-function Task() {}
-Task.prototype = {
+
+if (!mediastealer) var mediastealer={};
+
+mediastealer.Task = function(){}
+mediastealer.Task.prototype = {
     _id: null,
     _file: null,
     _dir:  null,
@@ -120,7 +123,7 @@ StealerHttpObserver.prototype = {
             if(ct) msg += "   " + ct + "\n";
             this.Stealer.dbgPrintln(msg); */
 
-            var task = new Task();  // file, url, type, size, stat ; dir, xlen
+            var task = new mediastealer.Task();  // file, url, type, size, stat ; dir, xlen
 
             for (var i = 0; i < stealerConfig.rules.length; i++) {
                 var rule = stealerConfig.rules[i];
