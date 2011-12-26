@@ -2,11 +2,14 @@
 // Objects defined in this file:
 //   stealerConfig: improtant
 //--------------------------------------------------------------------
-var JSON = Components.classes['@mozilla.org/dom/json;1'].createInstance(Components.interfaces.nsIJSON);
-if (typeof(JSON) == "undefined") {  
-    Components.utils.import("resource://gre/modules/JSON.jsm");  
-}
 
+if (!mediastealer) var mediastealer={};
+if (!mediastealer.JSON) {
+    mediastealer.JSON = Components.classes['@mozilla.org/dom/json;1'].createInstance(Components.interfaces.nsIJSON);
+    if (typeof(mediastealer.JSON) == "undefined") {
+        Components.utils.import("resource://gre/modules/JSON.jsm");  
+    }
+}
 const stealerPrefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService);
 var stealerBranch = stealerPrefs.getBranch("extensions.stealer.");
 stealerBranch.QueryInterface(Components.interfaces.nsIPrefBranch2);
@@ -36,7 +39,7 @@ StealerConfig.prototype = {
             this.useCache = stealerBranch.getBoolPref("useCache");
             this.alwaysConfirm = stealerBranch.getBoolPref("alwaysConfirm");
 
-            this.rules = JSON.decode(stealerBranch.getCharPref("rulesJSON"));
+            this.rules = mediastealer.JSON.decode(stealerBranch.getCharPref("rulesJSON"));
             for(var i = 0; i < this.rules.length; i++) {
                 this.rules[i]["dir"] = unescape(this.rules[i]["dir"]);
                 if(this.rules[i]["rtype"] > 0 && this.rules[i]["dir"] == "") {
@@ -68,7 +71,7 @@ StealerConfig.prototype = {
                 rule.dir     = escape(this.rules[i].dir);
                 rules.push(rule);
             }
-            stealerBranch.setCharPref("rulesJSON", JSON.encode(rules));
+            stealerBranch.setCharPref("rulesJSON", mediastealer.JSON.encode(rules));
         }
         catch(e) {
             //alert(e);
