@@ -5,10 +5,8 @@
 //   StealerCacheFetcher
 //--------------------------------------------------------------------
 
-if (!mediastealer) var mediastealer={};
-
-mediastealer.Task = function(){}
-mediastealer.Task.prototype = {
+Task = function(){}
+Task.prototype = {
     _id: null,
     _file: null,
     _dir:  null,
@@ -123,7 +121,7 @@ StealerHttpObserver.prototype = {
             if(ct) msg += "   " + ct + "\n";
             this.Stealer.dbgPrintln(msg); */
 
-            var task = new mediastealer.Task();  // file, url, type, size, stat ; dir, xlen
+            var task = new Task();  // file, url, type, size, stat ; dir, xlen
 
             for (var i = 0; i < stealerConfig.rules.length; i++) {
                 var rule = stealerConfig.rules[i];
@@ -249,10 +247,53 @@ StealerHttpObserver.prototype = {
 
             task.id = this.make_taskid();
             var originName = this.resolveOriginName(httpChannel);
+			
             var file = this.make_name(originName, task.id);
             task.filename = file;  /////
             task.file = task.dir + task.filename;  ///
+		
+		
+		    //check extention, gives flv extention when unknown extention is found			
+			var unknown = stealerConfig.filetypeunknown;
+			
+			if(unknown == true)
+                    {						  
+						var fileextention = file.charAt(file.length-4) + file.charAt(file.length-3) + file.charAt(file.length-2) + file.charAt(file.length-1);
+						
+							if ((fileextention != ".swf") && (fileextention != ".flv") && (fileextention != ".mp4") && (fileextention != ".mp3"))
+							{			   
+							var help = task.filename.substr(0,(task.filename.length-4));							
+							help += ".flv"; 							
+							task.filename = help;														
+							}		
+					}	
+			task.file = task.dir + task.filename; 
+			
+			
+			var nosmall = stealerConfig.nosmallfiles;
+			
+			if(nosmall==true && task.size <750000)
+			{
+				var permission2 = false;
+			}
+			else
+			{
+				var permission2 = true;
+			}	
+			
+			//avoid files with zero bytes such as cookies
+			var nozero = stealerConfig.nozerofiles;
+			if(nozero==true && task.size ==0)
+			{
+				var permission = false;
+			}
+			else
+			{
+				var permission = true;
+			}			
            
+		   if ((permission==true) && (permission2==true) ) 
+		   {
             if(query_cache) {
                 httpCacheSession.asyncOpenCacheEntry(task.url,
                      Components.interfaces.nsICache.ACCESS_READ, new StealerCacheFetcher(this.Stealer, task));
@@ -295,6 +336,7 @@ StealerHttpObserver.prototype = {
                     this.Stealer.dbgPrintln(message);
                 }
             }
+			}
         }
         catch(e) {
             //alert("StealerHttpObserver.doTask:\n"+e.name+": "+e.message);
@@ -355,6 +397,7 @@ function StealerStreamListener(stealer, task) {
 }
 
 StealerStreamListener.prototype = {
+
 
     onDataAvailable: function(request, context, inputStream, offset, count) {
         try {

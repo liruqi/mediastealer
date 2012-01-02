@@ -31,5 +31,5 @@ StealerGateKeeper.prototype = {
     }
 }
 
-var gatekeeper = new StealerGateKeeper();
+var Stealer_gatekeeper = new StealerGateKeeper();
 //--------------------------------------------------------------------
