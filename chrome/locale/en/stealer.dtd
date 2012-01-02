@@ -29,7 +29,7 @@
 <!ENTITY tasks_tree_file.label "File">
 <!ENTITY tasks_tree_url.label "URL">
 <!ENTITY tasks_tree_type.label "Type">
-<!ENTITY tasks_tree_total.label "Total">
+<!ENTITY tasks_tree_total.label "Total (bytes)">
 <!ENTITY tasks_tree_progress.label "Progress">
 <!ENTITY tasks_tree_status.label "Status">
 <!ENTITY tasks_tree_folder.label "Folder">
@@ -52,7 +52,7 @@
 
 <!ENTITY options_grp_opts.label "Options">
 <!ENTITY options_opts_enable.label "Enable Media Stealer">
-<!ENTITY options_opts_confirm.label "Confirm when resource is available">
+<!ENTITY options_opts_confirm.label "Disable automatic download, asks for confirmation everytime">
 <!ENTITY options_opts_cache.label "Fetch data from cache if it exists">
 <!ENTITY options_opts_statusbar.label "Show statusbar icon">
 

@@ -5,6 +5,7 @@
 
 <overlay id="mainbox-overlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
+
   <popupset>
     <menupopup id="tasklistPopup">
       <!--<menuitem label="Abort" accesskey="A" oncommand="Stealer.onAbort();"/>
@@ -16,8 +17,8 @@
       <menuitem label="&tasks_context_delete.label;" accesskey="D" oncommand="Stealer.onDeleteTask();"/>
       <menuitem label="&tasks_context_delete_all.label;" oncommand="Stealer.onDeleteAllTask();"/>
       <menuseparator/>
-      <menuitem label="&tasks_context_copy.label;" oncommand="Stealer.onCopyRow();"/>
-      <menuitem label="&tasks_context_copy_all.label;" oncommand="Stealer.onCopyAllRows();"/>
+      <menuitem label="Copy URL" oncommand="Stealer.onCopyURL();"/>
+      <menuitem label="Copy URLs" oncommand="Stealer.onCopyAllURLS();"/>
     </menupopup>
   </popupset>
 
@@ -65,6 +66,15 @@
               <treechildren id="tasklist">
               </treechildren>
             </tree>
+			 <hbox pack="center">
+             <button label="Rename" id="rename" oncommand="Stealer.onRenameFile();" accesskey="R"/> 			 
+			 <button label="Open File" id="openfile" oncommand="Stealer.onOpenFile();" accesskey="O"/>
+			 <button label="Open Folder" id="openfolder" oncommand="Stealer.onOpenFolder();" accesskey="F"/>			  
+			 <button label="Delete" id="delete" oncommand="Stealer.onDeleteTask();" accesskey="D"/> 
+             <button label="Copy URL" id="copyURL" oncommand="Stealer.onCopyURL();"/>
+             <button label="Copy URLs" id="copuURLs" oncommand="Stealer.onCopyAllURLS();"/>	
+			 <button label="Delete all" id="deleteall" oncommand="Stealer.onDeleteAllTask();"/>
+			 </hbox>
           </vbox>
         </tabpanel>
  
@@ -90,6 +100,9 @@
               <checkbox id="confirmCheck" label="&options_opts_confirm.label;" />
               <checkbox id="cacheCheck" label="&options_opts_cache.label;" />
               <checkbox id="showStatusbarCheck" label="&options_opts_statusbar.label;" />
+			  <checkbox id="filetypeunknownCheck" label="Use 'flv' extention when filetype is unknown" />
+			  <checkbox id="nosmallfilesCheck" label="Do not download small files (less than 750 000 bytes)" />
+			  <checkbox id="nozerofilesCheck" label="Do not download files with zero bytes" />
               <spacer flex="1" />
             </groupbox>
             </hbox>

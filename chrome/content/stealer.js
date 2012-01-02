@@ -21,7 +21,7 @@ MediaStealerController.prototype = {
     show: function() {
         var params = "";
         var windowName = "MediaStealer.MainWindow";
-        var windowType = "MediaStealerMainWindow";
+        var windowType = "MediaStealerMainWindow";		
         var url = "chrome://stealer/content/window.xul";
         var flags = "width=800,height=600,chrome=yes,centerscreen,resizable";
 
@@ -72,18 +72,27 @@ MediaStealerController.prototype = {
             var showStatusbar = config.showStatusbar;
             var useCache = config.useCache;
             var alwaysConfirm = config.alwaysConfirm;
-
+			var filetypeunknown = config.filetypeunknown;
+			var nozerofiles = config.nozerofiles;
+			var nosmallfiles = config.nosmallfiles;			
+			
             this.initStatusbar(showStatusbar, enabled);
 
             var enableCheck = document.getElementById("enableCheck");
             var showStatusbarCheck = document.getElementById("showStatusbarCheck");
             var cacheCheck = document.getElementById("cacheCheck");
             var confirmCheck = document.getElementById("confirmCheck");
+			var filetypeunknownCheck = document.getElementById("filetypeunknownCheck");
+			var nosmallfilesCheck = document.getElementById("nosmallfilesCheck");
+			var nozerofilesCheck = document.getElementById("nozerofilesCheck");
 
             enableCheck.setAttribute("checked", (enabled ? "true":"false"));
             showStatusbarCheck.setAttribute("checked", (showStatusbar ? "true" : "false"));
             cacheCheck.setAttribute("checked", (useCache ? "true" : "false"));
             confirmCheck.setAttribute("checked", (alwaysConfirm ? "true" : "false"));
+			filetypeunknownCheck.setAttribute("checked", (filetypeunknown ? "true" : "false"));
+			nosmallfilesCheck.setAttribute("checked", (nosmallfiles ? "true" : "false"));
+			nozerofilesCheck.setAttribute("checked", (nozerofiles ? "true" : "false"));
 
             document.getElementById("defaultDir").value = config.defaultDir;
 
@@ -97,14 +106,15 @@ MediaStealerController.prototype = {
                     document.getElementById("audioCheck").setAttribute("checked", "true");
                 if(rule.rtype == "3" && rule.enabled == "true")
                     document.getElementById("flashCheck").setAttribute("checked", "true");
-            }
+            }		
         }
         catch(e) {
             this.dbgPrintln("MediaStealerController.initUI():\n"+e.name+": "+e.message);
         }
     },
     initStatusbar: function(showStatusbar, enabled) {
-        var statusbar_bt = document.getElementById("stealerStatusbar");
+        var statusbar_bt = document.getElementById("stealerStatusbar");		
+		
         if(showStatusbar) {
             if(enabled) {
                 statusbar_bt.image = "chrome://stealer/skin/enable.png";
@@ -119,7 +129,7 @@ MediaStealerController.prototype = {
             statusbar_bt.image = "";
             statusbar_bt.setAttribute("tooltiptext", "");
         }
-    },
+    },	
     save: function(xconfig) {
         try {
             if(xconfig == null)
@@ -140,7 +150,9 @@ MediaStealerController.prototype = {
             config.showStatusbar = document.getElementById("showStatusbarCheck").checked;
             config.useCache = document.getElementById("cacheCheck").checked;
             config.alwaysConfirm = document.getElementById("confirmCheck").checked;
-
+			config.filetypeunknown = document.getElementById("filetypeunknownCheck").checked;
+			config.nozerofiles = document.getElementById("nozerofilesCheck").checked;
+            config.nosmallfiles	= document.getElementById("nosmallfilesCheck").checked;				
             config.defaultDir = document.getElementById("defaultDir").value;
             
             config.rules = [];
@@ -212,7 +224,7 @@ MediaStealerController.prototype = {
         treerow.childNodes[0].setAttribute("file", task.file);
         treerow.childNodes[0].setAttribute("dir", task.dir);
         //treerow.childNodes[0].setAttribute("id", task.id);
-        treerow.childNodes[1].setAttribute("label", task.url);
+        treerow.childNodes[1].setAttribute("label", decodeURIComponent(task.url));
         treerow.childNodes[2].setAttribute("label", task.type);
         treerow.childNodes[3].setAttribute("label", task.size);
         treerow.childNodes[4].setAttribute("mode", "normal");
@@ -262,29 +274,42 @@ MediaStealerController.prototype = {
             var question = "Really want to delete this task?";
             var checkstr = "Also remove downloaded file";
             var check = {value: true};
+			var list = document.getElementById("tasklist");
+			var Taskcount = list.childElementCount;	
 
             // do the deed
-            with(document.getElementById("task-tree")) {
+            with(document.getElementById("task-tree")) 
+			{				
                 var idx = currentIndex;
                 if(idx < 0) return;
+				
+				if(idx == Taskcount) return;
 
                 var result = prompts.confirmCheck(null, title, question, checkstr, check);
                 if(!result) return;
 
                 var treeitem = view.getItemAtIndex(idx);
                 var file = treeitem.firstChild.childNodes[0].getAttribute("file");
+				var stat = treeitem.firstChild.childNodes[5].getAttribute("label");				
+				if ((stat == "Finished")||(stat == "Interrupted")) 
+				   {
 
-                if(check.value) {
-                    var fd = Components.classes["@mozilla.org/file/local;1"].
+						if(check.value) {
+						var fd = Components.classes["@mozilla.org/file/local;1"].
                             createInstance(Components.interfaces.nsILocalFile);
-                    fd.initWithPath(file);
-                    if(fd.exists()) fd.remove(false);
-                }
+						fd.initWithPath(file);
+						if(fd.exists()) fd.remove(false);
+										}
 
-                treeitem.parentNode.removeChild(treeitem);
-                view.selection.select(idx);
-                treeBoxObject.ensureRowIsVisible(currentIndex);
-            }
+						treeitem.parentNode.removeChild(treeitem);
+						view.selection.select(idx);
+						treeBoxObject.ensureRowIsVisible(currentIndex);
+                  }
+				else
+				 {
+				    alert("Please wait until download is complete");
+				 }
+		  }
         }
         catch(e) {
             alert("onDeleteTask:\n"+e.name+": "+e.message);
@@ -303,18 +328,32 @@ MediaStealerController.prototype = {
             if(!result) return;
 
             // do the deed
+			with(document.getElementById("task-tree")) 
+			{
             var list = document.getElementById("tasklist");
-            while(list.hasChildNodes()) {
-                var treeitem = list.firstChild;
-                var file = treeitem.firstChild.childNodes[0].getAttribute("file");
-                if(check.value) {
-                    var fd = Components.classes["@mozilla.org/file/local;1"].
+			var Taskcount = list.childElementCount;					
+			for (Taskcount; Taskcount > 0; Taskcount--)	
+				{
+                var idx = Taskcount-1;				
+                var treeitem = view.getItemAtIndex(idx);
+				var file = treeitem.firstChild.childNodes[0].getAttribute("file");				
+				var stat = treeitem.firstChild.childNodes[5].getAttribute("label");	
+					if ((stat == "Finished")||(stat == "Interrupted")) 
+					{
+						if(check.value) 
+						{
+						var fd = Components.classes["@mozilla.org/file/local;1"].
                             createInstance(Components.interfaces.nsILocalFile);
-                    fd.initWithPath(file);
-                    if(fd.exists()) fd.remove(false);
-                }
-                treeitem.parentNode.removeChild(treeitem);
-            }
+						fd.initWithPath(file);
+						if(fd.exists()) fd.remove(false);
+					
+						}
+				    treeitem.parentNode.removeChild(treeitem);
+                    view.selection.select(idx);
+                    treeBoxObject.ensureRowIsVisible(idx);
+					}
+				}
+			}
         }
         catch(e) {
             //alert("onDeleteAllTasks:\n"+e.name+": "+e.message);
@@ -390,6 +429,9 @@ MediaStealerController.prototype = {
                 fd.initWithPath(file);
 
                 var newName = prompt("Please input a new name:");
+				//add support to remove illegal characters when rename a file
+				littleaid =  newName.replace(/[<>:"\|?*]/g, "");
+				newName = littleaid;
                 if(fd.exists()) fd.moveTo(null, newName);  // rename rather than move
 
                 treeitem.firstChild.childNodes[0].setAttribute("label", newName);
@@ -449,6 +491,25 @@ MediaStealerController.prototype = {
             //alert("onCopyRow:\n"+e.name+": "+e.message);
         }
     },
+	  onCopyURL: function() {
+        try {
+            with(document.getElementById("task-tree")) {
+                var idx = currentIndex;
+                if(idx < 0) return;
+
+                var treerow = view.getItemAtIndex(idx).firstChild;
+
+                var url      = treerow.childNodes[1].getAttribute("label");
+               
+                var str = url;
+                this.toClipboard(str);
+            }
+        }
+        catch(e) {
+            //alert("onCopyRow:\n"+e.name+": "+e.message);
+        }
+    },
+	
     onCopyAllRows: function() {
         try {
             var tasklist = document.getElementById("tasklist");
@@ -466,6 +527,26 @@ MediaStealerController.prototype = {
 
                 if(i) str += "\n";
                 str += filename+"\t"+url+"\t"+type+"\t"+size+"\t"+curr+"\t"+stat;
+            }
+            if(str != "")
+                this.toClipboard(str);
+        }
+        catch(e) {
+            //alert("onCopyAllRows:\n"+e.name+": "+e.message);
+        }
+    },
+	   onCopyAllURLS: function() {
+        try {
+            var tasklist = document.getElementById("tasklist");
+            var str = "";
+            for(var i = 0; i < tasklist.childNodes.length; i++) {
+
+                var treerow = tasklist.childNodes[i].firstChild;
+                
+                var url      = treerow.childNodes[1].getAttribute("label");                
+
+                if(i) str += "\n";
+                str += url;
             }
             if(str != "")
                 this.toClipboard(str);

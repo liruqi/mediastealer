@@ -15,13 +15,16 @@
          keycode="m"
          modifiers="accel,shift"
          oncommand="Stealer.onToggle();" />
-  </keyset>
+  </keyset>   
 
-  <menupopup id="menu_ToolsPopup">
-    <menuitem id="stealer-switch-toggle"
-              type="checkbox"
-              label="Media Stealer         Ctrl+Shift+S"
-              accesskey="s"
+  
+  <menupopup id="menu_ToolsPopup">    
+			  <menuitem id="stealer-switch-toggle"              
+              label="Media Stealer"			  
+              accesskey="s"			
+			  class="menuitem-iconic"
+			  acceltext="Ctrl+Shift+S"
+			  image="chrome://stealer/skin/mediastealer.png"
               oncommand="Stealer.onToggle();"/>
   </menupopup>
 
@@ -31,7 +34,14 @@
                     tooltiptext="abc"
                     image="chrome://stealer/skin/enable.png"
                     onclick="Stealer.onStatusbarClick(event);"/>
+    <statusbarpanel id="Media_StealerStatusbar" 
+                    class="statusbarpanel-iconic" 
+                    tooltiptext="Toggle Media Stealer"
+                    image="chrome://stealer/skin/mediastealer16.png"
+                    onclick="Stealer.onToggle();"/>	
   </statusbar>
+  
+
 
   <vbox id="appcontent">
     <splitter id="stealerPanelSplitter"
