@@ -277,10 +277,10 @@ MediaStealerController.prototype = {
 			var list = document.getElementById("tasklist");
 			var Taskcount = list.childElementCount;	
 
-            // do the deed
-            with(document.getElementById("task-tree")) 
-			{				
-                var idx = currentIndex;
+            // do the deed           
+			var temptaskTree = document.getElementById("task-tree");			
+					
+                var idx = temptaskTree.currentIndex;
                 if(idx < 0) return;
 				
 				if(idx == Taskcount) return;
@@ -288,7 +288,7 @@ MediaStealerController.prototype = {
                 var result = prompts.confirmCheck(null, title, question, checkstr, check);
                 if(!result) return;
 
-                var treeitem = view.getItemAtIndex(idx);
+                var treeitem = temptaskTree.view.getItemAtIndex(idx);
                 var file = treeitem.firstChild.childNodes[0].getAttribute("file");
 				var stat = treeitem.firstChild.childNodes[5].getAttribute("label");				
 				if ((stat == "Finished")||(stat == "Interrupted")) 
@@ -302,14 +302,13 @@ MediaStealerController.prototype = {
 										}
 
 						treeitem.parentNode.removeChild(treeitem);
-						view.selection.select(idx);
-						treeBoxObject.ensureRowIsVisible(currentIndex);
+						temptaskTree.view.selection.select(idx);
+						temptaskTree.treeBoxObject.ensureRowIsVisible(temptaskTree.currentIndex);
                   }
 				else
 				 {
 				    alert("Please wait until download is complete");
-				 }
-		  }
+				 }		  
         }
         catch(e) {
             alert("onDeleteTask:\n"+e.name+": "+e.message);
@@ -328,14 +327,13 @@ MediaStealerController.prototype = {
             if(!result) return;
 
             // do the deed
-			with(document.getElementById("task-tree")) 
-			{
+			var temptaskTree = document.getElementById("task-tree");			
             var list = document.getElementById("tasklist");
 			var Taskcount = list.childElementCount;					
 			for (Taskcount; Taskcount > 0; Taskcount--)	
 				{
                 var idx = Taskcount-1;				
-                var treeitem = view.getItemAtIndex(idx);
+                var treeitem = temptaskTree.view.getItemAtIndex(idx);
 				var file = treeitem.firstChild.childNodes[0].getAttribute("file");				
 				var stat = treeitem.firstChild.childNodes[5].getAttribute("label");	
 					if ((stat == "Finished")||(stat == "Interrupted")) 
@@ -349,11 +347,11 @@ MediaStealerController.prototype = {
 					
 						}
 				    treeitem.parentNode.removeChild(treeitem);
-                    view.selection.select(idx);
-                    treeBoxObject.ensureRowIsVisible(idx);
+                    temptaskTree.view.selection.select(idx);
+                    temptaskTree.treeBoxObject.ensureRowIsVisible(idx);
 					}
 				}
-			}
+			
         }
         catch(e) {
             //alert("onDeleteAllTasks:\n"+e.name+": "+e.message);
@@ -361,11 +359,11 @@ MediaStealerController.prototype = {
     },
     onOpenFile: function() {
         try {
-            with(document.getElementById("task-tree")) {
-                var idx = currentIndex;
+			var temptaskTree = document.getElementById("task-tree");            
+                var idx = temptaskTree.currentIndex;
                 if(idx < 0) return;
 
-                var treeitem = view.getItemAtIndex(idx);
+                var treeitem = temptaskTree.view.getItemAtIndex(idx);
                 var file = treeitem.firstChild.childNodes[0].getAttribute("file");  // full path
 
                 var fd = Components.classes["@mozilla.org/file/local;1"].
@@ -377,7 +375,7 @@ MediaStealerController.prototype = {
                 }
                 catch(e) {}
 
-            }
+            
         }
         catch(e) {
             //alert("onOpenFolder:\n"+e.name+": "+e.message);
@@ -385,11 +383,40 @@ MediaStealerController.prototype = {
     },
     onOpenFolder: function() {
         try {
-            with(document.getElementById("task-tree")) {
-                var idx = currentIndex;
-                if(idx < 0) return;
+		var temptaskTree = document.getElementById("task-tree");
+                var idx = temptaskTree.currentIndex;				
+                if(idx < 0) 				
+					{
+					var fd = Components.classes["@mozilla.org/file/local;1"].
+                            createInstance(Components.interfaces.nsILocalFile);
+					var tempdownloaddir = stealerConfig.defaultDir;
+					fd.initWithPath(tempdownloaddir);		
+					
+						if( !fd.exists() || !fd.isDirectory())		
+						{
+						  var tempdownloaddir = stealerConfig.home.path;
+						  fd.initWithPath(tempdownloaddir);
+						}
+						try 
+						{
+						fd.reveal();							
+						}
+						catch(e) 
+						{
+						var parent = fd.parent.QueryInterface(Components.interfaces.nsILocalFile);
+						if(!parent)
+						return;
+								try 
+								{
+								parent.launch();
+								} catch(e) {}
+						}
+					
+					
+					return;
+					}
 
-                var treeitem = view.getItemAtIndex(idx);
+                var treeitem = temptaskTree.view.getItemAtIndex(idx);
                 var file = treeitem.firstChild.childNodes[0].getAttribute("file");  // full path
 
                 var fd = Components.classes["@mozilla.org/file/local;1"].
@@ -409,7 +436,7 @@ MediaStealerController.prototype = {
                     } catch(e) {}
                 }
 
-            }
+            
         }
         catch(e) {
             //alert("onOpenFolder:\n"+e.name+": "+e.message);
@@ -417,11 +444,11 @@ MediaStealerController.prototype = {
     },
     onRenameFile: function() {
         try {
-            with(document.getElementById("task-tree")) {
-                var idx = currentIndex;
+            var temptaskTree = document.getElementById("task-tree");
+                var idx = temptaskTree.currentIndex;
                 if(idx < 0) return;
 
-                var treeitem = view.getItemAtIndex(idx);
+                var treeitem = temptaskTree.view.getItemAtIndex(idx);
                 var file = treeitem.firstChild.childNodes[0].getAttribute("file");  // full path
 
                 var fd = Components.classes["@mozilla.org/file/local;1"].
@@ -430,14 +457,14 @@ MediaStealerController.prototype = {
 
                 var newName = prompt("Please input a new name:");
 				//add support to remove illegal characters when rename a file
-				littleaid =  newName.replace(/[<>:"\|?*]/g, "");
+				var littleaid =  newName.replace(/[<>:"\|?*]/g, "");
 				newName = littleaid;
                 if(fd.exists()) fd.moveTo(null, newName);  // rename rather than move
 
                 treeitem.firstChild.childNodes[0].setAttribute("label", newName);
                 var dir  = treeitem.firstChild.childNodes[0].getAttribute("dir"); // path
                 treeitem.firstChild.childNodes[0].setAttribute("file", dir+newName);
-            }
+            
         }
         catch(e) {
             //alert("onRenameFile:\n"+e.name+": "+e.message);
@@ -446,11 +473,11 @@ MediaStealerController.prototype = {
     onTaskTreeDoubleClick: function(event) {
         if(event.button) return; // 右键
         try {
-            with(document.getElementById("task-tree")) {
-                var idx = currentIndex;
+            var temptaskTree = document.getElementById("task-tree");
+                var idx = temptaskTree.currentIndex;
                 if(idx < 0) return;
 
-                var treeitem = view.getItemAtIndex(idx);
+                var treeitem = temptaskTree.view.getItemAtIndex(idx);
                 var file = treeitem.firstChild.childNodes[0].getAttribute("file");  // full path
 
                 var fd = Components.classes["@mozilla.org/file/local;1"].
@@ -461,8 +488,7 @@ MediaStealerController.prototype = {
                     fd.launch();
                 }
                 catch(e) {}
-
-            }
+            
         }
         catch(e) {
             //alert("onOpenFolder:\n"+e.name+": "+e.message);
@@ -470,11 +496,11 @@ MediaStealerController.prototype = {
     },
     onCopyRow: function() {
         try {
-            with(document.getElementById("task-tree")) {
-                var idx = currentIndex;
+            var temptaskTree = document.getElementById("task-tree");
+                var idx = temptaskTree.currentIndex;
                 if(idx < 0) return;
 
-                var treerow = view.getItemAtIndex(idx).firstChild;
+                var treerow = temptaskTree.view.getItemAtIndex(idx).firstChild;
 
                 var filename = treerow.childNodes[0].getAttribute("label");
                 var url      = treerow.childNodes[1].getAttribute("label");
@@ -485,7 +511,7 @@ MediaStealerController.prototype = {
 
                 var str = filename+"\t"+url+"\t"+type+"\t"+size+"\t"+curr+"\t"+stat;
                 this.toClipboard(str);
-            }
+            
         }
         catch(e) {
             //alert("onCopyRow:\n"+e.name+": "+e.message);
@@ -493,17 +519,17 @@ MediaStealerController.prototype = {
     },
 	  onCopyURL: function() {
         try {
-            with(document.getElementById("task-tree")) {
-                var idx = currentIndex;
+            var temptaskTree = document.getElementById("task-tree");
+                var idx = temptaskTree.currentIndex;
                 if(idx < 0) return;
 
-                var treerow = view.getItemAtIndex(idx).firstChild;
+                var treerow = temptaskTree.view.getItemAtIndex(idx).firstChild;
 
                 var url      = treerow.childNodes[1].getAttribute("label");
                
                 var str = url;
                 this.toClipboard(str);
-            }
+            
         }
         catch(e) {
             //alert("onCopyRow:\n"+e.name+": "+e.message);
@@ -654,16 +680,15 @@ MediaStealerController.prototype = {
     },
     setTreeitem: function(treeitem, params) {
         try {
-            with(treeitem.firstChild) {
+			var temp_treeitem_firstChild = treeitem.firstChild;           
                 // 0        1            2    3             4
                 // enabled, description, url, content-type, directory
                 this.setCheckbox(treeitem, params["enabled"]);
-                childNodes[1].setAttribute("label", params["des"]);
-                childNodes[2].setAttribute("label", params["url"]);
-                childNodes[3].setAttribute("label", params["ct"]);
-                childNodes[4].setAttribute("label", params["dir"]);
-                setAttribute("rtype", params["rtype"]);
-            }
+                temp_treeitem_firstChild.childNodes[1].setAttribute("label", params["des"]);
+                temp_treeitem_firstChild.childNodes[2].setAttribute("label", params["url"]);
+                temp_treeitem_firstChild.childNodes[3].setAttribute("label", params["ct"]);
+                temp_treeitem_firstChild.childNodes[4].setAttribute("label", params["dir"]);
+                temp_treeitem_firstChild.setAttribute("rtype", params["rtype"]);          
         }
         catch(e) {
             //alert("setTreeitem:\n"+e.name+": "+e.message);
@@ -671,14 +696,14 @@ MediaStealerController.prototype = {
     },
     getTreeitem: function(treeitem) {
         try {
-            with(treeitem.firstChild) {
-                return {rtype:      getAttribute("rtype"),
-                        enabled:    childNodes[0].getAttribute("value"), 
-                        des:        childNodes[1].getAttribute("label"),
-                        url:        childNodes[2].getAttribute("label"), 
-                        ct:         childNodes[3].getAttribute("label"),
-                        dir:        childNodes[4].getAttribute("label")}
-            }
+			var temp_treeitem_firstChild = treeitem.firstChild;
+                return {rtype:      temp_treeitem_firstChild.getAttribute("rtype"),
+                        enabled:    temp_treeitem_firstChild.childNodes[0].getAttribute("value"), 
+                        des:        temp_treeitem_firstChild.childNodes[1].getAttribute("label"),
+                        url:        temp_treeitem_firstChild.childNodes[2].getAttribute("label"), 
+                        ct:         temp_treeitem_firstChild.childNodes[3].getAttribute("label"),
+                        dir:        temp_treeitem_firstChild.childNodes[4].getAttribute("label")}
+            
         }
         catch(e) {
             //alert("getTreeitem:\n"+e.name+": "+e.message);
@@ -695,61 +720,58 @@ MediaStealerController.prototype = {
             //alert("createTreeitem:\n"+e.name+": "+e.message);
         }
     },
-    editRuleList: function(mode) {
-        with(document.getElementById("ruleTree")) {
-            var idx = currentIndex;
-            if(idx < 0) {
+    editRuleList: function(mode) {        
+		var tempruleTree = document.getElementById("ruleTree");
+            var idx = tempruleTree.currentIndex;            
+			if(idx < 2) {
                 return;
             }
-            var treeitem = view.getItemAtIndex(idx);
+            var treeitem = tempruleTree.view.getItemAtIndex(idx);
             if(mode == "edit") {
                 this.jumptoDetailWindow(treeitem);
             }
-            else if(mode == "delete") {
+            else if(mode == "delete") {				
                 treeitem.parentNode.removeChild(treeitem);
-                view.selection.select(idx);
+                tempruleTree.view.selection.select(idx);
             }
-            treeBoxObject.ensureRowIsVisible(currentIndex);
-        }
+            tempruleTree.treeBoxObject.ensureRowIsVisible(idx);       
     },
-    moveItem: function(offset) {
-        with(document.getElementById("ruleTree")) {
+    moveItem: function(offset) {       
+	   var tempruleTree = document.getElementById("ruleTree");
             var idx;
             var idx2;
             if(offset < 0) {
-                idx = currentIndex;
+                idx = tempruleTree.currentIndex;
                 idx2 = idx + offset;
             }
             else {
-                idx2 = currentIndex;
+                idx2 = tempruleTree.currentIndex;
                 idx = idx2 + offset;
             }
             if(idx < 0 || idx2 < 0) {
                 return;
             }
             try {
-                var treeitem = view.getItemAtIndex(idx);
-                var treeitem2 = view.getItemAtIndex(idx2);
+                var treeitem = tempruleTree.view.getItemAtIndex(idx);
+                var treeitem2 = tempruleTree.view.getItemAtIndex(idx2);
                 var newTreeitem = treeitem.cloneNode(true);
                 treeitem2.parentNode.removeChild(treeitem);
-                treeitem2.parentNode.insertBefore(newTreeitem, view.getItemAtIndex(idx2));
+                treeitem2.parentNode.insertBefore(newTreeitem, tempruleTree.view.getItemAtIndex(idx2));
          
             } catch(e) {return;}
             if(offset < 0) {
-                view.selection.select(idx2);
+                tempruleTree.view.selection.select(idx2);
             }
             else {
-                view.selection.select(idx);
+                tempruleTree.view.selection.select(idx);
             }
-            treeBoxObject.ensureRowIsVisible(currentIndex);
-        }
+            tempruleTree.treeBoxObject.ensureRowIsVisible(currentIndex);        
     },
     onTreedblclick: function(event) {
         if(event.button) return; // 右键
-        with(document.getElementById("ruleTree")) {
-            var treeitem = view.getItemAtIndex(currentIndex);
+		var tempruleTree = document.getElementById("ruleTree");        
+            var treeitem = tempruleTree.view.getItemAtIndex(tempruleTree.currentIndex);
             this.jumptoDetailWindow(treeitem);
-        }
     },
     jumptoDetailWindow: function(treeitem) {
         try {
@@ -775,23 +797,25 @@ MediaStealerController.prototype = {
         }
     },
     onTreeclick: function(event) {
-        with(document.getElementById("ruleTree")) {
+        	
+		var tempruleTree = document.getElementById("ruleTree");		
             var row = {}, col = {}, obj = {};
-            treeBoxObject.getCellAt(event.clientX, event.clientY, row, col, obj);
+            tempruleTree.treeBoxObject.getCellAt(event.clientX, event.clientY, row, col, obj);
             if(col.value==null || row.value==null || obj.value==null)
                 return;
-            var treeitem = view.getItemAtIndex(row.value);
+            var treeitem = tempruleTree.view.getItemAtIndex(row.value);
             if(treeitem != null) {
                 // update "Delete" button state
                 var deleteButton = document.getElementById("deleteButton");
                 var rtype = treeitem.firstChild.getAttribute("rtype");
+				
                 if(rtype == "0")
                     deleteButton.setAttribute("disabled", "false");
                 else
                     deleteButton.setAttribute("disabled", "true");
 
                 // update "Move" button state
-                var rowcount = childNodes[1].childNodes.length;
+                var rowcount = tempruleTree.childNodes[1].childNodes.length;
                 var upButton = document.getElementById("upButton");
                 var downButton = document.getElementById("downButton");
                 if(row.value == 0)
@@ -803,13 +827,13 @@ MediaStealerController.prototype = {
                 else
                     downButton.setAttribute("disabled", "false");
 
-                // update checkbox state
+                // update checkbox state				
                 if(col.value.type == Components.interfaces.nsITreeColumn.TYPE_CHECKBOX)
                     this.reverseCheckbox(treeitem);
             }
-        }// with
+        
     },
-    setCheckbox: function(treeitem, checked) {
+    setCheckbox: function(treeitem, checked) {		
         var checkboxCell = treeitem.firstChild.childNodes[0];
         if(checked == "true") {
             checkboxCell.setAttribute("value", "true");
@@ -820,7 +844,7 @@ MediaStealerController.prototype = {
             checkboxCell.setAttribute("properties", "unchecked");
         }
     },
-    reverseCheckbox: function(treeitem) {
+    reverseCheckbox: function(treeitem) {	
         var checkboxCell = treeitem.firstChild.childNodes[0];
         var value = checkboxCell.getAttribute("value");
         if(value == "true") {
@@ -831,8 +855,9 @@ MediaStealerController.prototype = {
             checkboxCell.setAttribute("value", "true");
             checkboxCell.setAttribute("properties", "checked");
         }
-
+		
         var rtype = treeitem.firstChild.getAttribute("rtype");
+	
         if(rtype == "1") {
             var videoCheck = document.getElementById("videoCheck");
             videoCheck.checked = (value == "true") ? false : true;
@@ -846,10 +871,8 @@ MediaStealerController.prototype = {
             flashCheck.checked = (value == "true") ? false : true;
         }
     },
-    onNewButtonClick: function() {
-        with(document.getElementById("ruleTree")) {
-            this.jumptoDetailWindow(null);
-        }
+    onNewButtonClick: function() {        
+            this.jumptoDetailWindow(null);       
     },
     onEditButtonClick: function() {
         this.editRuleList("edit");

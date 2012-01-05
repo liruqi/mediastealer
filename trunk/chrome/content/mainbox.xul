@@ -69,7 +69,7 @@
 			 <hbox pack="center">
              <button label="Rename" id="rename" oncommand="Stealer.onRenameFile();" accesskey="R"/> 			 
 			 <button label="Open File" id="openfile" oncommand="Stealer.onOpenFile();" accesskey="O"/>
-			 <button label="Open Folder" id="openfolder" oncommand="Stealer.onOpenFolder();" accesskey="F"/>			  
+			 <button label="Open Download Folder" id="openfolder" oncommand="Stealer.onOpenFolder();" accesskey="F"/>			  
 			 <button label="Delete" id="delete" oncommand="Stealer.onDeleteTask();" accesskey="D"/> 
              <button label="Copy URL" id="copyURL" oncommand="Stealer.onCopyURL();"/>
              <button label="Copy URLs" id="copuURLs" oncommand="Stealer.onCopyAllURLS();"/>	
