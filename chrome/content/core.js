@@ -120,7 +120,7 @@ StealerHttpObserver.prototype = {
             msg += "   " + uri + "\n";
             if(ct) msg += "   " + ct + "\n";
             this.Stealer.dbgPrintln(msg); */
-
+			
             var task = new Task();  // file, url, type, size, stat ; dir, xlen
 
             for (var i = 0; i < stealerConfig.rules.length; i++) {
@@ -128,8 +128,9 @@ StealerHttpObserver.prototype = {
                 if(rule.enabled == "true") {
 
                     if(rs.match(/20\d/)) {
-                        ct = aSubject.getResponseHeader('Content-Type');
-                        if(new RegExp(rule.url,"i").exec(uri) && new RegExp(rule.ct,"i").exec(ct)) {
+                        ct = aSubject.getResponseHeader('Content-Type');						
+                        if(new RegExp(rule.url,"i").exec(uri) && new RegExp(rule.ct,"i").exec(ct))
+						{
                             task.url = uri;
                             task.type = ct;
                             task.size = len;

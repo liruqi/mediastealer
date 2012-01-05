@@ -13,7 +13,7 @@
       <label value="&url.label;" style="header" />
       <textbox id="editUrl" />
       <label value="&oldct.label;" style="header" />
-      <textbox id="editCt" />
+      <textbox id="editCt"  />
       <hbox>
         <label value="&directory.label;" style="header" />
         <label id="modiry-tip" value="&dir_mod_tip.label;" style="display:none"/>

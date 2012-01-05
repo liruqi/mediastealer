@@ -24,7 +24,7 @@ var detailWindow = {
 
         var url = window.arguments[0]["url"];
         if(url == "")
-            url = "http://";
+            url = "http:\/\/";
         document.getElementById("editUrl").value = url;
 
         document.getElementById("editCt").value = window.arguments[0]["ct"];
