@@ -27,6 +27,10 @@
 			  image="chrome://stealer/skin/mediastealer.png"
               oncommand="Stealer.onToggle();"/>
   </menupopup>
+  
+<toolbarpalette id="BrowserToolbarPalette">
+        <toolbarbutton id="Media_Stealer_Button" label="Media Stealer" class="toolbarbutton-1" oncommand="Stealer.onToggle();" tooltiptext="Toggle Media Stealer" image="chrome://stealer/skin/mediastealer16.png" />
+    </toolbarpalette>
 
   <statusbar id="status-bar">
     <statusbarpanel id="stealerStatusbar" 
@@ -38,8 +42,9 @@
                     class="statusbarpanel-iconic" 
                     tooltiptext="Toggle Media Stealer"
                     image="chrome://stealer/skin/mediastealer16.png"
-                    onclick="Stealer.onToggle();"/>	
+                    onclick="Stealer.onToggle();"/>	  
   </statusbar>
+  
   
 
 
