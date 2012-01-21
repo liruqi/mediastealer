@@ -36,7 +36,7 @@ See Also: <a href="about-zh.html">中文版</a>
 <strong><u>What Is This?</u></strong>
 </p>
 <p>
-Media Stealer is a Firefox Add-on dedicated to download Internet resource transfered by HTTP protocol. For primary users, it is designed to download online video, music and flash files(e.g. flash games). However, for advanced users who are familiar with HTTP request &amp; responce, Media Stealer can do much more.
+Media Stealer is a Firefox Add-on dedicated to download Internet resource transfered by HTTP protocol. For primary users, it is designed to download online video, music and flash files(e.g. flash games). However, for advanced users who are familiar with HTTP request &amp; response, Media Stealer can do much more.
 </p>
 <p>
 Media Stealer was originally designed to download flash media (especially the .flv format stream video), so given the name 'Media Stealer'. Unlike other online video download tools (e.g. youtube-dl) or online video retrieve website, the download function is independent of video providers (e.g. YouKu, Tudou, YouTube) as long as they use HTTP protocol.
@@ -57,12 +57,23 @@ Some of the Media Stealer features include:
 <strong><u>For Beginners</u></strong>
 </p>
 <p>
-Four panels in main window: Task, Options, Rules, Messages
-Task panel is to display downloading progress.
-Options panel is to select file type that you want to download.
-For beginners, the first two panels are what to need to concern. You can only read downloading progress in Task panel but not control it. This is due to the feature of HTTP protocol. The Options panel enable you to select your interested content type--Video, Audio and Flash, also read and change basic settings, and download directory. I thinks these options are clear to those who can read English.
+Media Stealer main program can be toggled via the menu of Firefox under "Tools" or via Firefox Add-on bar or pressing Ctrl-Shift-S. Media Stealer doesn't need to be toggled in order to download content.
 </p>
-
+<p>
+Four panels in main window: Tasks, Options, Rules, Messages. Tasks panel can display downloading progress. 
+</p>
+<p>
+Tasks panel
+</p>
+<p>
+You can only follow downloading progress in Task panel but not control it. This is due to the feature of HTTP protocol. The website of the flash video you want to download, shouldn't be closed until video is finished download. You can monitor the progress in this panel. Status "Finished" means the video is successfully downloaded en stored. Status "Interruped" means something went wrong, perhaps you closed the website. "Downloading" means Media Stealer is retieving the data and storing the information. You can delete the tasks and you have the options of deleting the actual file as well. Other task functions are: Rename, Delete, Deleteall, Open Download Folder, Copy Url, Copy Urls, Open File. 
+</p>
+<p>
+Options panel
+</p>
+<p>
+The Options panel enables you to select your interested content type--Video, Audio and Flash, also read and change basic settings, and download directory. This panel is also able to toggle special features. For example "Disable automatic download" (which is activated by default, once deactivated it downloads automatically content based on rules). Media Stealer can also be temporary deactivated (for example when you don't want to download content) by disabling "Enable Media Stealer". 
+</p>
 
 <p>
 <a name="advanced"></a>
@@ -76,6 +87,7 @@ You need to have some knowledge about HTTP protocol and javascript regular expre
 <li>Description is some words you describe this rule. This is arbitrary and does not affect download process. </li>
 <li>URL is a regular expression can be matched in HTTP request resource url. This is set when you want to download content from a specific site. For example, if you only want to download HD video from heidou(hd.tudou.com), and a video url for example, http://125.39.48.17/mp4/021/159/131/21159131.f4v?18000&key=5c49da497c1128a28ba84249ec7d062422d102, you observe that string 'mp4' or 'f4v' or IP address in url, so you need to set this to 'mp4' or 'f4v', or a regular expression matching an IP address( e.g, "((2[0-4]\d|25[0-5]|[01]?\d\d?)\.){3}((2[0-4]\d|25[0-5]|[01]?\d\d?))" ). </li>
 <li>Content-Type (MIME type) is a regular expression can be matched in HTTP responce content-type. Take previous example, this can be set to 'octet-stream'.</li>
+<li>You can add a rule that filters specific websites by example using "http:\/\/.+(\.youtube\.com)" as URL in the rules and "video|flv|f4v|mp4" as its content-type.</li>
 <li>Directory is where you want to save your downloaded files.</li>
 </ol>
 <p>
@@ -103,7 +115,7 @@ Media Stealer is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARR
 <strong><u>Credits</u></strong>
 </p>
 <p>
-This firefox add-on is developed by <a href="http://blog.163.com/cxc200026/">physacco</a> and <a href="http://hi.baidu.com/barnabas">liruqi</a>.
+This firefox add-on is developed by <a href="http://blog.163.com/cxc200026/">physacco</a> and <a href="http://hi.baidu.com/barnabas">liruqi</a> and AlexBelgium.
 You can check for new versions of Media Stealer at http://mediastealer.blogbus.com/
 </p>
 

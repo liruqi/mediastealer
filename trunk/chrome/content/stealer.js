@@ -1,4 +1,4 @@
-////--------------------------------------------------------------------
+﻿////--------------------------------------------------------------------
 function MediaStealerController() {
 }
 MediaStealerController.prototype = {
@@ -457,7 +457,7 @@ MediaStealerController.prototype = {
 
                 var newName = prompt("Please input a new name:");
 				//add support to remove illegal characters when rename a file
-				var littleaid =  newName.replace(/[<>:"\|?*]/g, "");
+				var littleaid =  newName.replace(/[<>:"\;|?*]/g, "");
 				newName = littleaid;
                 if(fd.exists()) fd.moveTo(null, newName);  // rename rather than move
 
