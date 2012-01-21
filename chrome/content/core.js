@@ -217,6 +217,10 @@ StealerHttpObserver.prototype = {
         // httpChannel: [xpconnect wrapped nsIHttpChannel]
         // query_cache: boolean, whether need to query cache
         try {
+			var prompts = Components.classes["@mozilla.org/embedcomp/prompt-service;1"].getService(Components.interfaces.nsIPromptService);			
+			var askcheck = {value: true};
+			var title = "Media Stealer";           
+            var checkstr = "Ask every time. Can be (re)activated via Firefox menu or Add-on Bar";            
             var httpCacheSession;
            
             if(query_cache) {
@@ -317,7 +321,8 @@ StealerHttpObserver.prototype = {
             }
             else {
                 dir = Components.classes["@mozilla.org/file/local;1"]
-                    .createInstance(Components.interfaces.nsILocalFile);                
+                    .createInstance(Components.interfaces.nsILocalFile);
+                
                 dir.initWithPath(task.dir);
                 if( !dir.exists() || !dir.isDirectory() ) {   // if it doesn't exist, set to HOME
                     homeDir =  stealerConfig.home.path + (stealerConfig.home.path[0]=="/" ? "/": "\\");
@@ -327,10 +332,12 @@ StealerHttpObserver.prototype = {
                     task.file = task.dir + task.filename;
                 }
                 //end of directory verification
-
+				
                 var choice;
-                if(stealerConfig.alwaysConfirm)
-                    choice = confirm("Content ["+task.type+"] found\nDo you want to download it to "+task.dir+" ?\n");
+                if(stealerConfig.alwaysConfirm)				
+				{                    
+					choice = prompts.confirmCheck(null, title, "Content ["+task.type+"] found\nDo you want to download it to "+task.dir+" ?\n", checkstr, askcheck);					
+				}	
                 else
                     choice = true;
                 if(choice) {
@@ -349,8 +356,15 @@ StealerHttpObserver.prototype = {
                     message    += "  Type: " + task.type + "\n";
                     message    += "  Size: " + task.size + "\n";
                     message    += "  Type: " + "Stream\n";
-                    this.Stealer.dbgPrintln(message);
+                    this.Stealer.dbgPrintln(message);			
                 }
+				if(!askcheck.value) 
+						{							
+							stealerConfig.alwaysConfirm = !stealerConfig.alwaysConfirm;							
+							stealerConfig.save();
+							var confirmCheck = document.getElementById("confirmCheck");
+							confirmCheck.setAttribute("checked", stealerConfig.alwaysConfirm ? "true" : "false");
+						}
             }
 			}
         }
