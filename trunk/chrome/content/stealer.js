@@ -224,7 +224,7 @@ MediaStealerController.prototype = {
         treerow.childNodes[0].setAttribute("file", task.file);
         treerow.childNodes[0].setAttribute("dir", task.dir);
         //treerow.childNodes[0].setAttribute("id", task.id);
-        treerow.childNodes[1].setAttribute("label", decodeURIComponent(task.url));
+        treerow.childNodes[1].setAttribute("label", task.url);
         treerow.childNodes[2].setAttribute("label", task.type);
         treerow.childNodes[3].setAttribute("label", task.size);
         treerow.childNodes[4].setAttribute("mode", "normal");
@@ -384,8 +384,10 @@ MediaStealerController.prototype = {
     onOpenFolder: function() {
         try {
 		var temptaskTree = document.getElementById("task-tree");
-                var idx = temptaskTree.currentIndex;				
-                if(idx < 0) 				
+                var idx = temptaskTree.currentIndex;
+				var list = document.getElementById("tasklist");
+				var idx2  = list.childElementCount;				
+                if((idx2 < 1) || (idx == idx2) || (idx == -1)) 				
 					{
 					var fd = Components.classes["@mozilla.org/file/local;1"].
                             createInstance(Components.interfaces.nsILocalFile);
@@ -525,7 +527,7 @@ MediaStealerController.prototype = {
 
                 var treerow = temptaskTree.view.getItemAtIndex(idx).firstChild;
 
-                var url      = treerow.childNodes[1].getAttribute("label");
+                var url      = decodeURIComponent(treerow.childNodes[1].getAttribute("label"));
                
                 var str = url;
                 this.toClipboard(str);
@@ -569,7 +571,7 @@ MediaStealerController.prototype = {
 
                 var treerow = tasklist.childNodes[i].firstChild;
                 
-                var url      = treerow.childNodes[1].getAttribute("label");                
+                var url      = decodeURIComponent(treerow.childNodes[1].getAttribute("label"));                
 
                 if(i) str += "\n";
                 str += url;
