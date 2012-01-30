@@ -121,6 +121,25 @@ StealerHttpObserver.prototype = {
             if(ct) msg += "   " + ct + "\n";
             this.Stealer.dbgPrintln(msg); */
 			
+			//test if there are duplicates
+			var testunique = true;	
+			var temptaskTree = document.getElementById("task-tree");			
+            var list = document.getElementById("tasklist");
+			var Taskcount = list.childElementCount;					
+			for (Taskcount; Taskcount > 0; Taskcount--)		
+				{               	
+				var idx = Taskcount-1;			   
+                var treeitem = temptaskTree.view.getItemAtIndex(idx);
+				var url = treeitem.firstChild.childNodes[1].getAttribute("label"); //url				
+				var filesize = treeitem.firstChild.childNodes[3].getAttribute("label");	//filesize					
+					if ((url == uri)&&(filesize == len)) 
+					{
+						testunique = false;						
+					}
+				}
+				
+			if (testunique == true)
+			{
             var task = new Task();  // file, url, type, size, stat ; dir, xlen
 
             for (var i = 0; i < stealerConfig.rules.length; i++) {
@@ -156,6 +175,7 @@ StealerHttpObserver.prototype = {
                     }
                 }
             }
+		  }
         } catch(e){}
     },
 
@@ -341,9 +361,23 @@ StealerHttpObserver.prototype = {
                 else
                     choice = true;
                 if(choice) {
-                    var newListener = new StealerStreamListener(this.Stealer, task);
-                    httpChannel.QueryInterface(Components.interfaces.nsITraceableChannel);
-                    newListener.originalListener = httpChannel.setNewListener(newListener);
+					//old method
+                    //var newListener = new StealerStreamListener(this.Stealer, task);
+                    //httpChannel.QueryInterface(Components.interfaces.nsITraceableChannel);
+                    //newListener.originalListener = httpChannel.setNewListener(newListener);
+
+					//new method
+					var file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);  					
+					file.initWithPath(task.file);					
+					var aURLToDownload = task.url;					
+					var obj_URI = Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService).newURI(aURLToDownload, null, null);  					
+					var persistListener = new StealerDownloader(this.Stealer, task);
+					var persist = Components.classes["@mozilla.org/embedding/browser/nsWebBrowserPersist;1"].createInstance(Components.interfaces.nsIWebBrowserPersist);
+					persist.progressListener = persistListener;	
+					var nsIWBP = Components.interfaces.nsIWebBrowserPersist;  
+					var flags = nsIWBP.PERSIST_FLAGS_REPLACE_EXISTING_FILES; 
+					persist.persistFlags = flags |nsIWBP.PERSIST_FLAGS_BYPASS_CACHE |nsIWBP.PERSIST_FLAGS_AUTODETECT_APPLY_CONVERSION;
+					persist.saveURI(obj_URI, null, null, null, "", file); 
 
                     task.curr = 0;
                     task.stat = "Transferring";
@@ -546,6 +580,68 @@ StealerStreamListener.prototype = {
     }
 }// StealerStreamListener.prototype
 
+function StealerDownloader(stealer, task) {
+    this.Stealer = stealer;
+    this.task = task;
+
+    this.stack = [];           // 数据缓冲栈（非栈）
+    this.total = task.size;    // Content-Length
+    this.curr = 0;             // 当前已下载的总长度
+    this.percent = 0;          // 当前已下载的百分比
+    this.curr_stack = 0;       // 当前栈中的数据量
+
+    this.originalListener = null;
+}
+
+StealerDownloader.prototype = {
+			QueryInterface : function(aIID)
+			{
+			if(aIID.equals(Components.interfaces.nsIWebProgressListener))
+			return this;
+			throw Components.results.NS_NOINTERFACE;
+			},
+
+			init : function()
+			{
+			},
+
+			destroy : function()
+			{
+			},
+
+  // nsIWebProgressListener
+			onProgressChange : function (aWebProgress, aRequest,
+                               aCurSelfProgress, aMaxSelfProgress,
+                               aCurTotalProgress, aMaxTotalProgress)
+		{
+			if (aCurTotalProgress == aMaxTotalProgress)
+					{
+					this.task.stat = "Finished";					
+					}					
+					
+					this.curr = aCurTotalProgress;
+					this.task.curr = aCurTotalProgress;	
+					this.Stealer.refreshTask(this.task);
+					
+		},
+
+		onStateChange : function(aWebProgress, aRequest, aStateFlags, aStatus)
+		{
+		},
+
+			onLocationChange : function(aWebProgress, aRequest, aLocation)
+		{
+		},
+
+		onStatusChange : function(aWebProgress, aRequest, aStatus, aMessage)
+		{
+		
+		},
+
+		onSecurityChange : function(aWebProgress, aRequest, aState)
+		{
+		}
+}
 //--------------------------------------------------------------------
 function StealerCacheFetcher(stealer, task) {
     this.Stealer = stealer;

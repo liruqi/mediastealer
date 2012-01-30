@@ -46,9 +46,9 @@ Some of the Media Stealer features include:
 </p>
 <ul>
 <li>Very easy to use for beginners and non-professonals
-<li>Precisely monitor and filter any HTTP request and responce
+<li>Precisely monitor and filter any HTTP request and response
 <li>Powerful detailed configurations provided for advanced users
-<li>Monitor download process with the builtin download manager, no more request will be sent, normal video watch cannot be interrupted, and you can download as much as you streaming.
+<li>Monitor download process with the builtin download manager.
 </ul>
 
 
@@ -66,7 +66,7 @@ Four panels in main window: Tasks, Options, Rules, Messages. Tasks panel can dis
 Tasks panel
 </p>
 <p>
-You can only follow downloading progress in Task panel but not control it. This is due to the feature of HTTP protocol. The website of the flash video you want to download, shouldn't be closed until video is finished download. You can monitor the progress in this panel. Status "Finished" means the video is successfully downloaded en stored. Status "Interruped" means something went wrong, perhaps you closed the website. "Downloading" means Media Stealer is retieving the data and storing the information. You can delete the tasks and you have the options of deleting the actual file as well. Other task functions are: Rename, Delete, Deleteall, Open Download Folder, Copy Url, Copy Urls, Open File. 
+You can only follow downloading progress in Task panel but not control it. This is due to the feature of HTTP protocol. You can monitor the progress in this panel. Status "Finished" means the video is successfully downloaded en stored. "Downloading" means Media Stealer is retieving the data and storing the information. You can delete the tasks and you have the options of deleting the actual file as well. Other task functions are: Rename, Delete, Deleteall, Open Download Folder, Copy Url, Copy Urls, Open File. 
 </p>
 <p>
 Options panel
@@ -81,13 +81,13 @@ The Options panel enables you to select your interested content type--Video, Aud
 </p>
 <p>
 <img class="DescriptionImage" src="chrome://stealer/skin/rule_editor.png" border="0" alt="Media Stealer" title="Media Stealer">
-You need to have some knowledge about HTTP protocol and javascript regular expression to set more specific settings. For those who are not quite familiar with HTTP request and responce, I advice you to watch Debug panel or download another add-on named 'firebug' to learn more. Rules panel is about downloading filter rules. First 3 rules are static, you cannot remove them, but still you can modify them, for they are associated with previous Options. You can double click a rule or press Edit button to open a rule edit window.
+You need to have some knowledge about HTTP protocol and javascript regular expression to set more specific settings. For those who are not quite familiar with HTTP request and response, I advice you to watch Debug panel or download another add-on named 'firebug' to learn more. Rules panel is about downloading filter rules. First 3 rules are static, you cannot remove them, but still you can modify them, for they are associated with previous Options. You can double click a rule or press Edit button to open a rule edit window.
 </p>
 <ol>
 <li>Description is some words you describe this rule. This is arbitrary and does not affect download process. </li>
 <li>URL is a regular expression can be matched in HTTP request resource url. This is set when you want to download content from a specific site. For example, if you only want to download HD video from heidou(hd.tudou.com), and a video url for example, http://125.39.48.17/mp4/021/159/131/21159131.f4v?18000&key=5c49da497c1128a28ba84249ec7d062422d102, you observe that string 'mp4' or 'f4v' or IP address in url, so you need to set this to 'mp4' or 'f4v', or a regular expression matching an IP address( e.g, "((2[0-4]\d|25[0-5]|[01]?\d\d?)\.){3}((2[0-4]\d|25[0-5]|[01]?\d\d?))" ). </li>
 <li>Content-Type (MIME type) is a regular expression can be matched in HTTP responce content-type. Take previous example, this can be set to 'octet-stream'.</li>
-<li>You can add a rule that filters specific websites by example using "http:\/\/.+(\.youtube\.com)" as URL in the rules and "video|flv|f4v|mp4" as its content-type.</li>
+<li>You can add a rule that filters specific websites by example using "http:\/\/.+(\.youtube\.com)" as URL in the rules and "video|flv|f4v|mp4" as its content-type. It is possible that youtube also needs the following content type: swf|flash|shockwave</li>
 <li>Directory is where you want to save your downloaded files.</li>
 </ol>
 <p>
