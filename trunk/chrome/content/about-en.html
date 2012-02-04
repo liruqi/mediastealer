@@ -66,13 +66,13 @@ Four panels in main window: Tasks, Options, Rules, Messages. Tasks panel can dis
 Tasks panel
 </p>
 <p>
-You can only follow downloading progress in Task panel but not control it. This is due to the feature of HTTP protocol. You can monitor the progress in this panel. Status "Finished" means the video is successfully downloaded en stored. "Downloading" means Media Stealer is retieving the data and storing the information. You can delete the tasks and you have the options of deleting the actual file as well. Other task functions are: Rename, Delete, Deleteall, Open Download Folder, Copy Url, Copy Urls, Open File. 
+You can only follow downloading progress in Task panel but not control it. This is due to the feature of HTTP protocol. You can monitor the progress in this panel. Status "Finished" means the video is successfully downloaded en stored. "Downloading" means Media Stealer is retieving the data and storing the information. You can delete the tasks and you have the options of deleting the actual file as well. Other task functions are: Rename, Delete, Delete all, Open Download Folder, Copy Url, Copy Urls, Open File. 
 </p>
 <p>
 Options panel
 </p>
 <p>
-The Options panel enables you to select your interested content type--Video, Audio and Flash, also read and change basic settings, and download directory. This panel is also able to toggle special features. For example "Disable automatic download" (which is activated by default, once deactivated it downloads automatically content based on rules). Media Stealer can also be temporary deactivated (for example when you don't want to download content) by disabling "Enable Media Stealer". 
+The Options panel enables you to select your interested content type--Video, Audio and Flash, also read and change basic settings, and download directory. The download directory is only for static rules. This panel is also able to toggle special features. For example "Disable automatic download" (which is activated by default, once deactivated it downloads automatically content based on rules). Media Stealer can also be temporary deactivated (for example when you don't want to download content) by disabling "Enable Media Stealer". 
 </p>
 
 <p>
@@ -88,7 +88,7 @@ You need to have some knowledge about HTTP protocol and javascript regular expre
 <li>URL is a regular expression can be matched in HTTP request resource url. This is set when you want to download content from a specific site. For example, if you only want to download HD video from heidou(hd.tudou.com), and a video url for example, http://125.39.48.17/mp4/021/159/131/21159131.f4v?18000&key=5c49da497c1128a28ba84249ec7d062422d102, you observe that string 'mp4' or 'f4v' or IP address in url, so you need to set this to 'mp4' or 'f4v', or a regular expression matching an IP address( e.g, "((2[0-4]\d|25[0-5]|[01]?\d\d?)\.){3}((2[0-4]\d|25[0-5]|[01]?\d\d?))" ). </li>
 <li>Content-Type (MIME type) is a regular expression can be matched in HTTP responce content-type. Take previous example, this can be set to 'octet-stream'.</li>
 <li>You can add a rule that filters specific websites by example using "http:\/\/.+(\.youtube\.com)" as URL in the rules and "video|flv|f4v|mp4" as its content-type. It is possible that youtube also needs the following content type: swf|flash|shockwave</li>
-<li>Directory is where you want to save your downloaded files.</li>
+<li>Directory is where you want to save your downloaded files. The download folder of static rules is controlled in the Options panel. The download folder of custom rules can be changed via the "edit" button of a custom rule.</li>
 </ol>
 <p>
 One thing I need to remind you is: functions of Media Stealer add-on is not limited to media data downloading. It can be used to download many other types of content that sent to your internet browser. You can do many amazing things if you configure it well. 
@@ -116,6 +116,7 @@ Media Stealer is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARR
 </p>
 <p>
 This firefox add-on is developed by <a href="http://blog.163.com/cxc200026/">physacco</a> and <a href="http://liruqi.info">liruqi</a> and AlexBelgium.
+You can check for new versions of Media Stealer at http://code.google.com/p/mediastealer//
 </p>
 
 <hr>
