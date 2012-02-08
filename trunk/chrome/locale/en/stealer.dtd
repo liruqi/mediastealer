@@ -67,7 +67,7 @@
 
 <!-- for editor window-->
 <!ENTITY showoptions.label "Options">
-<!ENTITY config.label "Config">
+<!ENTITY config.label "Browse">
 <!ENTITY description.label "Description">
 <!ENTITY directory.label "Directory">
 <!ENTITY dir_mod_tip.label "(Please modify it in tabpage 'Options' for this rule)">

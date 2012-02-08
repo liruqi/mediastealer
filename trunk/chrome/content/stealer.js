@@ -365,6 +365,8 @@ MediaStealerController.prototype = {
 
                 var treeitem = temptaskTree.view.getItemAtIndex(idx);
                 var file = treeitem.firstChild.childNodes[0].getAttribute("file");  // full path
+				var stat = treeitem.firstChild.childNodes[5].getAttribute("label");	// status
+					if ((stat == "Finished")||(stat == "Interrupted")) {
 
                 var fd = Components.classes["@mozilla.org/file/local;1"].
                             createInstance(Components.interfaces.nsILocalFile);
@@ -374,6 +376,11 @@ MediaStealerController.prototype = {
                     fd.launch();
                 }
                 catch(e) {}
+				}
+				else
+				{
+				alert("Please wait until download is complete");
+				}
 
             
         }
@@ -481,6 +488,8 @@ MediaStealerController.prototype = {
 
                 var treeitem = temptaskTree.view.getItemAtIndex(idx);
                 var file = treeitem.firstChild.childNodes[0].getAttribute("file");  // full path
+				var stat = treeitem.firstChild.childNodes[5].getAttribute("label");	// status
+					if ((stat == "Finished")||(stat == "Interrupted")) {
 
                 var fd = Components.classes["@mozilla.org/file/local;1"].
                             createInstance(Components.interfaces.nsILocalFile);
@@ -490,6 +499,11 @@ MediaStealerController.prototype = {
                     fd.launch();
                 }
                 catch(e) {}
+				}
+				else
+				{
+				alert("Please wait until download is complete");
+				}
             
         }
         catch(e) {

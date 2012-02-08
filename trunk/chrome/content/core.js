@@ -368,16 +368,17 @@ StealerHttpObserver.prototype = {
 
 					//new method
 					var file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);  					
-					file.initWithPath(task.file);					
-					var aURLToDownload = task.url;					
-					var obj_URI = Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService).newURI(aURLToDownload, null, null);  					
+					file.initWithPath(task.file);	
+					var IOservice = Components.classes['@mozilla.org/network/io-service;1'].getService(Components.interfaces.nsIIOService);
+					var obj_URI_Source = IOservice.newURI(task.url, null, null);					
+					var obj_File_Target = IOservice.newFileURI(file);	
 					var persistListener = new StealerDownloader(this.Stealer, task);
 					var persist = Components.classes["@mozilla.org/embedding/browser/nsWebBrowserPersist;1"].createInstance(Components.interfaces.nsIWebBrowserPersist);
 					persist.progressListener = persistListener;	
 					var nsIWBP = Components.interfaces.nsIWebBrowserPersist;  
 					var flags = nsIWBP.PERSIST_FLAGS_REPLACE_EXISTING_FILES; 
 					persist.persistFlags = flags |nsIWBP.PERSIST_FLAGS_BYPASS_CACHE |nsIWBP.PERSIST_FLAGS_AUTODETECT_APPLY_CONVERSION;
-					persist.saveURI(obj_URI, null, null, null, "", file); 
+					persist.saveURI(obj_URI_Source, null, null, null, "", obj_File_Target); 
 
                     task.curr = 0;
                     task.stat = "Transferring";
@@ -626,7 +627,9 @@ StealerDownloader.prototype = {
 		},
 
 		onStateChange : function(aWebProgress, aRequest, aStateFlags, aStatus)
-		{
+		{	
+			
+		
 		},
 
 			onLocationChange : function(aWebProgress, aRequest, aLocation)
@@ -634,8 +637,9 @@ StealerDownloader.prototype = {
 		},
 
 		onStatusChange : function(aWebProgress, aRequest, aStatus, aMessage)
-		{
-		
+		{		
+		this.task.stat = "Interrupted";
+		this.Stealer.refreshTask(this.task);	
 		},
 
 		onSecurityChange : function(aWebProgress, aRequest, aState)

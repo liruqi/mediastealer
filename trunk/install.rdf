@@ -4,7 +4,7 @@
 
   <Description about="urn:mozilla:install-manifest">
     <em:id>stealer@physacco.com</em:id>
-    <em:version>1.2.6</em:version>
+    <em:version>1.2.7</em:version>
 	
     <!-- Firefox -->
     <em:targetApplication>
@@ -21,7 +21,7 @@
     <em:creator>physacco, Liruqi</em:creator>
     <em:iconURL>chrome://stealer/skin/mediastealer.png</em:iconURL>
     <em:aboutURL>chrome://stealer/content/about-en.html</em:aboutURL>
-    <em:homepageURL>http://mediastealer.blogbus.com/</em:homepageURL>
+    <em:homepageURL>http://code.google.com/p/mediastealer/</em:homepageURL>
   </Description>
 
 </RDF>
