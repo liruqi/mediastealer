@@ -56,7 +56,7 @@
                 <splitter class="tree-splitter" />       
                 <treecol id="size-col"   label="&tasks_tree_total.label;"    flex="1" persist="width hidden ordinal" />
                 <splitter class="tree-splitter" />
-                <treecol id="curr-col"   label="&tasks_tree_progress.label;" flex="1" persist="width hidden ordinal" type="progressmeter"/>
+                <treecol id="curr-col"   label="&tasks_tree_progress.label;" flex="1" persist="width hidden ordinal" type="progressmeter"  onclick="Stealer.sort();" class="sortDirectionIndicator" sortDirection="descending"/>
                 <splitter class="tree-splitter" />
                 <treecol id="status-col" label="&tasks_tree_status.label;"   flex="1" persist="width hidden ordinal" />
                 <splitter class="tree-splitter" />
@@ -67,13 +67,13 @@
               </treechildren>
             </tree>
 			 <hbox pack="center">
-             <button label="Rename" id="rename" oncommand="Stealer.onRenameFile();" accesskey="R"/> 			 
-			 <button label="Open File" id="openfile" oncommand="Stealer.onOpenFile();" accesskey="O"/>
-			 <button label="Open Download Folder" id="openfolder" oncommand="Stealer.onOpenFolder();" accesskey="F"/>			  
-			 <button label="Delete" id="delete" oncommand="Stealer.onDeleteTask();" accesskey="D"/> 
+             <button label="&tasks_context_rename.label;" id="rename" oncommand="Stealer.onRenameFile();" accesskey="R"/> 			 
+			 <button label="&tasks_context_open.label;" id="openfile" oncommand="Stealer.onOpenFile();" accesskey="O"/>
+			 <button label="&tasks_context_open_folder.label;" id="openfolder" oncommand="Stealer.onOpenFolder();" accesskey="F"/>			  
+			 <button label="&tasks_context_delete.label;" id="delete" oncommand="Stealer.onDeleteTask();" accesskey="D"/> 
              <button label="Copy URL" id="copyURL" oncommand="Stealer.onCopyURL();"/>
              <button label="Copy URLs" id="copuURLs" oncommand="Stealer.onCopyAllURLS();"/>	
-			 <button label="Delete all" id="deleteall" oncommand="Stealer.onDeleteAllTask();"/>
+			 <button label="&tasks_context_delete_all.label;" id="deleteall" oncommand="Stealer.onDeleteAllTask();"/>
 			 </hbox>
           </vbox>
         </tabpanel>
@@ -141,6 +141,8 @@
               <button label="&delete.label;" id="deleteButton" oncommand="Stealer.onDeleteButtonClick();"/>
               <button label="&up.label;" id="upButton" oncommand="Stealer.moveItem(-1);"/>
               <button label="&down.label;" id="downButton" oncommand="Stealer.moveItem(1);"/>
+			  <button label="Import" id="ImportButton" oncommand="stealerConfig.importrules();"/>
+			  <button label="Export" id="ExportButton" oncommand="stealerConfig.exportrules();"/>
               <spacer flex="1" />
               <button label="&apply.label;" oncommand="Stealer.onApply();"/>
               <button label="&ok.label;" oncommand="Stealer.onOK();"/>

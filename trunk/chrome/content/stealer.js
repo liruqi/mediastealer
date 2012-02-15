@@ -739,9 +739,9 @@ MediaStealerController.prototype = {
     editRuleList: function(mode) {        
 		var tempruleTree = document.getElementById("ruleTree");
             var idx = tempruleTree.currentIndex;            
-			if(idx < 2) {
-                return;
-            }
+			//if(idx < 2) {
+            //    return;
+            //}
             var treeitem = tempruleTree.view.getItemAtIndex(idx);
             if(mode == "edit") {
                 this.jumptoDetailWindow(treeitem);
@@ -1025,6 +1025,37 @@ MediaStealerController.prototype = {
         // So I comment the `else' branch to disable my event handler.
         // 2011.2.15
     },
+	sort: function() {
+		
+		  try {	
+				var list = document.getElementById("tasklist");	                   
+				var temptaskTree = document.getElementById("task-tree");
+				var Taskcount = list.childElementCount-1;
+				 
+				for (Taskcount; Taskcount > -1; Taskcount--)	
+					{   
+					var Taskcount2 = Taskcount-1;
+					for (Taskcount2; Taskcount2 > -1; Taskcount2--)	
+					{   
+						var treeitem = temptaskTree.view.getItemAtIndex(Taskcount);
+						var curr = parseInt(treeitem.firstChild.childNodes[4].getAttribute("value"));	
+						var treeitem2 = temptaskTree.view.getItemAtIndex(Taskcount2);
+						var curr2 = parseInt(treeitem2.firstChild.childNodes[4].getAttribute("value"));	
+						
+						if (curr > curr2) 
+						{						
+						var newTreeitem = treeitem.cloneNode(true);
+						treeitem2.parentNode.removeChild(treeitem);
+						treeitem2.parentNode.insertBefore(newTreeitem, temptaskTree.view.getItemAtIndex(Taskcount-1));
+						}					
+					}
+					}
+			}
+		   catch(e) {
+			 //   alert("sort:\n"+e.name+": "+e.message);
+			}
+		
+		},
     //------------------------  界面状态管理（三态切换） ----------------------------
     //-------------------------------------------------------------------------------
 

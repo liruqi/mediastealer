@@ -36,10 +36,10 @@ button:hover {
     font-weight: bold;
 }
 #upButton {
-    display: none;
+    display: block;
 }
 #downButton {
-    display: none;
+    display: block;
 }
 #stealer-dbgbox {
     color: #00f;
