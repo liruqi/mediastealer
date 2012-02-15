@@ -1,0 +1,74 @@
+<!ENTITY title.label "Media Stealer">
+<!ENTITY enablefct.label "Activeer Media Stealer">
+<!ENTITY rule.label "Geregistreerde regels">
+<!ENTITY enable.label "Actief">
+<!ENTITY url.label "URL (*)">
+<!ENTITY oldct.label "Content-Type (*)">
+<!ENTITY reset.label "Reset">
+<!ENTITY showStatusBar.label "Toon icoon in statusbar">
+<!ENTITY context.label "Herlaad Media Stealer">
+
+<!-- main window -->
+<!ENTITY tab_tasks.label "Taken">
+<!ENTITY tab_options.label "Opties">
+<!ENTITY tab_rules.label "Regels">
+<!ENTITY tab_messages.label "Boodschappen">
+
+
+<!ENTITY save.label "Bewaren">
+<!ENTITY new.label "Toevoegen">
+<!ENTITY edit.label "Bewerken">
+<!ENTITY delete.label "Verwijderen">
+<!ENTITY up.label "Naar boven">
+<!ENTITY down.label "Naar beneden">
+<!ENTITY apply.label "Toepassen">
+<!ENTITY ok.label "OK">
+<!ENTITY discard.label "Annuleren">
+
+<!-- tabpage Tasks -->
+<!ENTITY tasks_tree_file.label "Bestand">
+<!ENTITY tasks_tree_url.label "URL">
+<!ENTITY tasks_tree_type.label "Type">
+<!ENTITY tasks_tree_total.label "Totaal (bytes)">
+<!ENTITY tasks_tree_progress.label "Vooruitgang">
+<!ENTITY tasks_tree_status.label "Status">
+<!ENTITY tasks_tree_folder.label "Map">
+
+<!ENTITY tasks_context_open.label "Openen">
+<!ENTITY tasks_context_open_folder.label "Open download map">
+<!ENTITY tasks_context_rename.label "Hernoemen">
+<!ENTITY tasks_context_delete.label "Verwijderen">
+<!ENTITY tasks_context_delete_all.label "Alles verwijderen">
+<!ENTITY tasks_context_copy.label "Rij copieren">
+<!ENTITY tasks_context_copy_all.label "Rijen copieren">
+
+<!-- tabpage Options -->
+<!ENTITY options_grp_type.label "Content-Type">
+<!ENTITY options_type_video.label "Video (video|flv|mp4)">
+<!ENTITY options_type_audio.label "Audio (mp3|wma|mpeg|ogg)">
+<!ENTITY options_type_flash.label "Flash (swf|flash|shockwave)">
+<!ENTITY options_type_dir.label "Download map">
+<!ENTITY options_type_browse.label "Map selecteren">
+
+<!ENTITY options_grp_opts.label "Opties">
+<!ENTITY options_opts_enable.label "Activeer Media Stealer">
+<!ENTITY options_opts_confirm.label "Deactiveer automatische download, vraagt iedere keer bevestiging">
+<!ENTITY options_opts_cache.label "Haal data uit cache indien het al bestaat">
+<!ENTITY options_opts_statusbar.label "Toon statusbar icoon">
+
+<!-- tabpage Rules -->
+<!ENTITY rules_tree_warn.label "Deze tabel is enkel bedoeld voor professionelen. Verander deze regels NIET tenzij je weet waarmee je bezig bent.">
+<!ENTITY rules_tree_enabled.label "Activeer">
+<!ENTITY rules_tree_description.label "Beschrijving">
+<!ENTITY rules_tree_url.label "URL">
+<!ENTITY rules_tree_type.label "Content-Type">
+<!ENTITY rules_tree_dir.label "Map">
+
+
+<!-- for editor window-->
+<!ENTITY showoptions.label "Optties">
+<!ENTITY config.label "Map selecteren">
+<!ENTITY description.label "Beschrijving">
+<!ENTITY directory.label "Map">
+<!ENTITY dir_mod_tip.label "(Gelieve dit te veranderen in het 'opties' paneel voor deze regel.)">
+
