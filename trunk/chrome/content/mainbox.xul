@@ -17,8 +17,8 @@
       <menuitem label="&tasks_context_delete.label;" accesskey="D" oncommand="Stealer.onDeleteTask();"/>
       <menuitem label="&tasks_context_delete_all.label;" oncommand="Stealer.onDeleteAllTask();"/>
       <menuseparator/>
-      <menuitem label="Copy URL" oncommand="Stealer.onCopyURL();"/>
-      <menuitem label="Copy URLs" oncommand="Stealer.onCopyAllURLS();"/>
+      <menuitem label="&tasks_context_copyURL.label;" oncommand="Stealer.onCopyURL();"/>
+      <menuitem label="&tasks_context_copuURLs.label;" oncommand="Stealer.onCopyAllURLS();"/>
     </menupopup>
   </popupset>
 
@@ -71,8 +71,8 @@
 			 <button label="&tasks_context_open.label;" id="openfile" oncommand="Stealer.onOpenFile();" accesskey="O"/>
 			 <button label="&tasks_context_open_folder.label;" id="openfolder" oncommand="Stealer.onOpenFolder();" accesskey="F"/>			  
 			 <button label="&tasks_context_delete.label;" id="delete" oncommand="Stealer.onDeleteTask();" accesskey="D"/> 
-             <button label="Copy URL" id="copyURL" oncommand="Stealer.onCopyURL();"/>
-             <button label="Copy URLs" id="copuURLs" oncommand="Stealer.onCopyAllURLS();"/>	
+             <button label="&tasks_context_copyURL.label;" id="copyURL" oncommand="Stealer.onCopyURL();"/>
+             <button label="&tasks_context_copuURLs.label;" id="copuURLs" oncommand="Stealer.onCopyAllURLS();"/>	
 			 <button label="&tasks_context_delete_all.label;" id="deleteall" oncommand="Stealer.onDeleteAllTask();"/>
 			 </hbox>
           </vbox>
@@ -100,9 +100,9 @@
               <checkbox id="confirmCheck" label="&options_opts_confirm.label;" />
               <checkbox id="cacheCheck" label="&options_opts_cache.label;" />
               <checkbox id="showStatusbarCheck" label="&options_opts_statusbar.label;" />
-			  <checkbox id="filetypeunknownCheck" label="Use 'flv' extention when filetype is unknown" />
-			  <checkbox id="nosmallfilesCheck" label="Do not download small files (less than 750 000 bytes)" />
-			  <checkbox id="nozerofilesCheck" label="Do not download files with zero bytes" />
+			  <checkbox id="filetypeunknownCheck" label="&options_opts_filetypeunknown.label;" />
+			  <checkbox id="nosmallfilesCheck" label="&options_opts_nosmallfiles;" />
+			  <checkbox id="nozerofilesCheck" label="&options_opts_nozerofiles.label;" />
               <spacer flex="1" />
             </groupbox>
             </hbox>
@@ -141,8 +141,8 @@
               <button label="&delete.label;" id="deleteButton" oncommand="Stealer.onDeleteButtonClick();"/>
               <button label="&up.label;" id="upButton" oncommand="Stealer.moveItem(-1);"/>
               <button label="&down.label;" id="downButton" oncommand="Stealer.moveItem(1);"/>
-			  <button label="Import" id="ImportButton" oncommand="stealerConfig.importrules();"/>
-			  <button label="Export" id="ExportButton" oncommand="stealerConfig.exportrules();"/>
+			  <button label="&import.label;" id="ImportButton" oncommand="stealerConfig.importrules();"/>
+			  <button label="&export.label;" id="ExportButton" oncommand="stealerConfig.exportrules();"/>
               <spacer flex="1" />
               <button label="&apply.label;" oncommand="Stealer.onApply();"/>
               <button label="&ok.label;" oncommand="Stealer.onOK();"/>
