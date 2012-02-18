@@ -1,0 +1,81 @@
+<!ENTITY title.label "Media Stealer">
+<!ENTITY enablefct.label "Enable Media Stealer">
+<!ENTITY rule.label "Registered rules">
+<!ENTITY enable.label "Active">
+<!ENTITY url.label "URL (*)">
+<!ENTITY oldct.label "Content-Type (*)">
+<!ENTITY reset.label "重置">
+<!ENTITY showStatusBar.label "顯示狀態欄圖示">
+<!ENTITY context.label "Use Media Stealer to reload">
+
+<!-- main window -->
+<!ENTITY tab_tasks.label "任務">
+<!ENTITY tab_options.label "選項">
+<!ENTITY tab_rules.label "規則">
+<!ENTITY tab_messages.label "訊息">
+
+
+<!ENTITY save.label "保存">
+<!ENTITY new.label "創建">
+<!ENTITY edit.label "編輯">
+<!ENTITY delete.label "刪除">
+<!ENTITY up.label "上移">
+<!ENTITY down.label "下移">
+<!ENTITY apply.label "應用">
+<!ENTITY ok.label "確認">
+<!ENTITY discard.label "取消">
+<!ENTITY import.label "輸入">
+<!ENTITY export.label "輸出">
+
+<!-- tabpage Tasks -->
+<!ENTITY tasks_tree_file.label "檔案">
+<!ENTITY tasks_tree_url.label "URL">
+<!ENTITY tasks_tree_type.label "型別">
+<!ENTITY tasks_tree_total.label "大小">
+<!ENTITY tasks_tree_progress.label "進度">
+<!ENTITY tasks_tree_status.label "狀態">
+<!ENTITY tasks_tree_folder.label "目錄">
+
+<!ENTITY tasks_context_open.label "打開">
+<!ENTITY tasks_context_open_folder.label "打開檔案夾">
+<!ENTITY tasks_context_rename.label "重命名">
+<!ENTITY tasks_context_delete.label "刪除">
+<!ENTITY tasks_context_delete_all.label "刪除全部">
+<!ENTITY tasks_context_copy.label "複製此行">
+<!ENTITY tasks_context_copy_all.label "複製全部">
+<!ENTITY tasks_context_copyURL.label "複製此URL">
+<!ENTITY tasks_context_copuURLs.label "複製所有URL">
+
+<!-- tabpage Options -->
+<!ENTITY options_grp_type.label "資源型別">
+<!ENTITY options_type_video.label "視訊 (video|flv|mp4)">
+<!ENTITY options_type_audio.label "音訊 (mp3|wma|mpeg|ogg)">
+<!ENTITY options_type_flash.label "Flash (swf|flash|shockwave)">
+<!ENTITY options_type_dir.label "默認下載路徑">
+<!ENTITY options_type_browse.label "瀏覽">
+
+<!ENTITY options_grp_opts.label "設定選項">
+<!ENTITY options_opts_enable.label "開啟Media Stealer">
+<!ENTITY options_opts_confirm.label "下載開始之前詢問我">
+<!ENTITY options_opts_cache.label "允許下載緩存中的檔案">
+<!ENTITY options_opts_statusbar.label "顯示狀態欄圖示">
+<!ENTITY options_opts_filetypeunknown.label "資料型別不明時儲存為'flv'檔案">
+<!ENTITY options_opts_nosmallfiles "不要下載小檔案 (不足 750 000 位元組)">
+<!ENTITY options_opts_nozerofiles.label "不要下載空檔案 (0 位元組)">
+
+<!-- tabpage Rules -->
+<!ENTITY rules_tree_warn.label "這個表是為專業人士準備的，如果你不清楚其涵義則請勿修改。">
+<!ENTITY rules_tree_enabled.label "開啟">
+<!ENTITY rules_tree_description.label "描述">
+<!ENTITY rules_tree_url.label "URL">
+<!ENTITY rules_tree_type.label "Content-Type">
+<!ENTITY rules_tree_dir.label "下載路徑">
+
+
+<!-- for editor window-->
+<!ENTITY showoptions.label "選項">
+<!ENTITY config.label "設定">
+<!ENTITY description.label "描述">
+<!ENTITY directory.label "目錄">
+<!ENTITY dir_mod_tip.label "(請在“選項”面板中修改此項)">
+

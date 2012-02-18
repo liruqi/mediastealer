@@ -1,74 +1,81 @@
 <!ENTITY title.label "Media Stealer">
-<!ENTITY enablefct.label "Media Stealer¤òÓÐ„¿¤Ë¤¹¤ë">
+<!ENTITY enablefct.label "Media Stealerã‚’æœ‰åŠ¹ã«ã™ã‚‹">
 <!ENTITY rule.label "Registered rules">
 <!ENTITY enable.label "Active">
 <!ENTITY url.label "URL (*)">
-<!ENTITY oldct.label "MIME¥¿¥¤¥× (*)">
-<!ENTITY reset.label "¥ê¥»¥Ã¥È">
-<!ENTITY showStatusBar.label "¥¹¥Æ©`¥¿¥¹¥Ð©`¤Ë¥¢¥¤¥³¥ó¤ò±íÊ¾¤¹¤ë">
-<!ENTITY context.label "Media Stealer¤Ç¥ê¥í©`¥É¤¹¤ë">
+<!ENTITY oldct.label "MIMEã‚¿ã‚¤ãƒ— (*)">
+<!ENTITY reset.label "ãƒªã‚»ãƒƒãƒˆ">
+<!ENTITY showStatusBar.label "ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ãƒãƒ¼ã«ã‚¢ã‚¤ã‚³ãƒ³ã‚’è¡¨ç¤ºã™ã‚‹">
+<!ENTITY context.label "Media Stealerã§ãƒªãƒ­ãƒ¼ãƒ‰ã™ã‚‹">
 
 <!-- main window -->
-<!ENTITY tab_tasks.label "¥¿¥¹¥¯">
-<!ENTITY tab_options.label "¥ª¥×¥·¥ç¥ó">
-<!ENTITY tab_rules.label "¥ë©`¥ë">
-<!ENTITY tab_messages.label "¥á¥Ã¥»©`¥¸">
+<!ENTITY tab_tasks.label "ã‚¿ã‚¹ã‚¯">
+<!ENTITY tab_options.label "ã‚ªãƒ—ã‚·ãƒ§ãƒ³">
+<!ENTITY tab_rules.label "ãƒ«ãƒ¼ãƒ«">
+<!ENTITY tab_messages.label "ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸">
 
 
-<!ENTITY save.label "¥»©`¥Ö">
-<!ENTITY new.label "ÐÂÒŽ">
-<!ENTITY edit.label "¾Ž¼¯">
-<!ENTITY delete.label "Ï÷³ý">
-<!ENTITY up.label "ÉÏ¤ØÒÆ„Ó">
-<!ENTITY down.label "ÏÂ¤ØÒÆ„Ó">
-<!ENTITY apply.label "ßmÓÃ">
-<!ENTITY ok.label "¤Ï¤¤">
-<!ENTITY discard.label "¥­¥ã¥ó¥»¥ë">
+<!ENTITY save.label "ã‚»ãƒ¼ãƒ–">
+<!ENTITY new.label "æ–°è¦">
+<!ENTITY edit.label "ç·¨é›†">
+<!ENTITY delete.label "å‰Šé™¤">
+<!ENTITY up.label "ä¸Šã¸ç§»å‹•">
+<!ENTITY down.label "ä¸‹ã¸ç§»å‹•">
+<!ENTITY apply.label "é©ç”¨">
+<!ENTITY ok.label "ã¯ã„">
+<!ENTITY discard.label "ã‚­ãƒ£ãƒ³ã‚»ãƒ«">
+<!ENTITY import.label "è¼¸å…¥">
+<!ENTITY export.label "è¼¸å‡º">
 
 <!-- tabpage Tasks -->
-<!ENTITY tasks_tree_file.label "¥Õ¥¡¥¤¥ë">
+<!ENTITY tasks_tree_file.label "ãƒ•ã‚¡ã‚¤ãƒ«">
 <!ENTITY tasks_tree_url.label "URL">
-<!ENTITY tasks_tree_type.label "¥¿¥¤¥×">
-<!ENTITY tasks_tree_total.label "¾tÓ‹">
-<!ENTITY tasks_tree_progress.label "ßMÐÐ¶È">
-<!ENTITY tasks_tree_status.label "¥¹¥Æ©`¥¿¥¹">
-<!ENTITY tasks_tree_folder.label "¥Õ¥©¥ë¥À">
+<!ENTITY tasks_tree_type.label "ã‚¿ã‚¤ãƒ—">
+<!ENTITY tasks_tree_total.label "ç·è¨ˆ">
+<!ENTITY tasks_tree_progress.label "é€²è¡Œåº¦">
+<!ENTITY tasks_tree_status.label "ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹">
+<!ENTITY tasks_tree_folder.label "ãƒ•ã‚©ãƒ«ãƒ€">
 
-<!ENTITY tasks_context_open.label "é_¤¯">
-<!ENTITY tasks_context_open_folder.label "¥Õ¥©¥ë¥À¤òé_¤¯">
-<!ENTITY tasks_context_rename.label "¥Õ¥¡¥¤¥ëÃû¤Î‰ä¸ü">
-<!ENTITY tasks_context_delete.label "Ï÷³ý¤¹¤ë">
-<!ENTITY tasks_context_delete_all.label "¤¹¤Ù¤Æ¤òÏ÷³ý¤¹¤ë">
-<!ENTITY tasks_context_copy.label "¥Æ¥­¥¹¥È¤ò¥³¥Ô©`¤¹¤ë">
-<!ENTITY tasks_context_copy_all.label "¤¹¤Ù¤Æ¤Î¥Æ¥­¥¹¥È¤ò¥³¥Ô©`¤¹¤ë">
+<!ENTITY tasks_context_open.label "é–‹ã">
+<!ENTITY tasks_context_open_folder.label "ãƒ•ã‚©ãƒ«ãƒ€ã‚’é–‹ã">
+<!ENTITY tasks_context_rename.label "ãƒ•ã‚¡ã‚¤ãƒ«åã®å¤‰æ›´">
+<!ENTITY tasks_context_delete.label "å‰Šé™¤ã™ã‚‹">
+<!ENTITY tasks_context_delete_all.label "ã™ã¹ã¦ã‚’å‰Šé™¤ã™ã‚‹">
+<!ENTITY tasks_context_copy.label "ãƒ†ã‚­ã‚¹ãƒˆã‚’ã‚³ãƒ”ãƒ¼ã™ã‚‹">
+<!ENTITY tasks_context_copy_all.label "ã™ã¹ã¦ã®ãƒ†ã‚­ã‚¹ãƒˆã‚’ã‚³ãƒ”ãƒ¼ã™ã‚‹">
+<!ENTITY tasks_context_copyURL.label "URLã‚’ã‚³ãƒ”ãƒ¼ã™ã‚‹">
+<!ENTITY tasks_context_copuURLs.label "ã™ã¹ã¦ã®URLã‚’ã‚³ãƒ”ãƒ¼ã™ã‚‹">
 
 <!-- tabpage Options -->
-<!ENTITY options_grp_type.label "MIME¥¿¥¤¥×">
-<!ENTITY options_type_video.label "¥Ó¥Ç¥ª (video|flv|mp4)">
-<!ENTITY options_type_audio.label "¥ª©`¥Ç¥£¥ª (mp3|wma|mpeg|ogg)">
-<!ENTITY options_type_flash.label "¥Õ¥é¥Ã¥·¥å (swf|flash|shockwave)">
-<!ENTITY options_type_dir.label "¥Õ¥¡¥¤¥ë¤Î±£´æÏÈ">
-<!ENTITY options_type_browse.label "²ÎÕÕ">
+<!ENTITY options_grp_type.label "MIMEã‚¿ã‚¤ãƒ—">
+<!ENTITY options_type_video.label "ãƒ“ãƒ‡ã‚ª (video|flv|mp4)">
+<!ENTITY options_type_audio.label "ã‚ªãƒ¼ãƒ‡ã‚£ã‚ª (mp3|wma|mpeg|ogg)">
+<!ENTITY options_type_flash.label "ãƒ•ãƒ©ãƒƒã‚·ãƒ¥ (swf|flash|shockwave)">
+<!ENTITY options_type_dir.label "ãƒ•ã‚¡ã‚¤ãƒ«ã®ä¿å­˜å…ˆ">
+<!ENTITY options_type_browse.label "å‚ç…§">
 
-<!ENTITY options_grp_opts.label "¥ª¥×¥·¥ç¥ó">
-<!ENTITY options_opts_enable.label "Media Stealer¤òÓÐ„¿¤Ë¤¹¤ë">
-<!ENTITY options_opts_confirm.label "¥À¥¦¥ó¥í©`¥É¤òÐÐ¤¦Ç°¥æ©`¥¶©`¤ËÂ„¤¯">
-<!ENTITY options_opts_cache.label "¤Ç¤­¤ì¤Ð¥­¥ã¥Ã¥·¥å¤«¤é¥Ç©`¥¿¤òÈ¡µÃ¤¹¤ë">
-<!ENTITY options_opts_statusbar.label "¥¹¥Æ©`¥¿¥¹¥Ð©`¤Ë¥¢¥¤¥³¥ó¤ò±íÊ¾¤¹¤ë">
+<!ENTITY options_grp_opts.label "ã‚ªãƒ—ã‚·ãƒ§ãƒ³">
+<!ENTITY options_opts_enable.label "Media Stealerã‚’æœ‰åŠ¹ã«ã™ã‚‹">
+<!ENTITY options_opts_confirm.label "ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ã‚’è¡Œã†å‰ãƒ¦ãƒ¼ã‚¶ãƒ¼ã«èžã">
+<!ENTITY options_opts_cache.label "ã§ãã‚Œã°ã‚­ãƒ£ãƒƒã‚·ãƒ¥ã‹ã‚‰ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ã™ã‚‹">
+<!ENTITY options_opts_statusbar.label "ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ãƒãƒ¼ã«ã‚¢ã‚¤ã‚³ãƒ³ã‚’è¡¨ç¤ºã™ã‚‹">
+<!ENTITY options_opts_filetypeunknown.label "ãƒ•ã‚¡ã‚¤ãƒ«ã‚¿ã‚¤ãƒ—ãŒä¸æ˜Žãªå ´åˆFLVã®æ‹¡å¼µå­ã‚’ä½¿ç”¨ã—">
+<!ENTITY options_opts_nosmallfiles "å°ã•ãªãƒ•ã‚¡ã‚¤ãƒ«ã‚’ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ã—ãªã„ (æœªæº€ã§750 000ãƒã‚¤ãƒˆ)">
+<!ENTITY options_opts_nozerofiles.label "ç©ºã®ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ã—ãªã„ (0 ãƒã‚¤ãƒˆ)">
 
 <!-- tabpage Rules -->
-<!ENTITY rules_tree_warn.label "¤³¤³¤Ï¥×¥í¥ª¥ó¥ê©`¡£·Ö¤«¤é¤Ê¤¤¤Ê¤é¥ë©`¥ë¤ò¾Ž¼¯¤·¤Ê¤¤¤ÇÏÂ¤µ¤¤¡£">
-<!ENTITY rules_tree_enabled.label "ÓÐ„¿">
-<!ENTITY rules_tree_description.label "ÕhÃ÷">
+<!ENTITY rules_tree_warn.label "ã“ã“ã¯ãƒ—ãƒ­ã‚ªãƒ³ãƒªãƒ¼ã€‚åˆ†ã‹ã‚‰ãªã„ãªã‚‰ãƒ«ãƒ¼ãƒ«ã‚’ç·¨é›†ã—ãªã„ã§ä¸‹ã•ã„ã€‚">
+<!ENTITY rules_tree_enabled.label "æœ‰åŠ¹">
+<!ENTITY rules_tree_description.label "èª¬æ˜Ž">
 <!ENTITY rules_tree_url.label "URL">
-<!ENTITY rules_tree_type.label "MIME¥¿¥¤¥×">
-<!ENTITY rules_tree_dir.label "¥Ç¥£¥ì¥¯¥È¥ê">
+<!ENTITY rules_tree_type.label "MIMEã‚¿ã‚¤ãƒ—">
+<!ENTITY rules_tree_dir.label "ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª">
 
 
 <!-- for editor window-->
-<!ENTITY showoptions.label "¥ª¥×¥·¥ç¥ó">
-<!ENTITY config.label "ÔO¶¨">
-<!ENTITY description.label "ÕhÃ÷">
-<!ENTITY directory.label "¥Ç¥£¥ì¥¯¥È¥ê">
-<!ENTITY dir_mod_tip.label "£¨¤³¤Î¥ë©`¥ë¤Ï¥ª¥×¥·¥ç¥ó¤Î¥¿¥Ö¥Ú©`¥¸¤Ç‰ä¸ü¤·¤ÆÏÂ¤µ¤¤£©">
+<!ENTITY showoptions.label "ã‚ªãƒ—ã‚·ãƒ§ãƒ³">
+<!ENTITY config.label "è¨­å®š">
+<!ENTITY description.label "èª¬æ˜Ž">
+<!ENTITY directory.label "ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª">
+<!ENTITY dir_mod_tip.label "ï¼ˆã“ã®ãƒ«ãƒ¼ãƒ«ã¯ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã®ã‚¿ãƒ–ãƒšãƒ¼ã‚¸ã§å¤‰æ›´ã—ã¦ä¸‹ã•ã„ï¼‰">
 
