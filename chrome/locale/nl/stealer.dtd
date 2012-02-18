@@ -24,6 +24,8 @@
 <!ENTITY apply.label "Toepassen">
 <!ENTITY ok.label "OK">
 <!ENTITY discard.label "Annuleren">
+<!ENTITY import.label "Import">
+<!ENTITY export.label "Export">
 
 <!-- tabpage Tasks -->
 <!ENTITY tasks_tree_file.label "Bestand">
@@ -41,6 +43,8 @@
 <!ENTITY tasks_context_delete_all.label "Alles verwijderen">
 <!ENTITY tasks_context_copy.label "Rij copieren">
 <!ENTITY tasks_context_copy_all.label "Rijen copieren">
+<!ENTITY tasks_context_copyURL.label "Kopie URL">
+<!ENTITY tasks_context_copuURLs.label "Kopie URL's">
 
 <!-- tabpage Options -->
 <!ENTITY options_grp_type.label "Content-Type">
@@ -55,6 +59,9 @@
 <!ENTITY options_opts_confirm.label "Deactiveer automatische download, vraagt iedere keer bevestiging">
 <!ENTITY options_opts_cache.label "Haal data uit cache indien het al bestaat">
 <!ENTITY options_opts_statusbar.label "Toon statusbar icoon">
+<!ENTITY options_opts_filetypeunknown.label "Gebruik 'flv' extenstie wanneer bestandtype onbekend is">
+<!ENTITY options_opts_nosmallfiles "Download geen kleine bestanden (minder dan 750 000 bytes)">
+<!ENTITY options_opts_nozerofiles.label "Download geen bestanden van nul bytes">
 
 <!-- tabpage Rules -->
 <!ENTITY rules_tree_warn.label "Deze tabel is enkel bedoeld voor professionelen. Verander deze regels NIET tenzij je weet waarmee je bezig bent.">
