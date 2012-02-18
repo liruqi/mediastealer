@@ -19,6 +19,7 @@
     <em:name>Media Stealer</em:name>
     <em:description>Help you download stream media easily</em:description>
     <em:creator>physacco, Liruqi</em:creator>
+    <em:contributor>Alex Rosseel</em:contributor>
     <em:iconURL>chrome://stealer/skin/mediastealer.png</em:iconURL>
     <em:aboutURL>chrome://stealer/content/about-en.html</em:aboutURL>
     <em:homepageURL>http://code.google.com/p/mediastealer/</em:homepageURL>

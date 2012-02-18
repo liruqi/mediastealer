@@ -1,4 +1,4 @@
-<!ENTITY title.label "Media Stealer 1.2.2">
+<!ENTITY title.label "Media Stealer">
 <!ENTITY enablefct.label "Enable Media Stealer">
 <!ENTITY rule.label "Registered rules">
 <!ENTITY enable.label "Active">
@@ -24,6 +24,8 @@
 <!ENTITY apply.label "应用">
 <!ENTITY ok.label "确定">
 <!ENTITY discard.label "取消">
+<!ENTITY import.label "导入">
+<!ENTITY export.label "导出">
 
 <!-- tabpage Tasks -->
 <!ENTITY tasks_tree_file.label "文件">
@@ -41,6 +43,8 @@
 <!ENTITY tasks_context_delete_all.label "删除全部">
 <!ENTITY tasks_context_copy.label "复制此行">
 <!ENTITY tasks_context_copy_all.label "复制全部">
+<!ENTITY tasks_context_copyURL.label "复制此链接">
+<!ENTITY tasks_context_copuURLs.label "复制所有链接">
 
 <!-- tabpage Options -->
 <!ENTITY options_grp_type.label "资源类型">
@@ -55,6 +59,9 @@
 <!ENTITY options_opts_confirm.label "当资源可用时提示">
 <!ENTITY options_opts_cache.label "允许从缓存取数据">
 <!ENTITY options_opts_statusbar.label "显示状态栏图标">
+<!ENTITY options_opts_filetypeunknown.label "资源类型不明时保存为'flv'扩展名">
+<!ENTITY options_opts_nosmallfiles "不要下载小文件 (小于 750 000 字节)">
+<!ENTITY options_opts_nozerofiles.label "不要下载长度为 0字节 的文件">
 
 <!-- tabpage Rules -->
 <!ENTITY rules_tree_warn.label "这张表是为专业人士准备的，如果你不清楚其涵义的话请不要修改。">
@@ -63,6 +70,7 @@
 <!ENTITY rules_tree_url.label "URL">
 <!ENTITY rules_tree_type.label "Content-Type">
 <!ENTITY rules_tree_dir.label "下载目录">
+
 
 <!-- for editor window-->
 <!ENTITY showoptions.label "选项">
