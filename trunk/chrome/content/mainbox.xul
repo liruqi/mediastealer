@@ -16,6 +16,9 @@
       <menuitem label="&tasks_context_rename.label;" accesskey="R" oncommand="Stealer.onRenameFile();"/>
       <menuitem label="&tasks_context_delete.label;" accesskey="D" oncommand="Stealer.onDeleteTask();"/>
       <menuitem label="&tasks_context_delete_all.label;" oncommand="Stealer.onDeleteAllTask();"/>
+	  <menuitem label="Pause" oncommand="Stealer.onPause();"/>
+	  <menuitem label="Resume" oncommand="Stealer.onResume();"/>
+	  <menuitem label="Abort" oncommand="Stealer.onAbort();"/> 
       <menuseparator/>
       <menuitem label="&tasks_context_copyURL.label;" oncommand="Stealer.onCopyURL();"/>
       <menuitem label="&tasks_context_copuURLs.label;" oncommand="Stealer.onCopyAllURLS();"/>
@@ -74,6 +77,9 @@
              <button label="&tasks_context_copyURL.label;" id="copyURL" oncommand="Stealer.onCopyURL();"/>
              <button label="&tasks_context_copuURLs.label;" id="copuURLs" oncommand="Stealer.onCopyAllURLS();"/>	
 			 <button label="&tasks_context_delete_all.label;" id="deleteall" oncommand="Stealer.onDeleteAllTask();"/>
+			 <button label="Pause" id="pause" oncommand="Stealer.onPause();"/>
+			 <button label="Resume" id="resume" oncommand="Stealer.onResume();"/>
+			 <button label="Abort" id="abort" oncommand="Stealer.onAbort();"/>
 			 </hbox>
           </vbox>
         </tabpanel>
@@ -103,6 +109,7 @@
 			  <checkbox id="filetypeunknownCheck" label="&options_opts_filetypeunknown.label;" />
 			  <checkbox id="nosmallfilesCheck" label="&options_opts_nosmallfiles;" />
 			  <checkbox id="nozerofilesCheck" label="&options_opts_nozerofiles.label;" />
+			  <checkbox id="alwaysaskdownloadfolderCheck" label="Always ask me where to put files" />
               <spacer flex="1" />
             </groupbox>
             </hbox>
