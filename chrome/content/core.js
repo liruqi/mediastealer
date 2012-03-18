@@ -16,6 +16,7 @@ Task.prototype = {
     _size: null,
     _curr: null,
     _stat: null,
+	_DownloadID: null,
 
     get id() {
         return this._id;
@@ -78,6 +79,12 @@ Task.prototype = {
     },
     set stat(value) {
         this._stat = value;
+	},
+	  get DownloadID() {
+        return this._DownloadID;
+    },
+    set DownloadID(value) {
+        this._DownloadID = value;
     }
 }
 
@@ -132,7 +139,7 @@ StealerHttpObserver.prototype = {
                 var treeitem = temptaskTree.view.getItemAtIndex(idx);
 				var url = treeitem.firstChild.childNodes[1].getAttribute("label"); //url				
 				var filesize = treeitem.firstChild.childNodes[3].getAttribute("label");	//filesize					
-					if ((url == uri)&&(filesize == len)) 
+					if (url == uri) 
 					{
 						testunique = false;						
 					}
@@ -366,21 +373,55 @@ StealerHttpObserver.prototype = {
                     //httpChannel.QueryInterface(Components.interfaces.nsITraceableChannel);
                     //newListener.originalListener = httpChannel.setNewListener(newListener);
 
+					var alwaysaskdownloadfolder = stealerConfig.alwaysaskdownloadfolder;
+					
+					if ((alwaysaskdownloadfolder == true) && (stealerConfig.alwaysConfirm == true))
+					{
+					
+					var __file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);  					
+					__file.initWithPath(task.dir);
+					
+					var nsIFilePicker = Components.interfaces.nsIFilePicker;
+					var fp = Components.classes["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
+					fp.init(window, "Please select a folder and enter a filename", nsIFilePicker.modeSave);		
+					fp.defaultString = task.filename;
+					fp.displayDirectory = __file;						
+					var res = fp.show();
+						if (res == nsIFilePicker.returnOK || res == nsIFilePicker.returnReplace)
+						{						 
+						  task.file = fp.file.path;
+						  task.filename = fp.file.leafName;
+						  var fileleafname = fp.file.leafName;
+						  var filepath = fp.file.path;						  
+						  var fileleafnamelength = fileleafname.length;
+						  var filepathlength = filepath.length;						  
+						  var fileresult = filepath.substr(0,(filepathlength-fileleafnamelength));						 
+						  task.dir = fileresult;						
+						}
+						else
+						{
+							return;
+						}						
+					}
 					//new method
 					var file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);  					
-					file.initWithPath(task.file);	
-					var IOservice = Components.classes['@mozilla.org/network/io-service;1'].getService(Components.interfaces.nsIIOService);
+					file.initWithPath(task.file);
+					var persist = Components.classes["@mozilla.org/embedding/browser/nsWebBrowserPersist;1"].createInstance(Components.interfaces.nsIWebBrowserPersist);
+					var nsIWBP = Components.interfaces.nsIWebBrowserPersist; 
+					var flags = nsIWBP.PERSIST_FLAGS_REPLACE_EXISTING_FILES; 
+					persist.persistFlags = flags |nsIWBP.PERSIST_FLAGS_BYPASS_CACHE|nsIWBP.PERSIST_FLAGS_CLEANUP_ON_FAILURE					
+					var IOservice = Components.classes['@mozilla.org/network/io-service;1'].getService(Components.interfaces.nsIIOService);	
 					var obj_URI_Source = IOservice.newURI(task.url, null, null);					
 					var obj_File_Target = IOservice.newFileURI(file);	
+					var dm = Components.classes['@mozilla.org/download-manager;1'].createInstance(Components.interfaces.nsIDownloadManager);
+					var dl = dm.addDownload(dm.DOWNLOAD_TYPE_DOWNLOAD, obj_URI_Source, obj_File_Target, '', null, Math.round(Date.now() * 1000), null, persist);				
 					var persistListener = new StealerDownloader(this.Stealer, task);
-					var persist = Components.classes["@mozilla.org/embedding/browser/nsWebBrowserPersist;1"].createInstance(Components.interfaces.nsIWebBrowserPersist);
-					persist.progressListener = persistListener;	
-					var nsIWBP = Components.interfaces.nsIWebBrowserPersist;  
-					var flags = nsIWBP.PERSIST_FLAGS_REPLACE_EXISTING_FILES; 
-					persist.persistFlags = flags |nsIWBP.PERSIST_FLAGS_BYPASS_CACHE |nsIWBP.PERSIST_FLAGS_AUTODETECT_APPLY_CONVERSION;
-					persist.saveURI(obj_URI_Source, null, null, null, "", obj_File_Target); 
-
+					dm.addListener(persistListener); 
+					persist.progressListener = dl;
+					persist.saveURI(dl.source, null, null, null, null, dl.targetFile);	
+					
                     task.curr = 0;
+					task.DownloadID = dl.id;
                     task.stat = "Transferring";
                     this.Stealer.addTask(task);
 
@@ -390,7 +431,7 @@ StealerHttpObserver.prototype = {
                     message    += "  URL:  " + task.url  + "\n";
                     message    += "  Type: " + task.type + "\n";
                     message    += "  Size: " + task.size + "\n";
-                    message    += "  Type: " + "Stream\n";
+					message    += "  DownloadID: "+ task.DownloadID + "\n";
                     this.Stealer.dbgPrintln(message);			
                 }
 				if(!askcheck.value) 
@@ -586,7 +627,7 @@ function StealerDownloader(stealer, task) {
     this.task = task;
 
     this.stack = [];           // 数据缓冲栈（非栈）
-    this.total = task.size;    // Content-Length
+    this.total = task.size;    // Content-Length	
     this.curr = 0;             // 当前已下载的总长度
     this.percent = 0;          // 当前已下载的百分比
     this.curr_stack = 0;       // 当前栈中的数据量
@@ -597,7 +638,7 @@ function StealerDownloader(stealer, task) {
 StealerDownloader.prototype = {
 			QueryInterface : function(aIID)
 			{
-			if(aIID.equals(Components.interfaces.nsIWebProgressListener))
+			if(aIID.equals(Components.interfaces.Components.interfaces.nsIDownloadProgressListener))
 			return this;
 			throw Components.results.NS_NOINTERFACE;
 			},
@@ -610,37 +651,60 @@ StealerDownloader.prototype = {
 			{
 			},
 
-  // nsIWebProgressListener
 			onProgressChange : function (aWebProgress, aRequest,
                                aCurSelfProgress, aMaxSelfProgress,
-                               aCurTotalProgress, aMaxTotalProgress)
-		{
-			if (aCurTotalProgress == aMaxTotalProgress)
+                               aCurTotalProgress, aMaxTotalProgress, aDownload)
+			{
+					if (aDownload.id == this.task.DownloadID)
 					{
-					this.task.stat = "Finished";					
-					}					
-					
-					this.curr = aCurTotalProgress;
-					this.task.curr = aCurTotalProgress;	
+					this.task.stat = "Transferring";
+					this.curr = aDownload.amountTransferred;
+					this.task.curr = aDownload.amountTransferred;
 					this.Stealer.refreshTask(this.task);
-					
-		},
-
-		onStateChange : function(aWebProgress, aRequest, aStateFlags, aStatus)
-		{	
+					}
+			},
 			
-		
-		},
+			onDownloadStateChange: function(aState, aDownload)
+			{				
+				if (aDownload.id == this.task.DownloadID)
+				{	
+					if (aDownload.state == 7 || aDownload.state == 1)
 
-			onLocationChange : function(aWebProgress, aRequest, aLocation)
-		{
-		},
+					{
+					this.curr = this.total;
+					this.task.curr = this.total;					
+					this.task.stat = "Finished";
+					this.Stealer.refreshTask(this.task);	
+					}					
+				}
+			},
 
-		onStatusChange : function(aWebProgress, aRequest, aStatus, aMessage)
-		{		
-		this.task.stat = "Interrupted";
-		this.Stealer.refreshTask(this.task);	
-		},
+			onStateChange : function(aWebProgress, aRequest, aStateFlags, aStatus, aDownload)
+			{	
+				if (aDownload.id == this.task.DownloadID)
+				{
+					var downloadManager = Components.classes["@mozilla.org/download-manager;1"].getService(Components.interfaces.nsIDownloadManager);						
+					if (aDownload.state == 4)
+					{					
+						this.task.stat = "Paused";
+						this.Stealer.refreshTask(this.task);
+					}							
+					else   //something went terribly wrong					
+					{				
+						this.task.stat = "Interrupted";
+						this.Stealer.refreshTask(this.task);						
+					}
+				}
+			},	
+			
+			onStatusChange : function(aWebProgress, aRequest, aStatus, aMessage, aDownload)
+			{	
+				if (aDownload.id == this.task.DownloadID)
+					{
+					this.task.stat = "Interrupted";
+					this.Stealer.refreshTask(this.task);	
+					}
+			},
 
 		onSecurityChange : function(aWebProgress, aRequest, aState)
 		{

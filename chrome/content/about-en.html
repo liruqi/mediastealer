@@ -33,71 +33,115 @@ See Also: <a href="about-zh.html">中文版</a>
 
 <p>
 <a name="whatis"></a>
-<strong><u>What Is This?</u></strong>
+<strong><u>What is Media Stealer</u></strong>
 </p>
 <p>
 Media Stealer is a Firefox Add-on dedicated to download Internet resource transfered by HTTP protocol. For primary users, it is designed to download online video, music and flash files(e.g. flash games). However, for advanced users who are familiar with HTTP request &amp; response, Media Stealer can do much more.
 </p>
 <p>
-Media Stealer was originally designed to download flash media (especially the .flv format stream video), so given the name 'Media Stealer'. Unlike other online video download tools (e.g. youtube-dl) or online video retrieve website, the download function is independent of video providers (e.g. YouKu, Tudou, YouTube) as long as they use HTTP protocol.
+<strong><u>How to access Media Stealer</u></strong>
+</p>
+<img src="chrome://stealer/skin/0.jpg">
+<p>
+It's highly recommended to activate the add-on menu. In the Firefox menu, click on View, Toolbars and finally Add-on bar. You can also access the main program via Firefox menu, Tools and finally Media Stealer.
 </p>
 <p>
-Some of the Media Stealer features include:
+<strong><u>Media Stealer icons</u></strong>
 </p>
-<ul>
-<li>Very easy to use for beginners and non-professonals
-<li>Precisely monitor and filter any HTTP request and response
-<li>Powerful detailed configurations provided for advanced users
-<li>Monitor download process with the builtin download manager.
-</ul>
-
-
+<img src="chrome://stealer/skin/1.jpg">
 <p>
-<a name="beginners"></a>
-<strong><u>For Beginners</u></strong>
+You'll see two icons on the Firefox Add-on bar. One is a start/stop icon, which enables/disables Media stealer. Once disabled, Media Stealer will not show a download dialog and will not download content, except previous tasks. The other icon is to toggle the main program. 
 </p>
 <p>
-Media Stealer main program can be toggled via the menu of Firefox under "Tools" or via Firefox Add-on bar or pressing Ctrl-Shift-S. Media Stealer doesn't need to be toggled in order to download content.
+<strong><u>A download dialog</u></strong>
+</p>
+<img src="chrome://stealer/skin/2.jpg">
+<p>
+When content such as Flash is detected, Media Stealer will automatically display the dialog above. When 'Ask every time. Can be (re)activated via Firefox menu or Add-on bar' is unchecked, it will automatically download content without asking. It can be reactivated via the Media Stealer icon. 
 </p>
 <p>
-Four panels in main window: Tasks, Options, Rules, Messages. Tasks panel can display downloading progress. 
+<strong><u>Tasks panel of media stealer</u></strong>
 </p>
-<p>
-Tasks panel
-</p>
-<p>
-You can only follow downloading progress in Task panel but not control it. This is due to the feature of HTTP protocol. You can monitor the progress in this panel. Status "Finished" means the video is successfully downloaded en stored. "Downloading" means Media Stealer is retieving the data and storing the information. You can delete the tasks and you have the options of deleting the actual file as well. Other task functions are: Rename, Delete, Delete all, Open Download Folder, Copy Url, Copy Urls, Open File. 
-</p>
-<p>
-Options panel
-</p>
-<p>
-The Options panel enables you to select your interested content type--Video, Audio and Flash, also read and change basic settings, and download directory. The download directory is only for static rules. This panel is also able to toggle special features. For example "Disable automatic download" (which is activated by default, once deactivated it downloads automatically content based on rules). Media Stealer can also be temporary deactivated (for example when you don't want to download content) by disabling "Enable Media Stealer". 
-</p>
+<img src="chrome://stealer/skin/3.jpg">
 
 <p>
-<a name="advanced"></a>
-<strong><u>For Advanced Users</u></strong>
+Click on the Media Stealer icon to toggle the main program. 
+<br>
+You'll see four panels. Let's focus on the first panel, called "tasks". It shows all the current downloads and their destination folder. You can monitor their progress. The status can be "downloading", "paused", "interrupted" or "finished". 
+<br>
+You can always open the download directory by pressing "Open folder", so you know where the download will go. You can always copy the URL or URL's from task(s).
+<br>
+When downloading, the task can be paused by pressing the "pause" button. And can be resumed by the "resume" button.
+<br>
+When downloading, the task can also be aborted by pressing the "abort" button. This will effectively abort the task and delete the downloaded file. Please be careful.
+<br>
+Once the download is finished, you can rename the file, open the file. Double clicking on the task, will also open the file.
+<br>
+When clicked on "Delete", a dialog will be represented. It will ask you to delete the task with the option to remove the downloaded file. Be careful, when the option to remove the download is checked and you press OK, the downloaded file will be removed from disc. The same applies to "delete all".
+<br>
+You can also right click on any task for a menu with the same functions as the buttons.
 </p>
 <p>
-<img class="DescriptionImage" src="chrome://stealer/skin/rule_editor.png" border="0" alt="Media Stealer" title="Media Stealer">
-You need to have some knowledge about HTTP protocol and javascript regular expression to set more specific settings. For those who are not quite familiar with HTTP request and response, I advice you to watch Debug panel or download another add-on named 'firebug' to learn more. Rules panel is about downloading filter rules. First 3 rules are static, you cannot remove them, but still you can modify them, for they are associated with previous Options. You can double click a rule or press Edit button to open a rule edit window.
+<strong><u>Options panel of media stealer</u></strong>
 </p>
+<img src="chrome://stealer/skin/4.jpg">
+
+<p>
+The next panel is called "options". Here you can finetune the behavior of Media Stealer. Here you can set the download directory. This will only apples to the standard rules. For rules, please read section "rules". 
+<br>
+In the options panel, on left side, you can quickly activate/deactivate video, audio and flash. 
+<br>
+On the right side, the first option is to enable/disable Media Stealer. When disabled, media stealer will not ask to download content and content will be not downloaded except previous tasks. Enabled by default.
+<br>
+The second option ensures you'll be immediately asked to download content. When this option is unchecked, it will automatically download content, without asking. Enabled by default.
+<br>
+The third option retrieves data (content) from cache, which is faster than downloading it again. Enabled by default.
+<br>
+The fourth option, when unchecked, disables the start/stop icon of Media Stealer. Enabled by default.
+<br>
+The firth one ensures that all files are given the "flv" extention when the filetype is unknown. This is entirely based on the content-type. The content type is defined in the "Rules" panel. Enabled by default.
+<br>
+The sixth one is a bit tricky one. When this option is enabled, unwanted files can be avoided (such as flash players). However, if a valid file is smaller than than 750 000 bytes, you'll not be prompted to download something. Disabled by default.
+<br>
+The seventh options ensures that empty files (such as cookies) will not be downloaded. Enabled by default.
+<br>
+The eight option ensures when you download something, Media Stealer will ask where you want the download on your hard disk. You can also rename at the same time. This is disabled by default.
+<br>
+Please chose "Apply" or "OK" to save the new settings. "OK", will close Media Stealer.
+</p>
+<p>
+<strong><u>Rules panel of media stealer</u></strong>
+</p>
+<img src="chrome://stealer/skin/5.jpg">
+<p>
+The "Rules" panels opens rules. There are two kinds, builtin ones, such as Video. The other kind are custom rules, which is entirely defined and made by the end user. The builtin ones can be changed. It's strongly recommend that this can only changed by an experienced/professional user. If you don't know what you're doing, stay away.
+<br>
+You can import/export rules. You can rearrange the order of the rules. This will not have an effect on the download experience. You can add/delete/create rules. The builtin ones cannot be deleted. Each rule can be enabled/disabled.
+</p>
+<p>
+<strong><u>Detail window of new rule</u></strong>
+</p>
+<img src="chrome://stealer/skin/6.jpg">
+<p>
+When you create a new rule a window should popup. Here you can enter a description (for example Images), a URL based on regex. For any URL's, please enter "http://\/\/" without quotes. Content-type can be for example "png|jpg|tiff|png", please use "|" (piping symbol) as a separator. Each custom rule can have a separate download directory.
+<br>
+<br>
+More detailed information:
+<br>
+<br>
+You need to have some knowledge about HTTP protocol and javascript regular expression to set more specific settings. For those who are not quite familiar with HTTP request and response, I advice you to watch Debug panel or download another add-on named 'firebug' to learn more. 
 <ol>
-<li>Description is some words you describe this rule. This is arbitrary and does not affect download process. </li>
 <li>URL is a regular expression can be matched in HTTP request resource url. This is set when you want to download content from a specific site. For example, if you only want to download HD video from heidou(hd.tudou.com), and a video url for example, http://125.39.48.17/mp4/021/159/131/21159131.f4v?18000&key=5c49da497c1128a28ba84249ec7d062422d102, you observe that string 'mp4' or 'f4v' or IP address in url, so you need to set this to 'mp4' or 'f4v', or a regular expression matching an IP address( e.g, "((2[0-4]\d|25[0-5]|[01]?\d\d?)\.){3}((2[0-4]\d|25[0-5]|[01]?\d\d?))" ). </li>
 <li>Content-Type (MIME type) is a regular expression can be matched in HTTP responce content-type. Take previous example, this can be set to 'octet-stream'.</li>
-<li>You can add a rule that filters specific websites by example using "http:\/\/.+(\.youtube\.com)" as URL in the rules and "video|flv|f4v|mp4" as its content-type. It is possible that youtube also needs the following content type: swf|flash|shockwave</li>
-<li>Directory is where you want to save your downloaded files. The download folder of static rules is controlled in the Options panel. The download folder of custom rules can be changed via the "edit" button of a custom rule.</li>
+<li>You can add a rule that filters specific websites by example using "http:\/\/.+(\.yourfavoritemoviessite\.com)" as URL in the rules and "video|flv|f4v|mp4|octet-stream" as its content-type.</li>
 </ol>
-<p>
-One thing I need to remind you is: functions of Media Stealer add-on is not limited to media data downloading. It can be used to download many other types of content that sent to your internet browser. You can do many amazing things if you configure it well. 
 </p>
 <p>
+<p>
+<strong><u>Messages panel of Media Stealer</u></strong>
+</p>
 As to the last Messages panel, it is for those who want to read, debug or modify the source code of this add-on. It's convient.
 </p>
-
-<p>
 <a name="licensing"></a>
 <strong><u>Licensing</u></strong>
 </p>
@@ -109,7 +153,6 @@ Media Stealer is licensed under the terms of the <a href="http://www.gnu.org/cop
 Media Stealer is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY, AND FITNESS FOR A PARTICULAR PURPOSE.
 </p>
 
-
 <p>
 <a name="downloading"></a>
 <strong><u>Credits</u></strong>
@@ -118,6 +161,9 @@ Media Stealer is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARR
 This firefox add-on is developed by <a href="http://blog.163.com/cxc200026/">physacco</a> and <a href="http://liruqi.info">liruqi</a> and AlexBelgium.
 You can check for new versions of Media Stealer at <a href="http://code.google.com/p/mediastealer/">http://code.google.com/p/mediastealer/</a>
 </p>
+
+
+
 
 <hr>
 

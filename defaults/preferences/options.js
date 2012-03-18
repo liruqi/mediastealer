@@ -6,4 +6,5 @@ pref("extensions.stealer.alwaysConfirm", true);
 pref("extensions.stealer.filetypeunknown", true);
 pref("extensions.stealer.nosmallfiles", false);
 pref("extensions.stealer.nozerofiles", true);
+pref("extensions.stealer.alwaysaskdownloadfolder", false);
 pref("extensions.stealer.rulesJSON", "[{\"rtype\":\"1\",\"enabled\":\"true\",\"des\":\"Video\",\"url\":\"http:\\\\/\\\\/\",\"ct\":\"video|flv|f4v|mp4\",\"dir\":\"\"},{\"rtype\":\"2\",\"enabled\":\"false\",\"des\":\"Audio\",\"url\":\"http:\\\\/\\\\/.+(\\\\.mp3|\\\\.wma)\",\"ct\":\"mpeg|mp3|wma|ogg|.*\",\"dir\":\"\"},{\"rtype\":\"3\",\"enabled\":\"false\",\"des\":\"Flash\",\"url\":\"http:\\\\/\\\\/\",\"ct\":\"swf|flash|shockwave\",\"dir\":\"\"}]");

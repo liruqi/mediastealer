@@ -15,6 +15,7 @@ function StealerConfig() {
 	this.filetypeunknown = true;
  	this.nosmallfiles = true;
  	this.nozerofiles = true;	
+	this.alwaysaskdownloadfolder = true;
     this.rules = [];
     this.home = Components.classes["@mozilla.org/file/directory_service;1"]
                                .getService(Components.interfaces.nsIProperties)
@@ -39,6 +40,7 @@ StealerConfig.prototype = {
 			this.filetypeunknown = stealerBranch.getBoolPref("filetypeunknown");	
 			this.nosmallfiles = stealerBranch.getBoolPref("nosmallfiles");
 			this.nozerofiles = stealerBranch.getBoolPref("nozerofiles");		
+			this.alwaysaskdownloadfolder = stealerBranch.getBoolPref("alwaysaskdownloadfolder");
 			
 			
             this.rules = JSON.parse(stealerBranch.getCharPref("rulesJSON"));			
@@ -68,6 +70,7 @@ StealerConfig.prototype = {
 			stealerBranch.setBoolPref("filetypeunknown", this.filetypeunknown);
 			stealerBranch.setBoolPref("nozerofiles", this.nozerofiles);
 			stealerBranch.setBoolPref("nosmallfiles", this.nosmallfiles);			
+			stealerBranch.setBoolPref("alwaysaskdownloadfolder",this.alwaysaskdownloadfolder);
 
             var rules = [];
             for(var i = 0; i < this.rules.length; i++) {
