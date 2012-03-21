@@ -326,7 +326,11 @@ MediaStealerController.prototype = {
                 var file = treeitem.firstChild.childNodes[0].getAttribute("file");
 				var downloadID = treeitem.firstChild.childNodes[0].getAttribute("DownloadID");
 				var stat = treeitem.firstChild.childNodes[5].getAttribute("label");	
-				treeitem.firstChild.childNodes[5].setAttribute("label", "Paused");	
+				treeitem.firstChild.childNodes[5].setAttribute("label", "Paused");
+				var resumeButton = document.getElementById("resume");
+				var pauseButton = document.getElementById("pause");
+				resumeButton.setAttribute("disabled", "false");
+				pauseButton.setAttribute("disabled", "true");				
 				if (stat == "Transferring")
 				{
 				downloadManager.pauseDownload(downloadID);
@@ -355,6 +359,10 @@ MediaStealerController.prototype = {
                 var file = treeitem.firstChild.childNodes[0].getAttribute("file");
 				var downloadID = treeitem.firstChild.childNodes[0].getAttribute("DownloadID");
 				var stat = treeitem.firstChild.childNodes[5].getAttribute("label");	
+				var resumeButton = document.getElementById("resume");
+				var pauseButton = document.getElementById("pause");
+				pauseButton.setAttribute("disabled", "false"); 
+				resumeButton.setAttribute("disabled", "true"); 
 				if (stat =="Paused")
 				{				
 				  downloadManager.resumeDownload(downloadID);	   
@@ -619,6 +627,46 @@ MediaStealerController.prototype = {
             //alert("onOpenFolder:\n"+e.name+": "+e.message);
         }
     },
+	onTaskTreeClick: function(event) {
+	 if(event.button) return; // 右键
+		try {
+            var temptaskTree = document.getElementById("task-tree");
+			var idx = temptaskTree.currentIndex;
+                if(idx < 0) return;			
+            var treeitem = temptaskTree.view.getItemAtIndex(idx); 
+			var resumeButton = document.getElementById("resume");
+            var pauseButton = document.getElementById("pause");
+			var deleteButton = document.getElementById("delete");
+			var stat = treeitem.firstChild.childNodes[5].getAttribute("label");	// status				
+				if (stat=="Transferring") 
+					{
+						resumeButton.setAttribute("disabled", "true");  
+						pauseButton.setAttribute("disabled", "false"); 
+						deleteButton.setAttribute("disabled", "true"); 
+					}
+				else if(stat=="Paused")
+					{
+						deleteButton.setAttribute("disabled", "true");
+						resumeButton.setAttribute("disabled", "false");
+						pauseButton.setAttribute("disabled", "true");
+					}
+				else if(stat=="Interrupted")
+					{
+						deleteButton.setAttribute("enabled", "true");
+						resumeButton.setAttribute("disabled", "true");
+						pauseButton.setAttribute("disabled", "true");
+					}
+				else if(stat=="Finished")
+					{
+						deleteButton.setAttribute("disabled", "false");
+					    resumeButton.setAttribute("disabled", "true");
+						pauseButton.setAttribute("disabled", "true");
+					}					
+        }
+        catch(e) {
+            //alert("onTaskTreeClick:\n"+e.name+": "+e.message);
+        }
+	},
     onCopyRow: function() {
         try {
             var temptaskTree = document.getElementById("task-tree");
