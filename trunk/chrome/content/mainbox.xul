@@ -48,7 +48,7 @@
           <vbox flex="3">
             <tree id="task-tree" flex="1" context="tasklistPopup" seltype="single"
                   enableColumnDrag="true" class="tree" rows=""
-                  onclick="" ondblclick="Stealer.onTaskTreeDoubleClick(event);">
+                  onclick="Stealer.onTaskTreeClick(event);" ondblclick="Stealer.onTaskTreeDoubleClick(event);">
  
               <treecols>
                 <treecol id="file-col"   label="&tasks_tree_file.label;"     flex="1" persist="width hidden ordinal" primary="true"/>
