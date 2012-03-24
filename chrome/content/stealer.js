@@ -21,7 +21,7 @@ MediaStealerController.prototype = {
     show: function() {
         var params = "";
         var windowName = "MediaStealer.MainWindow";
-        var windowType = "MediaStealerMainWindow";		
+        var windowType = "MediaStealerMainWindow";
         var url = "chrome://stealer/content/window.xul";
         var flags = "width=800,height=600,chrome=yes,centerscreen,resizable";
 
@@ -72,30 +72,30 @@ MediaStealerController.prototype = {
             var showStatusbar = config.showStatusbar;
             var useCache = config.useCache;
             var alwaysConfirm = config.alwaysConfirm;
-			var filetypeunknown = config.filetypeunknown;
-			var nozerofiles = config.nozerofiles;
-			var nosmallfiles = config.nosmallfiles;			
-			var alwaysaskdownloadfolder = config.alwaysaskdownloadfolder;
-			
+            var filetypeunknown = config.filetypeunknown;
+            var nozerofiles = config.nozerofiles;
+            var nosmallfiles = config.nosmallfiles;
+            var alwaysaskdownloadfolder = config.alwaysaskdownloadfolder;
+
             this.initStatusbar(showStatusbar, enabled);
 
             var enableCheck = document.getElementById("enableCheck");
             var showStatusbarCheck = document.getElementById("showStatusbarCheck");
             var cacheCheck = document.getElementById("cacheCheck");
             var confirmCheck = document.getElementById("confirmCheck");
-			var filetypeunknownCheck = document.getElementById("filetypeunknownCheck");
-			var nosmallfilesCheck = document.getElementById("nosmallfilesCheck");
-			var nozerofilesCheck = document.getElementById("nozerofilesCheck");
-			var alwaysaskdownloadfolderCheck = document.getElementById("alwaysaskdownloadfolderCheck");
+            var filetypeunknownCheck = document.getElementById("filetypeunknownCheck");
+            var nosmallfilesCheck = document.getElementById("nosmallfilesCheck");
+            var nozerofilesCheck = document.getElementById("nozerofilesCheck");
+            var alwaysaskdownloadfolderCheck = document.getElementById("alwaysaskdownloadfolderCheck");
 
             enableCheck.setAttribute("checked", (enabled ? "true":"false"));
             showStatusbarCheck.setAttribute("checked", (showStatusbar ? "true" : "false"));
             cacheCheck.setAttribute("checked", (useCache ? "true" : "false"));
             confirmCheck.setAttribute("checked", (alwaysConfirm ? "true" : "false"));
-			filetypeunknownCheck.setAttribute("checked", (filetypeunknown ? "true" : "false"));
-			nosmallfilesCheck.setAttribute("checked", (nosmallfiles ? "true" : "false"));
-			nozerofilesCheck.setAttribute("checked", (nozerofiles ? "true" : "false"));
-			alwaysaskdownloadfolderCheck.setAttribute("checked", (alwaysaskdownloadfolder ? "true" : "false"));
+            filetypeunknownCheck.setAttribute("checked", (filetypeunknown ? "true" : "false"));
+            nosmallfilesCheck.setAttribute("checked", (nosmallfiles ? "true" : "false"));
+            nozerofilesCheck.setAttribute("checked", (nozerofiles ? "true" : "false"));
+            alwaysaskdownloadfolderCheck.setAttribute("checked", (alwaysaskdownloadfolder ? "true" : "false"));
 
             document.getElementById("defaultDir").value = config.defaultDir;
 
@@ -109,15 +109,15 @@ MediaStealerController.prototype = {
                     document.getElementById("audioCheck").setAttribute("checked", "true");
                 if(rule.rtype == "3" && rule.enabled == "true")
                     document.getElementById("flashCheck").setAttribute("checked", "true");
-            }		
+            }
         }
         catch(e) {
             this.dbgPrintln("MediaStealerController.initUI():\n"+e.name+": "+e.message);
         }
     },
     initStatusbar: function(showStatusbar, enabled) {
-        var statusbar_bt = document.getElementById("stealerStatusbar");		
-		
+        var statusbar_bt = document.getElementById("stealerStatusbar");
+
         if(showStatusbar) {
             if(enabled) {
                 statusbar_bt.image = "chrome://stealer/skin/enable.png";
@@ -132,7 +132,7 @@ MediaStealerController.prototype = {
             statusbar_bt.image = "";
             statusbar_bt.setAttribute("tooltiptext", "");
         }
-    },	
+    },
     save: function(xconfig) {
         try {
             if(xconfig == null)
@@ -153,12 +153,12 @@ MediaStealerController.prototype = {
             config.showStatusbar = document.getElementById("showStatusbarCheck").checked;
             config.useCache = document.getElementById("cacheCheck").checked;
             config.alwaysConfirm = document.getElementById("confirmCheck").checked;
-			config.filetypeunknown = document.getElementById("filetypeunknownCheck").checked;
-			config.nozerofiles = document.getElementById("nozerofilesCheck").checked;
-            config.nosmallfiles	= document.getElementById("nosmallfilesCheck").checked;				
+            config.filetypeunknown = document.getElementById("filetypeunknownCheck").checked;
+            config.nozerofiles = document.getElementById("nozerofilesCheck").checked;
+            config.nosmallfiles = document.getElementById("nosmallfilesCheck").checked;
             config.defaultDir = document.getElementById("defaultDir").value;
-			config.alwaysaskdownloadfolder = document.getElementById("alwaysaskdownloadfolderCheck").checked;
-            
+            config.alwaysaskdownloadfolder = document.getElementById("alwaysaskdownloadfolderCheck").checked;
+
             config.rules = [];
             var list = document.getElementById("rulelist");
             if(list.childNodes.length > 0) {
@@ -177,7 +177,7 @@ MediaStealerController.prototype = {
         }
     },
 
-    //------------------  任务面板（tasklist及其popup）管理 -------------------------
+    //------------------  Task panel (tasklist and popup) -------------------------
     addTask: function(task) {
         try {
             var cell_file   = document.createElement("treecell");
@@ -192,7 +192,7 @@ MediaStealerController.prototype = {
             cell_file.setAttribute("file", task.file);
             cell_file.setAttribute("dir", task.dir);
             cell_file.setAttribute("id", task.id);
-			cell_file.setAttribute("DownloadID", task.DownloadID);
+            cell_file.setAttribute("DownloadID", task.DownloadID);
 
             cell_url .setAttribute("label", task.url);
             cell_type.setAttribute("label", task.type);
@@ -202,7 +202,7 @@ MediaStealerController.prototype = {
             cell_curr.setAttribute("curr", task.curr);
             cell_stat.setAttribute("label", task.stat);
             cell_folder.setAttribute("label", task.dir);
-         
+
             var row = document.createElement("treerow");
             row.appendChild(cell_file);
             row.appendChild(cell_url);
@@ -211,7 +211,7 @@ MediaStealerController.prototype = {
             row.appendChild(cell_curr);
             row.appendChild(cell_stat);
             row.appendChild(cell_folder);
-         
+
             var item = document.createElement("treeitem");
             item.appendChild(row);
             document.getElementById("tasklist").appendChild(item);
@@ -267,106 +267,106 @@ MediaStealerController.prototype = {
         this.setTask(index, task);
     },
 
-    // 以下是任务列表(tasklist)弹出菜单的实现
+    // implementation of the tasklist context menu
     onAbort: function() {
-			try{
-			var downloadManager = Components.classes["@mozilla.org/download-manager;1"].getService(Components.interfaces.nsIDownloadManager);			
-			var prompts = Components.classes["@mozilla.org/embedcomp/prompt-service;1"].getService(Components.interfaces.nsIPromptService);
-            var title = "Stealer";			
-			var list = document.getElementById("tasklist");
-			var Taskcount = list.childElementCount;	
+        try {
+            var downloadManager = Components.classes["@mozilla.org/download-manager;1"].getService(Components.interfaces.nsIDownloadManager);
+            var prompts = Components.classes["@mozilla.org/embedcomp/prompt-service;1"].getService(Components.interfaces.nsIPromptService);
+            var title = "Stealer";
+            var list = document.getElementById("tasklist");
+            var Taskcount = list.childElementCount;
 
-            // do the deed           
-			var temptaskTree = document.getElementById("task-tree");			
-					
-                var idx = temptaskTree.currentIndex;
-                if(idx < 0) return;
-				
-				if(idx == Taskcount) return;
-				
-				var choice = prompts.confirm(null, title, "Are you sure you want to abort this file and task? This will result in deleting the file and task.");
-				if(!choice) return;
-                var treeitem = temptaskTree.view.getItemAtIndex(idx);
-                var file = treeitem.firstChild.childNodes[0].getAttribute("file");
-				var downloadID = treeitem.firstChild.childNodes[0].getAttribute("DownloadID");
-				var stat = treeitem.firstChild.childNodes[5].getAttribute("label");		
+            // do the deed
+            var temptaskTree = document.getElementById("task-tree");
 
-				if (stat == "Transferring" || stat == "Paused")
-				{
-				downloadManager.cancelDownload(downloadID);	
-				}	
-				var fd = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
-				fd.initWithPath(file);
-				if(fd.exists()) fd.remove(false);
-				treeitem.parentNode.removeChild(treeitem);
-				temptaskTree.view.selection.select(idx);
-				temptaskTree.treeBoxObject.ensureRowIsVisible(temptaskTree.currentIndex);
+            var idx = temptaskTree.currentIndex;
+            if(idx < 0) return;
+
+            if(idx == Taskcount) return;
+
+            var choice = prompts.confirm(null, title, "Are you sure you want to abort this file and task? This will result in deleting the file and task.");
+            if(!choice) return;
+
+            var treeitem = temptaskTree.view.getItemAtIndex(idx);
+            var file = treeitem.firstChild.childNodes[0].getAttribute("file");
+            var downloadID = treeitem.firstChild.childNodes[0].getAttribute("DownloadID");
+            var stat = treeitem.firstChild.childNodes[5].getAttribute("label");
+
+            if (stat == "Transferring" || stat == "Paused")
+            {
+                downloadManager.cancelDownload(downloadID);
+            }
+            var fd = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
+            fd.initWithPath(file);
+            if(fd.exists()) fd.remove(false);
+            treeitem.parentNode.removeChild(treeitem);
+            temptaskTree.view.selection.select(idx);
+            temptaskTree.treeBoxObject.ensureRowIsVisible(temptaskTree.currentIndex);
         }
         catch(e) {
             alert("onAbort:\n"+e.name+": "+e.message);
         }
     },
-	onPause: function() {
-						
-			try{
-			
-			var downloadManager = Components.classes["@mozilla.org/download-manager;1"].getService(Components.interfaces.nsIDownloadManager);	
-			var list = document.getElementById("tasklist");
-			var Taskcount = list.childElementCount;	
+    onPause: function() {
 
-            // do the deed           
-			var temptaskTree = document.getElementById("task-tree");			
-					
-                var idx = temptaskTree.currentIndex;
-                if(idx < 0) return;
-				
-				if(idx == Taskcount) return
+        try {
 
-                var treeitem = temptaskTree.view.getItemAtIndex(idx);
-                var file = treeitem.firstChild.childNodes[0].getAttribute("file");
-				var downloadID = treeitem.firstChild.childNodes[0].getAttribute("DownloadID");
-				var stat = treeitem.firstChild.childNodes[5].getAttribute("label");	
-				treeitem.firstChild.childNodes[5].setAttribute("label", "Paused");
-				var resumeButton = document.getElementById("resume");
-				var pauseButton = document.getElementById("pause");
-				resumeButton.setAttribute("disabled", "false");
-				pauseButton.setAttribute("disabled", "true");				
-				if (stat == "Transferring")
-				{
-				downloadManager.pauseDownload(downloadID);
-				}
+            var downloadManager = Components.classes["@mozilla.org/download-manager;1"].getService(Components.interfaces.nsIDownloadManager);
+            var list = document.getElementById("tasklist");
+            var Taskcount = list.childElementCount;
+
+            // do the deed
+            var temptaskTree = document.getElementById("task-tree");
+
+            var idx = temptaskTree.currentIndex;
+            if(idx < 0) return;
+
+            if(idx == Taskcount) return;
+
+            var treeitem = temptaskTree.view.getItemAtIndex(idx);
+            var file = treeitem.firstChild.childNodes[0].getAttribute("file");
+            var downloadID = treeitem.firstChild.childNodes[0].getAttribute("DownloadID");
+            var stat = treeitem.firstChild.childNodes[5].getAttribute("label");
+            treeitem.firstChild.childNodes[5].setAttribute("label", "Paused");
+            var resumeButton = document.getElementById("resume");
+            var pauseButton = document.getElementById("pause");
+            resumeButton.setAttribute("disabled", "false");
+            pauseButton.setAttribute("disabled", "true");
+            if (stat == "Transferring")
+            {
+                downloadManager.pauseDownload(downloadID);
+            }
         }
         catch(e) {
             alert("onPause:\n"+e.name+": "+e.message);
         }
     },
-	onResume: function() {
-						
-			try{
-			var downloadManager = Components.classes["@mozilla.org/download-manager;1"].getService(Components.interfaces.nsIDownloadManager);	
-			var list = document.getElementById("tasklist");
-			var Taskcount = list.childElementCount;	
+    onResume: function() {
 
-            // do the deed           
-			var temptaskTree = document.getElementById("task-tree");			
-					
-                var idx = temptaskTree.currentIndex;
-                if(idx < 0) return;
-				
-				if(idx == Taskcount) return
+        try {
+            var downloadManager = Components.classes["@mozilla.org/download-manager;1"].getService(Components.interfaces.nsIDownloadManager);
+            var list = document.getElementById("tasklist");
+            var Taskcount = list.childElementCount;
 
-                var treeitem = temptaskTree.view.getItemAtIndex(idx);
-                var file = treeitem.firstChild.childNodes[0].getAttribute("file");
-				var downloadID = treeitem.firstChild.childNodes[0].getAttribute("DownloadID");
-				var stat = treeitem.firstChild.childNodes[5].getAttribute("label");	
-				var resumeButton = document.getElementById("resume");
-				var pauseButton = document.getElementById("pause");
-				pauseButton.setAttribute("disabled", "false"); 
-				resumeButton.setAttribute("disabled", "true"); 
-				if (stat =="Paused")
-				{				
-				  downloadManager.resumeDownload(downloadID);	   
-				}
+            // do the deed
+            var temptaskTree = document.getElementById("task-tree");
+
+            var idx = temptaskTree.currentIndex;
+            if(idx < 0) return;
+            if(idx == Taskcount) return
+
+            var treeitem = temptaskTree.view.getItemAtIndex(idx);
+            var file = treeitem.firstChild.childNodes[0].getAttribute("file");
+            var downloadID = treeitem.firstChild.childNodes[0].getAttribute("DownloadID");
+            var stat = treeitem.firstChild.childNodes[5].getAttribute("label");
+            var resumeButton = document.getElementById("resume");
+            var pauseButton = document.getElementById("pause");
+            pauseButton.setAttribute("disabled", "false");
+            resumeButton.setAttribute("disabled", "true");
+            if (stat =="Paused")
+            {
+                downloadManager.resumeDownload(downloadID);
+            }
         }
         catch(e) {
             alert("onResume:\n"+e.name+": "+e.message);
@@ -381,41 +381,39 @@ MediaStealerController.prototype = {
             var question = "Do you really want to delete this task?";
             var checkstr = "Also remove downloaded file";
             var check = {value: false};
-			var list = document.getElementById("tasklist");
-			var Taskcount = list.childElementCount;	
+            var list = document.getElementById("tasklist");
+            var Taskcount = list.childElementCount;
 
-            // do the deed           
-			var temptaskTree = document.getElementById("task-tree");			
-					
-                var idx = temptaskTree.currentIndex;
-                if(idx < 0) return;
-				
-				if(idx == Taskcount) return;
+            // do the deed
+            var temptaskTree = document.getElementById("task-tree");
 
-                var result = prompts.confirmCheck(null, title, question, checkstr, check);
-                if(!result) return;
+            var idx = temptaskTree.currentIndex;
+            if(idx < 0) return;
+            if(idx == Taskcount) return;
 
-                var treeitem = temptaskTree.view.getItemAtIndex(idx);
-                var file = treeitem.firstChild.childNodes[0].getAttribute("file");
-				var stat = treeitem.firstChild.childNodes[5].getAttribute("label");				
-				if ((stat == "Finished")||(stat == "Interrupted")) 
-				   {
+            var result = prompts.confirmCheck(null, title, question, checkstr, check);
+            if(!result) return;
 
-						if(check.value) {
-						var fd = Components.classes["@mozilla.org/file/local;1"].
-                            createInstance(Components.interfaces.nsILocalFile);
-						fd.initWithPath(file);
-						if(fd.exists()) fd.remove(false);
-										}
+            var treeitem = temptaskTree.view.getItemAtIndex(idx);
+            var file = treeitem.firstChild.childNodes[0].getAttribute("file");
+            var stat = treeitem.firstChild.childNodes[5].getAttribute("label");
+            if ((stat == "Finished")||(stat == "Interrupted")) {
 
-						treeitem.parentNode.removeChild(treeitem);
-						temptaskTree.view.selection.select(idx);
-						temptaskTree.treeBoxObject.ensureRowIsVisible(temptaskTree.currentIndex);
-                  }
-				else
-				 {
-				    alert("Please wait until download is complete");
-				 }		  
+                if(check.value) {
+                    var fd = Components.classes["@mozilla.org/file/local;1"]
+                                       .createInstance(Components.interfaces.nsILocalFile);
+                    fd.initWithPath(file);
+                    if(fd.exists())
+                        fd.remove(false);
+                }
+
+                treeitem.parentNode.removeChild(treeitem);
+                temptaskTree.view.selection.select(idx);
+                temptaskTree.treeBoxObject.ensureRowIsVisible(temptaskTree.currentIndex);
+            }
+            else {
+                alert("Please wait until download is complete");
+            }
         }
         catch(e) {
             alert("onDeleteTask:\n"+e.name+": "+e.message);
@@ -434,31 +432,30 @@ MediaStealerController.prototype = {
             if(!result) return;
 
             // do the deed
-			var temptaskTree = document.getElementById("task-tree");			
+            var temptaskTree = document.getElementById("task-tree");
             var list = document.getElementById("tasklist");
-			var Taskcount = list.childElementCount;					
-			for (Taskcount; Taskcount > 0; Taskcount--)	
-				{
-                var idx = Taskcount-1;				
+            var Taskcount = list.childElementCount;
+            for (Taskcount; Taskcount > 0; Taskcount--)
+            {
+                var idx = Taskcount-1;
                 var treeitem = temptaskTree.view.getItemAtIndex(idx);
-				var file = treeitem.firstChild.childNodes[0].getAttribute("file");				
-				var stat = treeitem.firstChild.childNodes[5].getAttribute("label");	
-					if ((stat == "Finished")||(stat == "Interrupted")) 
-					{
-						if(check.value) 
-						{
-						var fd = Components.classes["@mozilla.org/file/local;1"].
-                            createInstance(Components.interfaces.nsILocalFile);
-						fd.initWithPath(file);
-						if(fd.exists()) fd.remove(false);
-					
-						}
-				    treeitem.parentNode.removeChild(treeitem);
+                var file = treeitem.firstChild.childNodes[0].getAttribute("file");
+                var stat = treeitem.firstChild.childNodes[5].getAttribute("label");
+                if ((stat == "Finished")||(stat == "Interrupted"))
+                {
+                    if(check.value) {
+                    var fd = Components.classes["@mozilla.org/file/local;1"]
+                                       .createInstance(Components.interfaces.nsILocalFile);
+                    fd.initWithPath(file);
+                    if(fd.exists())
+                        fd.remove(false);
+
+                    }
+                    treeitem.parentNode.removeChild(treeitem);
                     temptaskTree.view.selection.select(idx);
                     temptaskTree.treeBoxObject.ensureRowIsVisible(idx);
-					}
-				}
-			
+                }
+            }
         }
         catch(e) {
             //alert("onDeleteAllTasks:\n"+e.name+": "+e.message);
@@ -466,30 +463,28 @@ MediaStealerController.prototype = {
     },
     onOpenFile: function() {
         try {
-			var temptaskTree = document.getElementById("task-tree");            
-                var idx = temptaskTree.currentIndex;
-                if(idx < 0) return;
+            var temptaskTree = document.getElementById("task-tree");
+            var idx = temptaskTree.currentIndex;
+            if(idx < 0) return;
 
-                var treeitem = temptaskTree.view.getItemAtIndex(idx);
-                var file = treeitem.firstChild.childNodes[0].getAttribute("file");  // full path
-				var stat = treeitem.firstChild.childNodes[5].getAttribute("label");	// status
-					if ((stat == "Finished")||(stat == "Interrupted")) {
+            var treeitem = temptaskTree.view.getItemAtIndex(idx);
+            var file = treeitem.firstChild.childNodes[0].getAttribute("file");  // full path
+            var stat = treeitem.firstChild.childNodes[5].getAttribute("label"); // status
+            if ((stat == "Finished") || (stat == "Interrupted")) {
 
-                var fd = Components.classes["@mozilla.org/file/local;1"].
-                            createInstance(Components.interfaces.nsILocalFile);
+                var fd = Components.classes["@mozilla.org/file/local;1"]
+                                   .createInstance(Components.interfaces.nsILocalFile);
                 fd.initWithPath(file);
 
                 try {
                     fd.launch();
                 }
                 catch(e) {}
-				}
-				else
-				{
-				alert("Please wait until download is complete");
-				}
-
-            
+            }
+            else
+            {
+                alert("Please wait until download is complete");
+            }
         }
         catch(e) {
             //alert("onOpenFolder:\n"+e.name+": "+e.message);
@@ -497,48 +492,20 @@ MediaStealerController.prototype = {
     },
     onOpenFolder: function() {
         try {
-		var temptaskTree = document.getElementById("task-tree");
-                var idx = temptaskTree.currentIndex;
-				var list = document.getElementById("tasklist");
-				var idx2  = list.childElementCount;				
-                if((idx2 < 1) || (idx == idx2) || (idx == -1)) 				
-					{
-					var fd = Components.classes["@mozilla.org/file/local;1"].
-                            createInstance(Components.interfaces.nsILocalFile);
-					var tempdownloaddir = stealerConfig.defaultDir;
-					fd.initWithPath(tempdownloaddir);		
-					
-						if( !fd.exists() || !fd.isDirectory())		
-						{
-						  var tempdownloaddir = stealerConfig.home.path;
-						  fd.initWithPath(tempdownloaddir);
-						}
-						try 
-						{
-						fd.reveal();							
-						}
-						catch(e) 
-						{
-						var parent = fd.parent.QueryInterface(Components.interfaces.nsILocalFile);
-						if(!parent)
-						return;
-								try 
-								{
-								parent.launch();
-								} catch(e) {}
-						}
-					
-					
-					return;
-					}
+            var temptaskTree = document.getElementById("task-tree");
+            var idx = temptaskTree.currentIndex;
+            var list = document.getElementById("tasklist");
+            var idx2  = list.childElementCount;
+            if((idx2 < 1) || (idx == idx2) || (idx == -1)) {
+                var fd = Components.classes["@mozilla.org/file/local;1"]
+                                   .createInstance(Components.interfaces.nsILocalFile);
+                var tempdownloaddir = stealerConfig.defaultDir;
+                fd.initWithPath(tempdownloaddir);
 
-                var treeitem = temptaskTree.view.getItemAtIndex(idx);
-                var file = treeitem.firstChild.childNodes[0].getAttribute("file");  // full path
-
-                var fd = Components.classes["@mozilla.org/file/local;1"].
-                            createInstance(Components.interfaces.nsILocalFile);
-                fd.initWithPath(file);
-
+                if( !fd.exists() || !fd.isDirectory()) {
+                    var tempdownloaddir = stealerConfig.home.path;
+                    fd.initWithPath(tempdownloaddir);
+                }
                 try {
                     fd.reveal();
                 }
@@ -552,7 +519,29 @@ MediaStealerController.prototype = {
                     } catch(e) {}
                 }
 
-            
+                return;
+            }
+
+            var treeitem = temptaskTree.view.getItemAtIndex(idx);
+            var file = treeitem.firstChild.childNodes[0].getAttribute("file");  // full path
+
+            var fd = Components.classes["@mozilla.org/file/local;1"].
+                        createInstance(Components.interfaces.nsILocalFile);
+            fd.initWithPath(file);
+
+            try {
+                fd.reveal();
+            }
+            catch(e) {
+                var parent = fd.parent.QueryInterface(Components.interfaces.nsILocalFile);
+                if(!parent)
+                    return;
+
+                try {
+                    parent.launch();
+                } catch(e) {}
+            }
+
         }
         catch(e) {
             //alert("onOpenFolder:\n"+e.name+": "+e.message);
@@ -561,52 +550,54 @@ MediaStealerController.prototype = {
     onRenameFile: function() {
         try {
             var temptaskTree = document.getElementById("task-tree");
-                var idx = temptaskTree.currentIndex;
-                if(idx < 0) return;
+            var idx = temptaskTree.currentIndex;
+            if(idx < 0) return;
 
-                var treeitem = temptaskTree.view.getItemAtIndex(idx);
-                var file = treeitem.firstChild.childNodes[0].getAttribute("file");  // full path
-				var label = treeitem.firstChild.childNodes[0].getAttribute("label");//filename
-				var dir = treeitem.firstChild.childNodes[0].getAttribute("dir");//destinationfolder
-                var fd = Components.classes["@mozilla.org/file/local;1"].
-                            createInstance(Components.interfaces.nsILocalFile);
-                fd.initWithPath(file);
-				var nsIFilePicker = Components.interfaces.nsIFilePicker;
-				var fp = Components.classes["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
-				fp.init(window, "Please select a folder and enter a filename", nsIFilePicker.modeSave);		
-				fp.defaultString = label;
-				fp.displayDirectory = fd;						
-				var res = fp.show();
-					if (res == nsIFilePicker.returnOK || res == nsIFilePicker.returnReplace)
-					{
-					var fileleafname = fp.file.leafName;
-					var filepath = fp.file.path;						  
-					var fileleafnamelength = fileleafname.length;
-					var filepathlength = filepath.length;						  
-					var fileresult = filepath.substr(0,(filepathlength-fileleafnamelength));
+            var treeitem = temptaskTree.view.getItemAtIndex(idx);
+            var file = treeitem.firstChild.childNodes[0].getAttribute("file");  // full path
+            var label = treeitem.firstChild.childNodes[0].getAttribute("label");//filename
+            var dir = treeitem.firstChild.childNodes[0].getAttribute("dir");//destinationfolder
+            var fd = Components.classes["@mozilla.org/file/local;1"]
+                               .createInstance(Components.interfaces.nsILocalFile);
+            fd.initWithPath(file);
+
+            var nsIFilePicker = Components.interfaces.nsIFilePicker;
+            var fp = Components.classes["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
+            fp.init(window, "Please select a folder and enter a filename", nsIFilePicker.modeSave);
+            fp.defaultString = label;
+            fp.displayDirectory = fd;
+            var res = fp.show();
+            if (res == nsIFilePicker.returnOK || res == nsIFilePicker.returnReplace) {
+                var fileleafname = fp.file.leafName;
+                var filepath = fp.file.path;
+                var fileleafnamelength = fileleafname.length;
+                var filepathlength = filepath.length;
+                var fileresult = filepath.substr(0,(filepathlength-fileleafnamelength));
+
                  // rename rather than move
-					if(fd.exists()) fd.moveTo(fp.file.parent, fp.file.leafName);
-					treeitem.firstChild.childNodes[0].setAttribute("label", fp.file.leafName);
-					var dir  = treeitem.firstChild.childNodes[0].getAttribute("dir"); // path
-					treeitem.firstChild.childNodes[0].setAttribute("file", fp.file.path);
-					treeitem.firstChild.childNodes[6].setAttribute("label", fileresult);
-					}
+                if(fd.exists()) fd.moveTo(fp.file.parent, fp.file.leafName);
+                treeitem.firstChild.childNodes[0].setAttribute("label", fp.file.leafName);
+                var dir  = treeitem.firstChild.childNodes[0].getAttribute("dir"); // path
+                treeitem.firstChild.childNodes[0].setAttribute("file", fp.file.path);
+                treeitem.firstChild.childNodes[6].setAttribute("label", fileresult);
+            }
         }
         catch(e) {
             //alert("onRenameFile:\n"+e.name+": "+e.message);
         }
     },
     onTaskTreeDoubleClick: function(event) {
-        if(event.button) return; // 右键
+        if(event.button) return;  // right click
+
         try {
             var temptaskTree = document.getElementById("task-tree");
-                var idx = temptaskTree.currentIndex;
-                if(idx < 0) return;
+            var idx = temptaskTree.currentIndex;
+            if(idx < 0) return;
 
-                var treeitem = temptaskTree.view.getItemAtIndex(idx);
-                var file = treeitem.firstChild.childNodes[0].getAttribute("file");  // full path
-				var stat = treeitem.firstChild.childNodes[5].getAttribute("label");	// status
-					if ((stat == "Finished")||(stat == "Interrupted")) {
+            var treeitem = temptaskTree.view.getItemAtIndex(idx);
+            var file = treeitem.firstChild.childNodes[0].getAttribute("file");  // full path
+            var stat = treeitem.firstChild.childNodes[5].getAttribute("label"); // status
+            if ((stat == "Finished")||(stat == "Interrupted")) {
 
                 var fd = Components.classes["@mozilla.org/file/local;1"].
                             createInstance(Components.interfaces.nsILocalFile);
@@ -616,99 +607,101 @@ MediaStealerController.prototype = {
                     fd.launch();
                 }
                 catch(e) {}
-				}
-				else
-				{
-				alert("Please wait until download is complete");
-				}
-            
+            }
+            else
+            {
+                alert("Please wait until download is complete");
+            }
+
         }
         catch(e) {
             //alert("onOpenFolder:\n"+e.name+": "+e.message);
         }
     },
-	onTaskTreeClick: function(event) {
-	 if(event.button) return; // 右键
-		try {
+    onTaskTreeClick: function(event) {
+        if(event.button) return; // right click
+
+        try {
             var temptaskTree = document.getElementById("task-tree");
-			var idx = temptaskTree.currentIndex;
-                if(idx < 0) return;			
-            var treeitem = temptaskTree.view.getItemAtIndex(idx); 
-			var resumeButton = document.getElementById("resume");
+            var idx = temptaskTree.currentIndex;
+            if(idx < 0) return;
+
+            var treeitem = temptaskTree.view.getItemAtIndex(idx);
+            var resumeButton = document.getElementById("resume");
             var pauseButton = document.getElementById("pause");
-			var deleteButton = document.getElementById("delete");
-			var stat = treeitem.firstChild.childNodes[5].getAttribute("label");	// status				
-				if (stat=="Transferring") 
-					{
-						resumeButton.setAttribute("disabled", "true");  
-						pauseButton.setAttribute("disabled", "false"); 
-						deleteButton.setAttribute("disabled", "true"); 
-					}
-				else if(stat=="Paused")
-					{
-						deleteButton.setAttribute("disabled", "true");
-						resumeButton.setAttribute("disabled", "false");
-						pauseButton.setAttribute("disabled", "true");
-					}
-				else if(stat=="Interrupted")
-					{
-						deleteButton.setAttribute("enabled", "true");
-						resumeButton.setAttribute("disabled", "true");
-						pauseButton.setAttribute("disabled", "true");
-					}
-				else if(stat=="Finished")
-					{
-						deleteButton.setAttribute("disabled", "false");
-					    resumeButton.setAttribute("disabled", "true");
-						pauseButton.setAttribute("disabled", "true");
-					}					
+            var deleteButton = document.getElementById("delete");
+            var stat = treeitem.firstChild.childNodes[5].getAttribute("label"); // status
+
+            if (stat=="Transferring")
+            {
+                resumeButton.setAttribute("disabled", "true");
+                pauseButton.setAttribute("disabled", "false");
+                deleteButton.setAttribute("disabled", "true");
+            }
+            else if(stat=="Paused")
+            {
+                deleteButton.setAttribute("disabled", "true");
+                resumeButton.setAttribute("disabled", "false");
+                pauseButton.setAttribute("disabled", "true");
+            }
+            else if(stat=="Interrupted")
+            {
+                deleteButton.setAttribute("enabled", "true");
+                resumeButton.setAttribute("disabled", "true");
+                pauseButton.setAttribute("disabled", "true");
+            }
+            else if(stat=="Finished")
+            {
+                deleteButton.setAttribute("disabled", "false");
+                resumeButton.setAttribute("disabled", "true");
+                pauseButton.setAttribute("disabled", "true");
+            }
         }
         catch(e) {
             //alert("onTaskTreeClick:\n"+e.name+": "+e.message);
         }
-	},
+    },
     onCopyRow: function() {
         try {
             var temptaskTree = document.getElementById("task-tree");
-                var idx = temptaskTree.currentIndex;
-                if(idx < 0) return;
+            var idx = temptaskTree.currentIndex;
+            if(idx < 0) return;
 
-                var treerow = temptaskTree.view.getItemAtIndex(idx).firstChild;
+            var treerow = temptaskTree.view.getItemAtIndex(idx).firstChild;
 
-                var filename = treerow.childNodes[0].getAttribute("label");
-                var url      = treerow.childNodes[1].getAttribute("label");
-                var type     = treerow.childNodes[2].getAttribute("label");
-                var size     = treerow.childNodes[3].getAttribute("label");
-                var curr     = treerow.childNodes[4].getAttribute("curr");
-                var stat     = treerow.childNodes[5].getAttribute("label");
+            var filename = treerow.childNodes[0].getAttribute("label");
+            var url      = treerow.childNodes[1].getAttribute("label");
+            var type     = treerow.childNodes[2].getAttribute("label");
+            var size     = treerow.childNodes[3].getAttribute("label");
+            var curr     = treerow.childNodes[4].getAttribute("curr");
+            var stat     = treerow.childNodes[5].getAttribute("label");
 
-                var str = filename+"\t"+url+"\t"+type+"\t"+size+"\t"+curr+"\t"+stat;
-                this.toClipboard(str);
-            
+            var str = filename+"\t"+url+"\t"+type+"\t"+size+"\t"+curr+"\t"+stat;
+            this.toClipboard(str);
         }
         catch(e) {
             //alert("onCopyRow:\n"+e.name+": "+e.message);
         }
     },
-	  onCopyURL: function() {
+    onCopyURL: function() {
         try {
             var temptaskTree = document.getElementById("task-tree");
-                var idx = temptaskTree.currentIndex;
-                if(idx < 0) return;
+            var idx = temptaskTree.currentIndex;
+            if(idx < 0) return;
 
-                var treerow = temptaskTree.view.getItemAtIndex(idx).firstChild;
+            var treerow = temptaskTree.view.getItemAtIndex(idx).firstChild;
 
-                var url      = decodeURIComponent(treerow.childNodes[1].getAttribute("label"));
-               
-                var str = url;
-                this.toClipboard(str);
-            
+            var url = decodeURIComponent(treerow.childNodes[1].getAttribute("label"));
+
+            var str = url;
+            this.toClipboard(str);
+
         }
         catch(e) {
             //alert("onCopyRow:\n"+e.name+": "+e.message);
         }
     },
-	
+
     onCopyAllRows: function() {
         try {
             var tasklist = document.getElementById("tasklist");
@@ -734,15 +727,15 @@ MediaStealerController.prototype = {
             //alert("onCopyAllRows:\n"+e.name+": "+e.message);
         }
     },
-	   onCopyAllURLS: function() {
+    onCopyAllURLS: function() {
         try {
             var tasklist = document.getElementById("tasklist");
             var str = "";
             for(var i = 0; i < tasklist.childNodes.length; i++) {
 
                 var treerow = tasklist.childNodes[i].firstChild;
-                
-                var url      = decodeURIComponent(treerow.childNodes[1].getAttribute("label"));                
+
+                var url = decodeURIComponent(treerow.childNodes[1].getAttribute("label"));
 
                 if(i) str += "\n";
                 str += url;
@@ -757,16 +750,15 @@ MediaStealerController.prototype = {
     toClipboard: function(obj) {
         try {
             const clipboardHelper = Components.classes["@mozilla.org/widget/clipboardhelper;1"]
-                        .getService(Components.interfaces.nsIClipboardHelper);
-			clipboardHelper.copyString(String(obj));
-		} catch(e) {}
+                                              .getService(Components.interfaces.nsIClipboardHelper);
+            clipboardHelper.copyString(String(obj));
+        } catch(e) {}
     },
-    //------------------  任务面板（tasklist及其popup）管理 -------------------------
     //-------------------------------------------------------------------------------
 
-    //------------------------  选项面板管理及控件响应  -----------------------------
+    //------------------------  Option panel  -----------------------------
     onVideoClick: function() {
-        var state = document.getElementById("videoCheck").checked; // 得到点击前的状态
+        var state = document.getElementById("videoCheck").checked;
         var tasklist = document.getElementById("rulelist");
         for(var i = 0; i < tasklist.childNodes.length; i++) {
             var treeitem = tasklist.childNodes[i];
@@ -804,16 +796,16 @@ MediaStealerController.prototype = {
             }
         }
     },
-    onDirChanged: function() {  // 动态监视defaultDir输入框的变化
+    onDirChanged: function() {  // monitor the defaultDir input
         var text = String(document.getElementById("defaultDir").value);
         if(text.replace(/[ \t]+/g, "") == "")
             alert("Download directory must not be empty!");
-        
+
     },
-    changeDir: function() {  // 点击“浏览”按钮后的操作
+    changeDir: function() {  // the Browse button is clicked
         var fp = Components.classes["@mozilla.org/filepicker;1"]
                    .createInstance(Components.interfaces.nsIFilePicker);
-        fp.init(window, "Please choose a default download directory:", 
+        fp.init(window, "Please choose a default download directory:",
                     Components.interfaces.nsIFilePicker.modeGetFolder);
         var ret = fp.show();
         if (ret == Components.interfaces.nsIFilePicker.returnOK) {
@@ -821,10 +813,9 @@ MediaStealerController.prototype = {
             document.getElementById("defaultDir").value = path;
         }
     },
-    //------------------------  选项面板管理及控件响应  -----------------------------
     //-------------------------------------------------------------------------------
 
-    //------------------  规则面板（rulelist及相关按钮）管理 ------------------------
+    //------------------  Rule panel (rulelist)  ------------------------
     createTreeitem: function(listName, params) {
         try {
             var treecell1 = document.createElement("treecell");  // enabled
@@ -832,19 +823,19 @@ MediaStealerController.prototype = {
             var treecell3 = document.createElement("treecell");  // url
             var treecell4 = document.createElement("treecell");  // ct
             var treecell5 = document.createElement("treecell");  // dir
-           
+
             var treerow = document.createElement("treerow");
             treerow.appendChild(treecell1);
             treerow.appendChild(treecell2);
             treerow.appendChild(treecell3);
             treerow.appendChild(treecell4);
             treerow.appendChild(treecell5);
-           
+
             var treeitem = document.createElement("treeitem");
             treeitem.appendChild(treerow);
-           
+
             this.setTreeitem(treeitem, params);
-           
+
             document.getElementById(listName).appendChild(treeitem);
         }
         catch(e) {
@@ -853,15 +844,15 @@ MediaStealerController.prototype = {
     },
     setTreeitem: function(treeitem, params) {
         try {
-			var temp_treeitem_firstChild = treeitem.firstChild;           
-                // 0        1            2    3             4
-                // enabled, description, url, content-type, directory
-                this.setCheckbox(treeitem, params["enabled"]);
-                temp_treeitem_firstChild.childNodes[1].setAttribute("label", params["des"]);
-                temp_treeitem_firstChild.childNodes[2].setAttribute("label", params["url"]);
-                temp_treeitem_firstChild.childNodes[3].setAttribute("label", params["ct"]);
-                temp_treeitem_firstChild.childNodes[4].setAttribute("label", params["dir"]);
-                temp_treeitem_firstChild.setAttribute("rtype", params["rtype"]);          
+            var temp_treeitem_firstChild = treeitem.firstChild;
+            // 0        1            2    3             4
+            // enabled, description, url, content-type, directory
+            this.setCheckbox(treeitem, params["enabled"]);
+            temp_treeitem_firstChild.childNodes[1].setAttribute("label", params["des"]);
+            temp_treeitem_firstChild.childNodes[2].setAttribute("label", params["url"]);
+            temp_treeitem_firstChild.childNodes[3].setAttribute("label", params["ct"]);
+            temp_treeitem_firstChild.childNodes[4].setAttribute("label", params["dir"]);
+            temp_treeitem_firstChild.setAttribute("rtype", params["rtype"]);
         }
         catch(e) {
             //alert("setTreeitem:\n"+e.name+": "+e.message);
@@ -869,14 +860,15 @@ MediaStealerController.prototype = {
     },
     getTreeitem: function(treeitem) {
         try {
-			var temp_treeitem_firstChild = treeitem.firstChild;
-                return {rtype:      temp_treeitem_firstChild.getAttribute("rtype"),
-                        enabled:    temp_treeitem_firstChild.childNodes[0].getAttribute("value"), 
-                        des:        temp_treeitem_firstChild.childNodes[1].getAttribute("label"),
-                        url:        temp_treeitem_firstChild.childNodes[2].getAttribute("label"), 
-                        ct:         temp_treeitem_firstChild.childNodes[3].getAttribute("label"),
-                        dir:        temp_treeitem_firstChild.childNodes[4].getAttribute("label")}
-            
+            var temp_treeitem_firstChild = treeitem.firstChild;
+            return {
+                rtype:      temp_treeitem_firstChild.getAttribute("rtype"),
+                enabled:    temp_treeitem_firstChild.childNodes[0].getAttribute("value"),
+                des:        temp_treeitem_firstChild.childNodes[1].getAttribute("label"),
+                url:        temp_treeitem_firstChild.childNodes[2].getAttribute("label"),
+                ct:         temp_treeitem_firstChild.childNodes[3].getAttribute("label"),
+                dir:        temp_treeitem_firstChild.childNodes[4].getAttribute("label")
+            };
         }
         catch(e) {
             //alert("getTreeitem:\n"+e.name+": "+e.message);
@@ -893,58 +885,59 @@ MediaStealerController.prototype = {
             //alert("createTreeitem:\n"+e.name+": "+e.message);
         }
     },
-    editRuleList: function(mode) {        
-		var tempruleTree = document.getElementById("ruleTree");
-            var idx = tempruleTree.currentIndex;            
-			//if(idx < 2) {
-            //    return;
-            //}
-            var treeitem = tempruleTree.view.getItemAtIndex(idx);
-            if(mode == "edit") {
-                this.jumptoDetailWindow(treeitem);
-            }
-            else if(mode == "delete") {				
-                treeitem.parentNode.removeChild(treeitem);
-                tempruleTree.view.selection.select(idx);
-            }
-            tempruleTree.treeBoxObject.ensureRowIsVisible(idx);       
+    editRuleList: function(mode) {
+        var tempruleTree = document.getElementById("ruleTree");
+        var idx = tempruleTree.currentIndex;
+        //if(idx < 2) {
+        //    return;
+        //}
+        var treeitem = tempruleTree.view.getItemAtIndex(idx);
+        if(mode == "edit") {
+            this.jumptoDetailWindow(treeitem);
+        }
+        else if(mode == "delete") {
+            treeitem.parentNode.removeChild(treeitem);
+            tempruleTree.view.selection.select(idx);
+        }
+        tempruleTree.treeBoxObject.ensureRowIsVisible(idx);
     },
-    moveItem: function(offset) {       
-	   var tempruleTree = document.getElementById("ruleTree");
-            var idx;
-            var idx2;
-            if(offset < 0) {
-                idx = tempruleTree.currentIndex;
-                idx2 = idx + offset;
-            }
-            else {
-                idx2 = tempruleTree.currentIndex;
-                idx = idx2 + offset;
-            }
-            if(idx < 0 || idx2 < 0) {
-                return;
-            }
-            try {
-                var treeitem = tempruleTree.view.getItemAtIndex(idx);
-                var treeitem2 = tempruleTree.view.getItemAtIndex(idx2);
-                var newTreeitem = treeitem.cloneNode(true);
-                treeitem2.parentNode.removeChild(treeitem);
-                treeitem2.parentNode.insertBefore(newTreeitem, tempruleTree.view.getItemAtIndex(idx2));
-         
-            } catch(e) {return;}
-            if(offset < 0) {
-                tempruleTree.view.selection.select(idx2);
-            }
-            else {
-                tempruleTree.view.selection.select(idx);
-            }
-            tempruleTree.treeBoxObject.ensureRowIsVisible(currentIndex);        
+    moveItem: function(offset) {
+        var tempruleTree = document.getElementById("ruleTree");
+        var idx;
+        var idx2;
+        if(offset < 0) {
+            idx = tempruleTree.currentIndex;
+            idx2 = idx + offset;
+        }
+        else {
+            idx2 = tempruleTree.currentIndex;
+            idx = idx2 + offset;
+        }
+        if(idx < 0 || idx2 < 0) {
+            return;
+        }
+        try {
+            var treeitem = tempruleTree.view.getItemAtIndex(idx);
+            var treeitem2 = tempruleTree.view.getItemAtIndex(idx2);
+            var newTreeitem = treeitem.cloneNode(true);
+            treeitem2.parentNode.removeChild(treeitem);
+            treeitem2.parentNode.insertBefore(newTreeitem, tempruleTree.view.getItemAtIndex(idx2));
+
+        } catch(e) {return;}
+        if(offset < 0) {
+            tempruleTree.view.selection.select(idx2);
+        }
+        else {
+            tempruleTree.view.selection.select(idx);
+        }
+        tempruleTree.treeBoxObject.ensureRowIsVisible(currentIndex);
     },
     onTreedblclick: function(event) {
-        if(event.button) return; // 右键
-		var tempruleTree = document.getElementById("ruleTree");        
-            var treeitem = tempruleTree.view.getItemAtIndex(tempruleTree.currentIndex);
-            this.jumptoDetailWindow(treeitem);
+        if(event.button) return; // right click
+
+        var tempruleTree = document.getElementById("ruleTree");
+        var treeitem = tempruleTree.view.getItemAtIndex(tempruleTree.currentIndex);
+        this.jumptoDetailWindow(treeitem);
     },
     jumptoDetailWindow: function(treeitem) {
         try {
@@ -953,7 +946,7 @@ MediaStealerController.prototype = {
                 params = {rtype:"0", enabled:"true", des:"", url:"", ct:"", dir:stealerConfig.defaultDir};
             else
                 params = this.getTreeitem(treeitem);
-           
+
             var retParams = {rtype:params.rtype, enabled:params.enabled, des:"", url:"", ct:"", dir:"", changed:false};
             detailWindow.show(params, retParams);
             if(retParams.changed) {
@@ -970,43 +963,43 @@ MediaStealerController.prototype = {
         }
     },
     onTreeclick: function(event) {
-        	
-		var tempruleTree = document.getElementById("ruleTree");		
-            var row = {}, col = {}, obj = {};
-            tempruleTree.treeBoxObject.getCellAt(event.clientX, event.clientY, row, col, obj);
-            if(col.value==null || row.value==null || obj.value==null)
-                return;
-            var treeitem = tempruleTree.view.getItemAtIndex(row.value);
-            if(treeitem != null) {
-                // update "Delete" button state
-                var deleteButton = document.getElementById("deleteButton");
-                var rtype = treeitem.firstChild.getAttribute("rtype");
-				
-                if(rtype == "0")
-                    deleteButton.setAttribute("disabled", "false");
-                else
-                    deleteButton.setAttribute("disabled", "true");
 
-                // update "Move" button state
-                var rowcount = tempruleTree.childNodes[1].childNodes.length;
-                var upButton = document.getElementById("upButton");
-                var downButton = document.getElementById("downButton");
-                if(row.value == 0)
-                    upButton.setAttribute("disabled", "true");
-                else
-                    upButton.setAttribute("disabled", "false");
-                if(row.value == (rowcount-1))
-                    downButton.setAttribute("disabled", "true");
-                else
-                    downButton.setAttribute("disabled", "false");
+        var tempruleTree = document.getElementById("ruleTree");
+        var row = {}, col = {}, obj = {};
+        tempruleTree.treeBoxObject.getCellAt(event.clientX, event.clientY, row, col, obj);
+        if(col.value==null || row.value==null || obj.value==null)
+            return;
+        var treeitem = tempruleTree.view.getItemAtIndex(row.value);
+        if(treeitem != null) {
+            // update "Delete" button state
+            var deleteButton = document.getElementById("deleteButton");
+            var rtype = treeitem.firstChild.getAttribute("rtype");
 
-                // update checkbox state				
-                if(col.value.type == Components.interfaces.nsITreeColumn.TYPE_CHECKBOX)
-                    this.reverseCheckbox(treeitem);
-            }
-        
+            if(rtype == "0")
+                deleteButton.setAttribute("disabled", "false");
+            else
+                deleteButton.setAttribute("disabled", "true");
+
+            // update "Move" button state
+            var rowcount = tempruleTree.childNodes[1].childNodes.length;
+            var upButton = document.getElementById("upButton");
+            var downButton = document.getElementById("downButton");
+            if(row.value == 0)
+                upButton.setAttribute("disabled", "true");
+            else
+                upButton.setAttribute("disabled", "false");
+            if(row.value == (rowcount-1))
+                downButton.setAttribute("disabled", "true");
+            else
+                downButton.setAttribute("disabled", "false");
+
+            // update checkbox state
+            if(col.value.type == Components.interfaces.nsITreeColumn.TYPE_CHECKBOX)
+                this.reverseCheckbox(treeitem);
+        }
+
     },
-    setCheckbox: function(treeitem, checked) {		
+    setCheckbox: function(treeitem, checked) {
         var checkboxCell = treeitem.firstChild.childNodes[0];
         if(checked == "true") {
             checkboxCell.setAttribute("value", "true");
@@ -1017,7 +1010,7 @@ MediaStealerController.prototype = {
             checkboxCell.setAttribute("properties", "unchecked");
         }
     },
-    reverseCheckbox: function(treeitem) {	
+    reverseCheckbox: function(treeitem) {
         var checkboxCell = treeitem.firstChild.childNodes[0];
         var value = checkboxCell.getAttribute("value");
         if(value == "true") {
@@ -1028,9 +1021,9 @@ MediaStealerController.prototype = {
             checkboxCell.setAttribute("value", "true");
             checkboxCell.setAttribute("properties", "checked");
         }
-		
+
         var rtype = treeitem.firstChild.getAttribute("rtype");
-	
+
         if(rtype == "1") {
             var videoCheck = document.getElementById("videoCheck");
             videoCheck.checked = (value == "true") ? false : true;
@@ -1044,8 +1037,8 @@ MediaStealerController.prototype = {
             flashCheck.checked = (value == "true") ? false : true;
         }
     },
-    onNewButtonClick: function() {        
-            this.jumptoDetailWindow(null);       
+    onNewButtonClick: function() {
+        this.jumptoDetailWindow(null);
     },
     onEditButtonClick: function() {
         this.editRuleList("edit");
@@ -1053,10 +1046,9 @@ MediaStealerController.prototype = {
     onDeleteButtonClick: function() {
         this.editRuleList("delete");
     },
-    //------------------  规则面板（rulelist及相关按钮）管理 ------------------------
     //-------------------------------------------------------------------------------
 
-    //---------------------------  消息与调试面板管理 -------------------------------
+    //---------------------------  Debug panel -------------------------------
     dbgPrint: function(msg) {
         var dbgbox = document.getElementById("stealer-dbgbox");
         dbgbox.value += msg;
@@ -1064,13 +1056,14 @@ MediaStealerController.prototype = {
     dbgPrintln: function(msg) {
         this.dbgPrint(msg+"\n");
     },
-    //----------------------------  消息与调试面板管理 ------------------------------
     //-------------------------------------------------------------------------------
-    switchState: function(newState) {  // 三态切换的唯一途径
+
+    // It is possible to open Media Stealer in a seperate window. Disabled.
+    switchState: function(newState) {  // switch between bottom panel and seperate window
         try {
             var oldState = this.getState();
             if(newState == oldState && oldState != "window") return;
-         
+
             var mediator = Components.classes["@mozilla.org/appshell/window-mediator;1"]
                                      .getService(Components.interfaces.nsIWindowMediator);
             var browser = mediator.getMostRecentWindow("navigator:browser");
@@ -1182,38 +1175,37 @@ MediaStealerController.prototype = {
         // So I comment the `else' branch to disable my event handler.
         // 2011.2.15
     },
-	sort: function() {
-		
-		  try {	
-				var list = document.getElementById("tasklist");	                   
-				var temptaskTree = document.getElementById("task-tree");
-				var Taskcount = list.childElementCount-1;
-				 
-				for (Taskcount; Taskcount > -1; Taskcount--)	
-					{   
-					var Taskcount2 = Taskcount-1;
-					for (Taskcount2; Taskcount2 > -1; Taskcount2--)	
-					{   
-						var treeitem = temptaskTree.view.getItemAtIndex(Taskcount);
-						var curr = parseInt(treeitem.firstChild.childNodes[4].getAttribute("value"));	
-						var treeitem2 = temptaskTree.view.getItemAtIndex(Taskcount2);
-						var curr2 = parseInt(treeitem2.firstChild.childNodes[4].getAttribute("value"));	
-						
-						if (curr > curr2) 
-						{						
-						var newTreeitem = treeitem.cloneNode(true);
-						treeitem2.parentNode.removeChild(treeitem);
-						treeitem2.parentNode.insertBefore(newTreeitem, temptaskTree.view.getItemAtIndex(Taskcount-1));
-						}					
-					}
-					}
-			}
-		   catch(e) {
-			 //   alert("sort:\n"+e.name+": "+e.message);
-			}
-		
-		},
-    //------------------------  界面状态管理（三态切换） ----------------------------
+    sort: function() {
+
+        try {
+            var list = document.getElementById("tasklist");
+            var temptaskTree = document.getElementById("task-tree");
+            var Taskcount = list.childElementCount-1;
+
+            for (Taskcount; Taskcount > -1; Taskcount--)
+            {
+                var Taskcount2 = Taskcount-1;
+                for (Taskcount2; Taskcount2 > -1; Taskcount2--)
+                {
+                    var treeitem = temptaskTree.view.getItemAtIndex(Taskcount);
+                    var curr = parseInt(treeitem.firstChild.childNodes[4].getAttribute("value"));
+                    var treeitem2 = temptaskTree.view.getItemAtIndex(Taskcount2);
+                    var curr2 = parseInt(treeitem2.firstChild.childNodes[4].getAttribute("value"));
+
+                    if (curr > curr2)
+                    {
+                        var newTreeitem = treeitem.cloneNode(true);
+                        treeitem2.parentNode.removeChild(treeitem);
+                        treeitem2.parentNode.insertBefore(newTreeitem, temptaskTree.view.getItemAtIndex(Taskcount-1));
+                    }
+                }
+            }
+        }
+        catch(e) {
+        //   alert("sort:\n"+e.name+": "+e.message);
+        }
+
+    },
     //-------------------------------------------------------------------------------
 
     onAbout: function() {
