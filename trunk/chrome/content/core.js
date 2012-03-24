@@ -16,7 +16,7 @@ Task.prototype = {
     _size: null,
     _curr: null,
     _stat: null,
-	_DownloadID: null,
+    _DownloadID: null,
 
     get id() {
         return this._id;
@@ -79,8 +79,9 @@ Task.prototype = {
     },
     set stat(value) {
         this._stat = value;
-	},
-	  get DownloadID() {
+    },
+
+    get DownloadID() {
         return this._DownloadID;
     },
     set DownloadID(value) {
@@ -127,62 +128,62 @@ StealerHttpObserver.prototype = {
             msg += "   " + uri + "\n";
             if(ct) msg += "   " + ct + "\n";
             this.Stealer.dbgPrintln(msg); */
-			
-			//test if there are duplicates
-			var testunique = true;	
-			var temptaskTree = document.getElementById("task-tree");			
+
+            //test if there are duplicates
+            var testunique = true;
+            var temptaskTree = document.getElementById("task-tree");
             var list = document.getElementById("tasklist");
-			var Taskcount = list.childElementCount;					
-			for (Taskcount; Taskcount > 0; Taskcount--)		
-				{               	
-				var idx = Taskcount-1;			   
+            var Taskcount = list.childElementCount;
+            for (Taskcount; Taskcount > 0; Taskcount--)
+            {
+                var idx = Taskcount-1;
                 var treeitem = temptaskTree.view.getItemAtIndex(idx);
-				var url = treeitem.firstChild.childNodes[1].getAttribute("label"); //url				
-				var filesize = treeitem.firstChild.childNodes[3].getAttribute("label");	//filesize					
-					if (url == uri) 
-					{
-						testunique = false;						
-					}
-				}
-				
-			if (testunique == true)
-			{
-            var task = new Task();  // file, url, type, size, stat ; dir, xlen
+                var url = treeitem.firstChild.childNodes[1].getAttribute("label"); //url
+                var filesize = treeitem.firstChild.childNodes[3].getAttribute("label");    //filesize
+                if (url == uri)
+                {
+                    testunique = false;
+                }
+            }
 
-            for (var i = 0; i < stealerConfig.rules.length; i++) {
-                var rule = stealerConfig.rules[i];
-                if(rule.enabled == "true") {
+            if (testunique == true)
+            {
+                var task = new Task();  // file, url, type, size, stat ; dir, xlen
 
-                    if(rs.match(/20\d/)) {
-                        ct = aSubject.getResponseHeader('Content-Type');						
-                        if(new RegExp(rule.url,"i").exec(uri) && new RegExp(rule.ct,"i").exec(ct))
-						{
-                            task.url = uri;
-                            task.type = ct;
-                            task.size = len;
-                            task.dir = rule.dir;
-                            this.doTask(task, aSubject, false);
+                for (var i = 0; i < stealerConfig.rules.length; i++) {
+                    var rule = stealerConfig.rules[i];
+                    if(rule.enabled == "true") {
+
+                        if(rs.match(/20\d/)) {
+                            ct = aSubject.getResponseHeader('Content-Type');
+                            if(new RegExp(rule.url,"i").exec(uri) && new RegExp(rule.ct,"i").exec(ct))
+                            {
+                                task.url = uri;
+                                task.type = ct;
+                                task.size = len;
+                                task.dir = rule.dir;
+                                this.doTask(task, aSubject, false);
+                            }
                         }
-                    }
-                    else if(rs.match(/30[012357]/)) {
-                        if(new RegExp(rule.url,"i").exec(loc)) {
-                            task.url = loc;
-                            task.type = rule.ct;
-                            task.dir = rule.dir;
-                            this.doTask(task, aSubject, true);
+                        else if(rs.match(/30[012357]/)) {
+                            if(new RegExp(rule.url,"i").exec(loc)) {
+                                task.url = loc;
+                                task.type = rule.ct;
+                                task.dir = rule.dir;
+                                this.doTask(task, aSubject, true);
+                            }
                         }
-                    }
-                    else if(rs == "304") {
-                        if(new RegExp(rule.url,"i").exec(uri)) {
-                            task.url = uri;
-                            task.type = rule.ct;
-                            task.dir = rule.dir;
-                            this.doTask(task, aSubject, true);
+                        else if(rs == "304") {
+                            if(new RegExp(rule.url,"i").exec(uri)) {
+                                task.url = uri;
+                                task.type = rule.ct;
+                                task.dir = rule.dir;
+                                this.doTask(task, aSubject, true);
+                            }
                         }
                     }
                 }
             }
-		  }
         } catch(e){}
     },
 
@@ -213,7 +214,7 @@ StealerHttpObserver.prototype = {
         //try to retrieve file name from location
         if(rs == "302") {
             try {
-             // fetch filename from Location if 302
+                // fetch filename from Location if 302
                 var loc = aSubject.getResponseHeader("Location");
                 originName = this.getFNfromURI(loc);
             }
@@ -244,12 +245,12 @@ StealerHttpObserver.prototype = {
         // httpChannel: [xpconnect wrapped nsIHttpChannel]
         // query_cache: boolean, whether need to query cache
         try {
-			var prompts = Components.classes["@mozilla.org/embedcomp/prompt-service;1"].getService(Components.interfaces.nsIPromptService);			
-			var askcheck = {value: true};
-			var title = "Media Stealer";           
-            var checkstr = "Ask every time. Can be (re)activated via Firefox menu or Add-on Bar";            
+            var prompts = Components.classes["@mozilla.org/embedcomp/prompt-service;1"].getService(Components.interfaces.nsIPromptService);
+            var askcheck = {value: true};
+            var title = "Media Stealer";
+            var checkstr = "Ask every time. Can be (re)activated via Firefox menu or Add-on Bar";
             var httpCacheSession;
-           
+
             if(query_cache) {
                 if(!stealerConfig.useCache)
                     return;
@@ -279,170 +280,171 @@ StealerHttpObserver.prototype = {
 
             task.id = this.make_taskid();
             var originName = this.resolveOriginName(httpChannel);
-			
+
             var file = this.make_name(originName, task.id);
             task.filename = file;  /////
             task.file = task.dir + task.filename;  ///
-			
-			
-		    //check extention, gives flv extention when unknown extention is found			
-			var unknown = stealerConfig.filetypeunknown;
-			
-			if(unknown == true)
-                    {			
-						var help_known = false;		
-						var fileextention = file.charAt(file.length-3) + file.charAt(file.length-2) + file.charAt(file.length-1);
-						
-						for (var i = 0; i < stealerConfig.rules.length; i++) 
-						{
-						var rule = stealerConfig.rules[i];
-						if(rule.enabled == "true") 
-							{
-								var help_ct = (rule.ct);								
-								var test = help_ct.indexOf(fileextention);	
-								
-								if (test != "-1")
-								{
-									help_known = true;									
-								}
-							}
-						}	
-						
-						if (help_known == false)
-							{			   
-							var help = task.filename.substr(0,(task.filename.length-4));							
-							help += ".flv"; 							
-							task.filename = help;														
-							}		
-					}	
-			task.file = task.dir + task.filename; 
-			
-			
-			var nosmall = stealerConfig.nosmallfiles;
-			
-			if(nosmall==true && task.size <750000)
-			{
-				var permission2 = false;
-			}
-			else
-			{
-				var permission2 = true;
-			}	
-			
-			//avoid files with zero bytes such as cookies
-			var nozero = stealerConfig.nozerofiles;
-			if(nozero==true && task.size ==0)
-			{
-				var permission = false;
-			}
-			else
-			{
-				var permission = true;
-			}			
-           
-		   if ((permission==true) && (permission2==true) ) 
-		   {
-            if(query_cache) {
-                httpCacheSession.asyncOpenCacheEntry(task.url,
-                     Components.interfaces.nsICache.ACCESS_READ, new StealerCacheFetcher(this.Stealer, task));
-            }
-            else {
-                dir = Components.classes["@mozilla.org/file/local;1"]
-                    .createInstance(Components.interfaces.nsILocalFile);
-                
-                dir.initWithPath(task.dir);
-                if( !dir.exists() || !dir.isDirectory() ) {   // if it doesn't exist, set to HOME
-                    homeDir =  stealerConfig.home.path + (stealerConfig.home.path[0]=="/" ? "/": "\\");
-                    alert("Task directory " + task.dir + "not exist. Change to home directory " + homeDir);
-                    stealerConfig.defaultDir = homeDir;
-                    task.dir = homeDir;
-                    task.file = task.dir + task.filename;
-                }
-                //end of directory verification
-				
-                var choice;
-                if(stealerConfig.alwaysConfirm)				
-				{                    
-					choice = prompts.confirmCheck(null, title, "Content ["+task.type+"] found\nDo you want to download it to "+task.dir+" ?\n", checkstr, askcheck);					
-				}	
-                else
-                    choice = true;
-                if(choice) {
-					//old method
-                    //var newListener = new StealerStreamListener(this.Stealer, task);
-                    //httpChannel.QueryInterface(Components.interfaces.nsITraceableChannel);
-                    //newListener.originalListener = httpChannel.setNewListener(newListener);
 
-					var alwaysaskdownloadfolder = stealerConfig.alwaysaskdownloadfolder;
-					
-					if ((alwaysaskdownloadfolder == true) && (stealerConfig.alwaysConfirm == true))
-					{
-					
-					var __file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);  					
-					__file.initWithPath(task.dir);
-					
-					var nsIFilePicker = Components.interfaces.nsIFilePicker;
-					var fp = Components.classes["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
-					fp.init(window, "Please select a folder and enter a filename", nsIFilePicker.modeSave);		
-					fp.defaultString = task.filename;
-					fp.displayDirectory = __file;						
-					var res = fp.show();
-						if (res == nsIFilePicker.returnOK || res == nsIFilePicker.returnReplace)
-						{						 
-						  task.file = fp.file.path;
-						  task.filename = fp.file.leafName;
-						  var fileleafname = fp.file.leafName;
-						  var filepath = fp.file.path;						  
-						  var fileleafnamelength = fileleafname.length;
-						  var filepathlength = filepath.length;						  
-						  var fileresult = filepath.substr(0,(filepathlength-fileleafnamelength));						 
-						  task.dir = fileresult;						
-						}
-						else
-						{
-							return;
-						}						
-					}
-					//new method
-					var file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);  					
-					file.initWithPath(task.file);
-					var persist = Components.classes["@mozilla.org/embedding/browser/nsWebBrowserPersist;1"].createInstance(Components.interfaces.nsIWebBrowserPersist);
-					var nsIWBP = Components.interfaces.nsIWebBrowserPersist; 
-					var flags = nsIWBP.PERSIST_FLAGS_REPLACE_EXISTING_FILES; 
-					persist.persistFlags = flags |nsIWBP.PERSIST_FLAGS_BYPASS_CACHE|nsIWBP.PERSIST_FLAGS_CLEANUP_ON_FAILURE					
-					var IOservice = Components.classes['@mozilla.org/network/io-service;1'].getService(Components.interfaces.nsIIOService);	
-					var obj_URI_Source = IOservice.newURI(task.url, null, null);					
-					var obj_File_Target = IOservice.newFileURI(file);	
-					var dm = Components.classes['@mozilla.org/download-manager;1'].createInstance(Components.interfaces.nsIDownloadManager);
-					var dl = dm.addDownload(dm.DOWNLOAD_TYPE_DOWNLOAD, obj_URI_Source, obj_File_Target, '', null, Math.round(Date.now() * 1000), null, persist);				
-					var persistListener = new StealerDownloader(this.Stealer, task);
-					dm.addListener(persistListener); 
-					persist.progressListener = dl;
-					persist.saveURI(dl.source, null, null, null, null, dl.targetFile);	
-					
-                    task.curr = 0;
-					task.DownloadID = dl.id;
-                    task.stat = "Transferring";
-                    this.Stealer.addTask(task);
 
-                    var message = "\n----------  Download started  ----------\n";
-                    message    += "  Time: " + new Date().toLocaleString() + "\n";
-                    message    += "  File: " + task.file + "\n";
-                    message    += "  URL:  " + task.url  + "\n";
-                    message    += "  Type: " + task.type + "\n";
-                    message    += "  Size: " + task.size + "\n";
-					message    += "  DownloadID: "+ task.DownloadID + "\n";
-                    this.Stealer.dbgPrintln(message);			
-                }
-				if(!askcheck.value) 
-						{							
-							stealerConfig.alwaysConfirm = !stealerConfig.alwaysConfirm;							
-							stealerConfig.save();
-							var confirmCheck = document.getElementById("confirmCheck");
-							confirmCheck.setAttribute("checked", stealerConfig.alwaysConfirm ? "true" : "false");
-						}
+            //check extention, gives flv extention when unknown extention is found
+            var unknown = stealerConfig.filetypeunknown;
+
+            if(unknown == true)
+                    {
+                        var help_known = false;
+                        var fileextention = file.charAt(file.length-3) + file.charAt(file.length-2) + file.charAt(file.length-1);
+
+                        for (var i = 0; i < stealerConfig.rules.length; i++)
+                        {
+                        var rule = stealerConfig.rules[i];
+                        if(rule.enabled == "true")
+                            {
+                                var help_ct = (rule.ct);
+                                var test = help_ct.indexOf(fileextention);
+
+                                if (test != "-1")
+                                {
+                                    help_known = true;
+                                }
+                            }
+                        }
+
+                        if (help_known == false)
+                            {
+                            var help = task.filename.substr(0,(task.filename.length-4));
+                            help += ".flv";
+                            task.filename = help;
+                            }
+                    }
+            task.file = task.dir + task.filename;
+
+
+            var nosmall = stealerConfig.nosmallfiles;
+
+            if(nosmall==true && task.size <750000)
+            {
+                var permission2 = false;
             }
-			}
+            else
+            {
+                var permission2 = true;
+            }
+
+            //avoid files with zero bytes such as cookies
+            var nozero = stealerConfig.nozerofiles;
+            if(nozero==true && task.size ==0)
+            {
+                var permission = false;
+            }
+            else
+            {
+                var permission = true;
+            }
+
+            if ((permission==true) && (permission2==true) )
+            {
+                if(query_cache) {
+                    httpCacheSession.asyncOpenCacheEntry(task.url,
+                        Components.interfaces.nsICache.ACCESS_READ, new StealerCacheFetcher(this.Stealer, task));
+                }
+                else {
+                    dir = Components.classes["@mozilla.org/file/local;1"]
+                        .createInstance(Components.interfaces.nsILocalFile);
+
+                    dir.initWithPath(task.dir);
+                    if( !dir.exists() || !dir.isDirectory() ) {   // if it doesn't exist, set to HOME
+                        homeDir =  stealerConfig.home.path + (stealerConfig.home.path[0]=="/" ? "/": "\\");
+                        alert("Task directory " + task.dir + "not exist. Change to home directory " + homeDir);
+                        stealerConfig.defaultDir = homeDir;
+                        task.dir = homeDir;
+                        task.file = task.dir + task.filename;
+                    }
+                    //end of directory verification
+
+                    var choice;
+                    if(stealerConfig.alwaysConfirm)
+                    {
+                        choice = prompts.confirmCheck(null, title, "Content ["+task.type+"] found\nDo you want to download it to "+task.dir+" ?\n", checkstr, askcheck);
+                    }
+                    else
+                        choice = true;
+                    if(choice) {
+                        //old method
+                        //var newListener = new StealerStreamListener(this.Stealer, task);
+                        //httpChannel.QueryInterface(Components.interfaces.nsITraceableChannel);
+                        //newListener.originalListener = httpChannel.setNewListener(newListener);
+
+                        var alwaysaskdownloadfolder = stealerConfig.alwaysaskdownloadfolder;
+
+                        if ((alwaysaskdownloadfolder == true) && (stealerConfig.alwaysConfirm == true))
+                        {
+
+                            var __file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
+                            __file.initWithPath(task.dir);
+
+                            var nsIFilePicker = Components.interfaces.nsIFilePicker;
+                            var fp = Components.classes["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
+                            fp.init(window, "Please select a folder and enter a filename", nsIFilePicker.modeSave);
+                            fp.defaultString = task.filename;
+                            fp.displayDirectory = __file;
+                            var res = fp.show();
+                            if (res == nsIFilePicker.returnOK || res == nsIFilePicker.returnReplace)
+                            {
+                                task.file = fp.file.path;
+                                task.filename = fp.file.leafName;
+                                var fileleafname = fp.file.leafName;
+                                var filepath = fp.file.path;
+                                var fileleafnamelength = fileleafname.length;
+                                var filepathlength = filepath.length;
+                                var fileresult = filepath.substr(0,(filepathlength-fileleafnamelength));
+                                task.dir = fileresult;
+                            }
+                            else
+                            {
+                                return;
+                            }
+                        }
+
+                        //new method
+                        var file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
+                        file.initWithPath(task.file);
+                        var persist = Components.classes["@mozilla.org/embedding/browser/nsWebBrowserPersist;1"].createInstance(Components.interfaces.nsIWebBrowserPersist);
+                        var nsIWBP = Components.interfaces.nsIWebBrowserPersist;
+                        var flags = nsIWBP.PERSIST_FLAGS_REPLACE_EXISTING_FILES;
+                        persist.persistFlags = flags |nsIWBP.PERSIST_FLAGS_BYPASS_CACHE|nsIWBP.PERSIST_FLAGS_CLEANUP_ON_FAILURE
+                        var IOservice = Components.classes['@mozilla.org/network/io-service;1'].getService(Components.interfaces.nsIIOService);
+                        var obj_URI_Source = IOservice.newURI(task.url, null, null);
+                        var obj_File_Target = IOservice.newFileURI(file);
+                        var dm = Components.classes['@mozilla.org/download-manager;1'].createInstance(Components.interfaces.nsIDownloadManager);
+                        var dl = dm.addDownload(dm.DOWNLOAD_TYPE_DOWNLOAD, obj_URI_Source, obj_File_Target, '', null, Math.round(Date.now() * 1000), null, persist);
+                        var persistListener = new StealerDownloader(this.Stealer, task);
+                        dm.addListener(persistListener);
+                        persist.progressListener = dl;
+                        persist.saveURI(dl.source, null, null, null, null, dl.targetFile);
+
+                        task.curr = 0;
+                        task.DownloadID = dl.id;
+                        task.stat = "Transferring";
+                        this.Stealer.addTask(task);
+
+                        var message = "\n----------  Download started  ----------\n";
+                        message    += "  Time: " + new Date().toLocaleString() + "\n";
+                        message    += "  File: " + task.file + "\n";
+                        message    += "  URL:  " + task.url  + "\n";
+                        message    += "  Type: " + task.type + "\n";
+                        message    += "  Size: " + task.size + "\n";
+                        message    += "  DownloadID: "+ task.DownloadID + "\n";
+                        this.Stealer.dbgPrintln(message);
+                    }
+                    if(!askcheck.value)
+                    {
+                        stealerConfig.alwaysConfirm = !stealerConfig.alwaysConfirm;
+                        stealerConfig.save();
+                        var confirmCheck = document.getElementById("confirmCheck");
+                        confirmCheck.setAttribute("checked", stealerConfig.alwaysConfirm ? "true" : "false");
+                    }
+                }
+            }
         }
         catch(e) {
             //alert("StealerHttpObserver.doTask:\n"+e.name+": "+e.message);
@@ -493,17 +495,16 @@ function StealerStreamListener(stealer, task) {
     this.Stealer = stealer;
     this.task = task;
 
-    this.stack = [];           // 数据缓冲栈（非栈）
+    this.stack = [];           // data trunk (buffer) list
     this.total = task.size;    // Content-Length
-    this.curr = 0;             // 当前已下载的总长度
-    this.percent = 0;          // 当前已下载的百分比
-    this.curr_stack = 0;       // 当前栈中的数据量
+    this.curr = 0;             // total bytes of received data
+    this.percent = 0;          // percentage of received data
+    this.curr_stack = 0;       // bytes of data in `stack'
 
     this.originalListener = null;
 }
 
 StealerStreamListener.prototype = {
-
 
     onDataAvailable: function(request, context, inputStream, offset, count) {
         try {
@@ -556,7 +557,7 @@ StealerStreamListener.prototype = {
 
     onStartRequest: function(request, context) {
         try {
-            
+
             this.fd = Components.classes["@mozilla.org/file/local;1"]
                           .createInstance(Components.interfaces.nsILocalFile);
             try {
@@ -626,89 +627,88 @@ function StealerDownloader(stealer, task) {
     this.Stealer = stealer;
     this.task = task;
 
-    this.stack = [];           // 数据缓冲栈（非栈）
-    this.total = task.size;    // Content-Length	
-    this.curr = 0;             // 当前已下载的总长度
-    this.percent = 0;          // 当前已下载的百分比
-    this.curr_stack = 0;       // 当前栈中的数据量
+    this.stack = [];           // data trunk (buffer) list
+    this.total = task.size;    // Content-Length
+    this.curr = 0;             // total bytes of received data
+    this.percent = 0;          // percentage of received data
+    this.curr_stack = 0;       // bytes of data in `stack'
 
     this.originalListener = null;
 }
 
 StealerDownloader.prototype = {
-			QueryInterface : function(aIID)
-			{
-			if(aIID.equals(Components.interfaces.Components.interfaces.nsIDownloadProgressListener))
-			return this;
-			throw Components.results.NS_NOINTERFACE;
-			},
+    QueryInterface : function(aIID)
+    {
+        if(aIID.equals(Components.interfaces.Components.interfaces.nsIDownloadProgressListener))
+            return this;
+        throw Components.results.NS_NOINTERFACE;
+    },
 
-			init : function()
-			{
-			},
+    init : function()
+    {
+    },
 
-			destroy : function()
-			{
-			},
+    destroy : function()
+    {
+    },
 
-			onProgressChange : function (aWebProgress, aRequest,
-                               aCurSelfProgress, aMaxSelfProgress,
-                               aCurTotalProgress, aMaxTotalProgress, aDownload)
-			{
-					if (aDownload.id == this.task.DownloadID)
-					{
-					this.task.stat = "Transferring";
-					this.curr = aDownload.amountTransferred;
-					this.task.curr = aDownload.amountTransferred;
-					this.Stealer.refreshTask(this.task);
-					}
-			},
-			
-			onDownloadStateChange: function(aState, aDownload)
-			{				
-				if (aDownload.id == this.task.DownloadID)
-				{	
-					if (aDownload.state == 7 || aDownload.state == 1)
+    onProgressChange : function (aWebProgress, aRequest,
+                       aCurSelfProgress, aMaxSelfProgress,
+                       aCurTotalProgress, aMaxTotalProgress, aDownload)
+    {
+        if (aDownload.id == this.task.DownloadID)
+        {
+            this.task.stat = "Transferring";
+            this.curr = aDownload.amountTransferred;
+            this.task.curr = aDownload.amountTransferred;
+            this.Stealer.refreshTask(this.task);
+        }
+    },
 
-					{
-					this.curr = this.total;
-					this.task.curr = this.total;					
-					this.task.stat = "Finished";
-					this.Stealer.refreshTask(this.task);	
-					}					
-				}
-			},
+    onDownloadStateChange: function(aState, aDownload)
+    {
+        if (aDownload.id == this.task.DownloadID)
+        {
+            if (aDownload.state == 7 || aDownload.state == 1)
+            {
+                this.curr = this.total;
+                this.task.curr = this.total;
+                this.task.stat = "Finished";
+                this.Stealer.refreshTask(this.task);
+            }
+        }
+    },
 
-			onStateChange : function(aWebProgress, aRequest, aStateFlags, aStatus, aDownload)
-			{	
-				if (aDownload.id == this.task.DownloadID)
-				{
-					var downloadManager = Components.classes["@mozilla.org/download-manager;1"].getService(Components.interfaces.nsIDownloadManager);						
-					if (aDownload.state == 4)
-					{					
-						this.task.stat = "Paused";
-						this.Stealer.refreshTask(this.task);
-					}							
-					else   //something went terribly wrong					
-					{				
-						this.task.stat = "Interrupted";
-						this.Stealer.refreshTask(this.task);						
-					}
-				}
-			},	
-			
-			onStatusChange : function(aWebProgress, aRequest, aStatus, aMessage, aDownload)
-			{	
-				if (aDownload.id == this.task.DownloadID)
-					{
-					this.task.stat = "Interrupted";
-					this.Stealer.refreshTask(this.task);	
-					}
-			},
+    onStateChange : function(aWebProgress, aRequest, aStateFlags, aStatus, aDownload)
+    {
+        if (aDownload.id == this.task.DownloadID)
+        {
+            var downloadManager = Components.classes["@mozilla.org/download-manager;1"].getService(Components.interfaces.nsIDownloadManager);
+            if (aDownload.state == 4)
+            {
+                this.task.stat = "Paused";
+                this.Stealer.refreshTask(this.task);
+            }
+            else   //something went terribly wrong
+            {
+                this.task.stat = "Interrupted";
+                this.Stealer.refreshTask(this.task);
+            }
+        }
+    },
 
-		onSecurityChange : function(aWebProgress, aRequest, aState)
-		{
-		}
+    onStatusChange : function(aWebProgress, aRequest, aStatus, aMessage, aDownload)
+    {
+        if (aDownload.id == this.task.DownloadID)
+            {
+                this.task.stat = "Interrupted";
+                this.Stealer.refreshTask(this.task);
+            }
+    },
+
+    onSecurityChange : function(aWebProgress, aRequest, aState)
+    {
+    }
 }
 //--------------------------------------------------------------------
 function StealerCacheFetcher(stealer, task) {
@@ -724,7 +724,7 @@ StealerCacheFetcher.prototype = {
                 this.content_type = RegExp.$1;
                 head.match(new RegExp(/Content-Length: (.*)(\n)?/i));
                 this.content_length = RegExp.$1;
-         
+
                 if(new RegExp(this.task.type, "i").exec(this.content_type)) {
                     var choice;
                     if(stealerConfig.alwaysConfirm) {
@@ -739,7 +739,7 @@ StealerCacheFetcher.prototype = {
                         this.task.curr = 0;
                         this.task.stat = "Transferring";
                         this.Stealer.addTask(this.task);
-         
+
                         var message = "\n----------  Download started  ----------\n";
                         message    += "  Time: " + new Date().toLocaleString() + "\n";
                         message    += "  File: " + this.task.file + "\n";
@@ -748,7 +748,7 @@ StealerCacheFetcher.prototype = {
                         message    += "  Size: " + this.task.size + "\n";
                         message    += "  Type: " + "Cached\n";
                         this.Stealer.dbgPrintln(message);
-         
+
                         this.fetch(descriptor);  // fetch it!
                     }
                 }
@@ -770,7 +770,7 @@ StealerCacheFetcher.prototype = {
         var bstream = Components.classes["@mozilla.org/binaryoutputstream;1"]
                    .createInstance(Components.interfaces.nsIBinaryOutputStream);
         bstream.setOutputStream(outStream);
-        
+
         //set up for input file
         var inStream = descriptor.openInputStream(0);
         var bInStream = Components.classes["@mozilla.org/binaryinputstream;1"]
@@ -783,7 +783,7 @@ StealerCacheFetcher.prototype = {
         inStream.close();
         if (outStream instanceof Components.interfaces.nsISafeOutputStream)
             outStream.finish();
-        else 
+        else
             outStream.close();
 
         this.task.curr = this.task.size;
