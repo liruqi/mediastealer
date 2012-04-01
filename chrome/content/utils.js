@@ -26,7 +26,7 @@ StealerConfig.prototype = {
     load: function() {
         try {
             var stealerPrefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService);
-            var stealerBranch = stealerPrefs.getBranch("extensions.stealer.");
+            var stealerBranch = stealerPrefs.getBranch("extensions.MediaStealer.");
             stealerBranch.QueryInterface(Components.interfaces.nsIPrefBranch2);
             this.defaultDir = unescape(stealerBranch.getCharPref("defaultDir"));
             if(this.defaultDir == "") {
@@ -58,7 +58,7 @@ StealerConfig.prototype = {
     save: function() {
         try {
             var stealerPrefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService);
-            var stealerBranch = stealerPrefs.getBranch("extensions.stealer.");
+            var stealerBranch = stealerPrefs.getBranch("extensions.MediaStealer.");
             stealerBranch.QueryInterface(Components.interfaces.nsIPrefBranch2);
 
             stealerBranch.setCharPref("defaultDir", escape(this.defaultDir));
@@ -127,7 +127,7 @@ StealerConfig.prototype = {
         var checkstr = "I'm sure";
         var check = {value: false};
         var stealerPrefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService);
-        var stealerBranch = stealerPrefs.getBranch("extensions.stealer.");
+        var stealerBranch = stealerPrefs.getBranch("extensions.MediaStealer.");
         stealerBranch.QueryInterface(Components.interfaces.nsIPrefBranch2);
         this.defaultDir = unescape(stealerBranch.getCharPref("defaultDir"));
         if(this.defaultDir == "") {
@@ -159,7 +159,7 @@ StealerConfig.prototype = {
                     }
                 }
 
-                Stealer.clearTreeitem("rulelist");
+                Stealer.clearTreeitem("MediaStealerrulelist");
                 var rules = [];
                 for(var i = 0; i < this.rules.length; i++) {
                     var rule = {};
@@ -173,16 +173,16 @@ StealerConfig.prototype = {
                 }
                 stealerBranch.setCharPref("rulesJSON", JSON.stringify(rules));
 
-                Stealer.clearTreeitem("rulelist");
+                Stealer.clearTreeitem("MediaStealerrulelist");
                 for (var i = 0; i < rules.length; i++) {
                     var rule = rules[i];
-                    Stealer.createTreeitem("rulelist", rule);
+                    Stealer.createTreeitem("MediaStealerrulelist", rule);
                     if(rule.rtype == "1" && rule.enabled == "true")
-                        document.getElementById("videoCheck").setAttribute("checked", "true");
+                        document.getElementById("MediaStealervideoCheck").setAttribute("checked", "true");
                     if(rule.rtype == "2" && rule.enabled == "true")
-                        document.getElementById("audioCheck").setAttribute("checked", "true");
+                        document.getElementById("MediaStealeraudioCheck").setAttribute("checked", "true");
                     if(rule.rtype == "3" && rule.enabled == "true")
-                        document.getElementById("flashCheck").setAttribute("checked", "true");
+                        document.getElementById("MediaStealerflashCheck").setAttribute("checked", "true");
                 }
                 inputFile.close();
                 readInputStream.close();

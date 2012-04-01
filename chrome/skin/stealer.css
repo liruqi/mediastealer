@@ -9,7 +9,7 @@ treechildren::-moz-tree-checkbox(checked) {
 textbox[readonly="true"] {
 	color: grey;
 }
-#labelDefaultDir {
+#MediaStealerlabelDefaultDir {
     padding: 4px;
 }
 checkbox:hover {
@@ -18,27 +18,27 @@ checkbox:hover {
 button:hover {
     color: green;
 }
-#mediastealer {
+#MediaStealerAbout{
 	font-family: arial;
 	font-size: 14px;
 	font-weight: bold;
 	color: #00f;
 }
-#mediastealer:hover {
+#MediaStealerAbout:hover {
 	font-family: arial;
 	font-size: 14px;
 	font-weight: bold;
 	color: #f00;
     cursor: pointer;
 }
-#rulelist-warning {
+#MediaStealerrulelist-warning {
 	font-family: arial;
     font-weight: bold;
 }
-#upButton {
+#MediaStealerupButton {
     display: block;
 }
-#downButton {
+#MediaStealerdownButton {
     display: block;
 }
 #stealer-dbgbox {

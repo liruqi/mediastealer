@@ -11,7 +11,7 @@
   <script type="application/javascript" src="chrome://stealer/content/editor.js"/>
 
   <keyset id="mainKeyset">
-    <key id="key_toggle"
+    <key id="MediaStealerkey_toggle"
          keycode="m"
          modifiers="accel,shift"
          oncommand="Stealer.onToggle();" />
@@ -43,7 +43,7 @@
                     tooltiptext="abc"
                     image="chrome://stealer/skin/enable.png"
                     onclick="Stealer.onStatusbarClick(event);"/>
-    <statusbarpanel id="Media_StealerStatusbar" 
+    <statusbarpanel id="MediaStealerTogglebar" 
                     class="statusbarpanel-iconic" 
                     tooltiptext="Toggle Media Stealer"
                     image="chrome://stealer/skin/mediastealer16.png"
@@ -57,7 +57,7 @@
     <splitter id="stealerPanelSplitter"
               collapsed="true"
               persist="height"/>
-    <vbox id="panel-parent1"
+    <vbox id="MediaStealerpanel-parent1"
           collapsed="true"
           persist="height">
       <vbox id="stealer-mainpanel"/>

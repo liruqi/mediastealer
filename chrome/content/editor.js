@@ -1,5 +1,7 @@
 //--------------------------------------------------------------------
-var detailWindow = {
+function detailWindow() {
+}
+detailWindow.prototype = {
     show: function(params, retParams) {
         this.openWindow("stealer.detailWindow", "chrome://stealer/content/editor.xul", 
                 "modal,chrome=yes,centerscreen", params, retParams);
@@ -75,4 +77,5 @@ var detailWindow = {
             document.getElementById("labelDir").value = fp.file.path + "\\";
     }
 }// detailWindow
+var detailWindow = new detailWindow;
 //--------------------------------------------------------------------

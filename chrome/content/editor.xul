@@ -25,7 +25,7 @@
     </groupbox>
     <hbox>
       <spacer flex="1"/>
-      <button id="OKButton" label="&ok.label;" default="true" oncommand="if(detailWindow.save()){close();}"/>
+      <button id="MediaStealerOKButton" label="&ok.label;" default="true" oncommand="if(detailWindow.save()){close();}"/>
       <button id="discardButton" label="&discard.label;" oncommand="close();"/>
     </hbox>
     <spacer style="height: 5px"/>
