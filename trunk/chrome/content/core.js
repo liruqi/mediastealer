@@ -5,7 +5,7 @@
 //   StealerCacheFetcher
 //--------------------------------------------------------------------
 
-Task = function(){}
+function Task() {}
 Task.prototype = {
     _id: null,
     _file: null,
@@ -131,8 +131,8 @@ StealerHttpObserver.prototype = {
 
             //test if there are duplicates
             var testunique = true;
-            var temptaskTree = document.getElementById("task-tree");
-            var list = document.getElementById("tasklist");
+            var temptaskTree = document.getElementById("MediaStealertask-tree");
+            var list = document.getElementById("MediaStealertasklist");
             var Taskcount = list.childElementCount;
             for (Taskcount; Taskcount > 0; Taskcount--)
             {
@@ -348,7 +348,7 @@ StealerHttpObserver.prototype = {
                         Components.interfaces.nsICache.ACCESS_READ, new StealerCacheFetcher(this.Stealer, task));
                 }
                 else {
-                    dir = Components.classes["@mozilla.org/file/local;1"]
+                    var dir = Components.classes["@mozilla.org/file/local;1"]
                         .createInstance(Components.interfaces.nsILocalFile);
 
                     dir.initWithPath(task.dir);
@@ -440,8 +440,8 @@ StealerHttpObserver.prototype = {
                     {
                         stealerConfig.alwaysConfirm = !stealerConfig.alwaysConfirm;
                         stealerConfig.save();
-                        var confirmCheck = document.getElementById("confirmCheck");
-                        confirmCheck.setAttribute("checked", stealerConfig.alwaysConfirm ? "true" : "false");
+                        var MediaStealerconfirmCheck = document.getElementById("MediaStealerconfirmCheck");
+                        MediaStealerconfirmCheck.setAttribute("checked", stealerConfig.alwaysConfirm ? "true" : "false");
                     }
                 }
             }

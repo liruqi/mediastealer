@@ -1,23 +1,23 @@
 //--------------------------------------------------------------------
-function StealerGateKeeper() {
+function MediaStealerGateKeeper() {
     this.init();
 }
-StealerGateKeeper.prototype = {
-    observer: null,
+MediaStealerGateKeeper.prototype = {
+    MediaStealerobserver: null,
     init: function() {
         window.addEventListener("load", this.enter, false);
         window.addEventListener("unload", this.exit, false);
     },
     enter: function() {
         // register http observer
-        this.observer = new StealerHttpObserver();
+        this.MediaStealerobserver = new StealerHttpObserver();
         var observerService = Components.classes["@mozilla.org/observer-service;1"]
                            .getService(Components.interfaces.nsIObserverService);
-        observerService.addObserver(this.observer, "http-on-modify-request", false);
-        observerService.addObserver(this.observer, "http-on-examine-response", false);
+        observerService.addObserver(this.MediaStealerobserver, "http-on-modify-request", false);
+        observerService.addObserver(this.MediaStealerobserver, "http-on-examine-response", false);
  
         // global storage
-        Application.storage.set("observer", this.observer);
+        Application.storage.set("observer", this.MediaStealerobserver);
         Application.storage.set("state", "close");
 
         // finally, initialize the bottom panel
@@ -26,10 +26,10 @@ StealerGateKeeper.prototype = {
     exit: function() {
         // unregister http observer
         var observerService = Components.classes["@mozilla.org/observer-service;1"].getService(Components.interfaces.nsIObserverService);
-        observerService.removeObserver(this.observer, "http-on-modify-request");
-        observerService.removeObserver(this.observer, "http-on-examine-response");
+        observerService.removeObserver(this.MediaStealerobserver, "http-on-modify-request");
+        observerService.removeObserver(this.MediaStealerobserver, "http-on-examine-response");
     }
 }
 
-var Stealer_gatekeeper = new StealerGateKeeper();
+var MediaStealer_gatekeeper = new MediaStealerGateKeeper();
 //--------------------------------------------------------------------

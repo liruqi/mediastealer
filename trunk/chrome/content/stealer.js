@@ -79,36 +79,36 @@ MediaStealerController.prototype = {
 
             this.initStatusbar(showStatusbar, enabled);
 
-            var enableCheck = document.getElementById("enableCheck");
-            var showStatusbarCheck = document.getElementById("showStatusbarCheck");
-            var cacheCheck = document.getElementById("cacheCheck");
-            var confirmCheck = document.getElementById("confirmCheck");
-            var filetypeunknownCheck = document.getElementById("filetypeunknownCheck");
-            var nosmallfilesCheck = document.getElementById("nosmallfilesCheck");
-            var nozerofilesCheck = document.getElementById("nozerofilesCheck");
-            var alwaysaskdownloadfolderCheck = document.getElementById("alwaysaskdownloadfolderCheck");
+            var MediaStealerenableCheck = document.getElementById("MediaStealerenableCheck");
+            var MediaStealershowStatusbarCheck = document.getElementById("MediaStealershowStatusbarCheck");
+            var MediaStealercacheCheck = document.getElementById("MediaStealercacheCheck");
+            var MediaStealerconfirmCheck = document.getElementById("MediaStealerconfirmCheck");
+            var MediaStealerfiletypeunknownCheck = document.getElementById("MediaStealerfiletypeunknownCheck");
+            var MediaStealernosmallfilesCheck = document.getElementById("MediaStealernosmallfilesCheck");
+            var MediaStealernozerofilesCheck = document.getElementById("MediaStealernozerofilesCheck");
+            var MediaStealeralwaysaskdownloadfolderCheck = document.getElementById("MediaStealeralwaysaskdownloadfolderCheck");
 
-            enableCheck.setAttribute("checked", (enabled ? "true":"false"));
-            showStatusbarCheck.setAttribute("checked", (showStatusbar ? "true" : "false"));
-            cacheCheck.setAttribute("checked", (useCache ? "true" : "false"));
-            confirmCheck.setAttribute("checked", (alwaysConfirm ? "true" : "false"));
-            filetypeunknownCheck.setAttribute("checked", (filetypeunknown ? "true" : "false"));
-            nosmallfilesCheck.setAttribute("checked", (nosmallfiles ? "true" : "false"));
-            nozerofilesCheck.setAttribute("checked", (nozerofiles ? "true" : "false"));
-            alwaysaskdownloadfolderCheck.setAttribute("checked", (alwaysaskdownloadfolder ? "true" : "false"));
+            MediaStealerenableCheck.setAttribute("checked", (enabled ? "true":"false"));
+            MediaStealershowStatusbarCheck.setAttribute("checked", (showStatusbar ? "true" : "false"));
+            MediaStealercacheCheck.setAttribute("checked", (useCache ? "true" : "false"));
+            MediaStealerconfirmCheck.setAttribute("checked", (alwaysConfirm ? "true" : "false"));
+            MediaStealerfiletypeunknownCheck.setAttribute("checked", (filetypeunknown ? "true" : "false"));
+            MediaStealernosmallfilesCheck.setAttribute("checked", (nosmallfiles ? "true" : "false"));
+            MediaStealernozerofilesCheck.setAttribute("checked", (nozerofiles ? "true" : "false"));
+            MediaStealeralwaysaskdownloadfolderCheck.setAttribute("checked", (alwaysaskdownloadfolder ? "true" : "false"));
 
-            document.getElementById("defaultDir").value = config.defaultDir;
+            document.getElementById("MediaStealerdefaultDir").value = config.defaultDir;
 
-            this.clearTreeitem("rulelist");
+            this.clearTreeitem("MediaStealerrulelist");
             for (var i = 0; i < config.rules.length; i++) {
                 var rule = config.rules[i];
-                this.createTreeitem("rulelist", rule);
+                this.createTreeitem("MediaStealerrulelist", rule);
                 if(rule.rtype == "1" && rule.enabled == "true")
-                    document.getElementById("videoCheck").setAttribute("checked", "true");
+                    document.getElementById("MediaStealervideoCheck").setAttribute("checked", "true");
                 if(rule.rtype == "2" && rule.enabled == "true")
-                    document.getElementById("audioCheck").setAttribute("checked", "true");
+                    document.getElementById("MediaStealeraudioCheck").setAttribute("checked", "true");
                 if(rule.rtype == "3" && rule.enabled == "true")
-                    document.getElementById("flashCheck").setAttribute("checked", "true");
+                    document.getElementById("MediaStealerflashCheck").setAttribute("checked", "true");
             }
         }
         catch(e) {
@@ -149,18 +149,18 @@ MediaStealerController.prototype = {
     collectConfig: function() {
         try {
             var config = new StealerConfig();
-            config.enabled = document.getElementById("enableCheck").checked;
-            config.showStatusbar = document.getElementById("showStatusbarCheck").checked;
-            config.useCache = document.getElementById("cacheCheck").checked;
-            config.alwaysConfirm = document.getElementById("confirmCheck").checked;
-            config.filetypeunknown = document.getElementById("filetypeunknownCheck").checked;
-            config.nozerofiles = document.getElementById("nozerofilesCheck").checked;
-            config.nosmallfiles = document.getElementById("nosmallfilesCheck").checked;
-            config.defaultDir = document.getElementById("defaultDir").value;
-            config.alwaysaskdownloadfolder = document.getElementById("alwaysaskdownloadfolderCheck").checked;
+            config.enabled = document.getElementById("MediaStealerenableCheck").checked;
+            config.showStatusbar = document.getElementById("MediaStealershowStatusbarCheck").checked;
+            config.useCache = document.getElementById("MediaStealercacheCheck").checked;
+            config.alwaysConfirm = document.getElementById("MediaStealerconfirmCheck").checked;
+            config.filetypeunknown = document.getElementById("MediaStealerfiletypeunknownCheck").checked;
+            config.nozerofiles = document.getElementById("MediaStealernozerofilesCheck").checked;
+            config.nosmallfiles = document.getElementById("MediaStealernosmallfilesCheck").checked;
+            config.defaultDir = document.getElementById("MediaStealerdefaultDir").value;
+            config.alwaysaskdownloadfolder = document.getElementById("MediaStealeralwaysaskdownloadfolderCheck").checked;
 
             config.rules = [];
-            var list = document.getElementById("rulelist");
+            var list = document.getElementById("MediaStealerrulelist");
             if(list.childNodes.length > 0) {
                 for(var i = 0; i < list.childNodes.length; i++) {
                     var params = this.getTreeitem(list.childNodes[i]);
@@ -214,7 +214,7 @@ MediaStealerController.prototype = {
 
             var item = document.createElement("treeitem");
             item.appendChild(row);
-            document.getElementById("tasklist").appendChild(item);
+            document.getElementById("MediaStealertasklist").appendChild(item);
         }
         catch(e) {
             //alert("MediaStealerController.addTask:\n"+e.name+": "+e.message);
@@ -222,7 +222,7 @@ MediaStealerController.prototype = {
     },
     setTask: function(index, task) {
         if(index == -1 || !task) return;
-        var tasklist = document.getElementById("tasklist");
+        var tasklist = document.getElementById("MediaStealertasklist");
         var treerow = tasklist.childNodes[index].firstChild;
 
         treerow.childNodes[0].setAttribute("label", task.filename);
@@ -239,7 +239,7 @@ MediaStealerController.prototype = {
         treerow.childNodes[6].setAttribute("label", task.dir);
     },
     findTaskById: function(task) {
-        var tasklist = document.getElementById("tasklist");
+        var tasklist = document.getElementById("MediaStealertasklist");
         for(var i = 0; i < tasklist.childNodes.length; i++) {
             var treeitem = tasklist.childNodes[i];
             var treerow = treeitem.firstChild;
@@ -249,7 +249,7 @@ MediaStealerController.prototype = {
         return -1;
     },
     findTaskByFile: function(task) {
-        var tasklist = document.getElementById("tasklist");
+        var tasklist = document.getElementById("MediaStealertasklist");
         for(var i = 0; i < tasklist.childNodes.length; i++) {
             var treeitem = tasklist.childNodes[i];
             var treerow = treeitem.firstChild;
@@ -273,11 +273,11 @@ MediaStealerController.prototype = {
             var downloadManager = Components.classes["@mozilla.org/download-manager;1"].getService(Components.interfaces.nsIDownloadManager);
             var prompts = Components.classes["@mozilla.org/embedcomp/prompt-service;1"].getService(Components.interfaces.nsIPromptService);
             var title = "Stealer";
-            var list = document.getElementById("tasklist");
+            var list = document.getElementById("MediaStealertasklist");
             var Taskcount = list.childElementCount;
 
             // do the deed
-            var temptaskTree = document.getElementById("task-tree");
+            var temptaskTree = document.getElementById("MediaStealertask-tree");
 
             var idx = temptaskTree.currentIndex;
             if(idx < 0) return;
@@ -312,11 +312,11 @@ MediaStealerController.prototype = {
         try {
 
             var downloadManager = Components.classes["@mozilla.org/download-manager;1"].getService(Components.interfaces.nsIDownloadManager);
-            var list = document.getElementById("tasklist");
+            var list = document.getElementById("MediaStealertasklist");
             var Taskcount = list.childElementCount;
 
             // do the deed
-            var temptaskTree = document.getElementById("task-tree");
+            var temptaskTree = document.getElementById("MediaStealertask-tree");
 
             var idx = temptaskTree.currentIndex;
             if(idx < 0) return;
@@ -328,8 +328,8 @@ MediaStealerController.prototype = {
             var downloadID = treeitem.firstChild.childNodes[0].getAttribute("DownloadID");
             var stat = treeitem.firstChild.childNodes[5].getAttribute("label");
             treeitem.firstChild.childNodes[5].setAttribute("label", "Paused");
-            var resumeButton = document.getElementById("resume");
-            var pauseButton = document.getElementById("pause");
+            var resumeButton = document.getElementById("MediaStealerresume");
+            var pauseButton = document.getElementById("MediaStealerpause");
             resumeButton.setAttribute("disabled", "false");
             pauseButton.setAttribute("disabled", "true");
             if (stat == "Transferring")
@@ -345,11 +345,11 @@ MediaStealerController.prototype = {
 
         try {
             var downloadManager = Components.classes["@mozilla.org/download-manager;1"].getService(Components.interfaces.nsIDownloadManager);
-            var list = document.getElementById("tasklist");
+            var list = document.getElementById("MediaStealertasklist");
             var Taskcount = list.childElementCount;
 
             // do the deed
-            var temptaskTree = document.getElementById("task-tree");
+            var temptaskTree = document.getElementById("MediaStealertask-tree");
 
             var idx = temptaskTree.currentIndex;
             if(idx < 0) return;
@@ -359,8 +359,8 @@ MediaStealerController.prototype = {
             var file = treeitem.firstChild.childNodes[0].getAttribute("file");
             var downloadID = treeitem.firstChild.childNodes[0].getAttribute("DownloadID");
             var stat = treeitem.firstChild.childNodes[5].getAttribute("label");
-            var resumeButton = document.getElementById("resume");
-            var pauseButton = document.getElementById("pause");
+            var resumeButton = document.getElementById("MediaStealerresume");
+            var pauseButton = document.getElementById("MediaStealerpause");
             pauseButton.setAttribute("disabled", "false");
             resumeButton.setAttribute("disabled", "true");
             if (stat =="Paused")
@@ -381,11 +381,11 @@ MediaStealerController.prototype = {
             var question = "Do you really want to delete this task?";
             var checkstr = "Also remove downloaded file";
             var check = {value: false};
-            var list = document.getElementById("tasklist");
+            var list = document.getElementById("MediaStealertasklist");
             var Taskcount = list.childElementCount;
 
             // do the deed
-            var temptaskTree = document.getElementById("task-tree");
+            var temptaskTree = document.getElementById("MediaStealertask-tree");
 
             var idx = temptaskTree.currentIndex;
             if(idx < 0) return;
@@ -432,8 +432,8 @@ MediaStealerController.prototype = {
             if(!result) return;
 
             // do the deed
-            var temptaskTree = document.getElementById("task-tree");
-            var list = document.getElementById("tasklist");
+            var temptaskTree = document.getElementById("MediaStealertask-tree");
+            var list = document.getElementById("MediaStealertasklist");
             var Taskcount = list.childElementCount;
             for (Taskcount; Taskcount > 0; Taskcount--)
             {
@@ -463,7 +463,7 @@ MediaStealerController.prototype = {
     },
     onOpenFile: function() {
         try {
-            var temptaskTree = document.getElementById("task-tree");
+            var temptaskTree = document.getElementById("MediaStealertask-tree");
             var idx = temptaskTree.currentIndex;
             if(idx < 0) return;
 
@@ -492,9 +492,9 @@ MediaStealerController.prototype = {
     },
     onOpenFolder: function() {
         try {
-            var temptaskTree = document.getElementById("task-tree");
+            var temptaskTree = document.getElementById("MediaStealertask-tree");
             var idx = temptaskTree.currentIndex;
-            var list = document.getElementById("tasklist");
+            var list = document.getElementById("MediaStealertasklist");
             var idx2  = list.childElementCount;
             if((idx2 < 1) || (idx == idx2) || (idx == -1)) {
                 var fd = Components.classes["@mozilla.org/file/local;1"]
@@ -549,7 +549,7 @@ MediaStealerController.prototype = {
     },
     onRenameFile: function() {
         try {
-            var temptaskTree = document.getElementById("task-tree");
+            var temptaskTree = document.getElementById("MediaStealertask-tree");
             var idx = temptaskTree.currentIndex;
             if(idx < 0) return;
 
@@ -590,7 +590,7 @@ MediaStealerController.prototype = {
         if(event.button) return;  // right click
 
         try {
-            var temptaskTree = document.getElementById("task-tree");
+            var temptaskTree = document.getElementById("MediaStealertask-tree");
             var idx = temptaskTree.currentIndex;
             if(idx < 0) return;
 
@@ -622,14 +622,14 @@ MediaStealerController.prototype = {
         if(event.button) return; // right click
 
         try {
-            var temptaskTree = document.getElementById("task-tree");
+            var temptaskTree = document.getElementById("MediaStealertask-tree");
             var idx = temptaskTree.currentIndex;
             if(idx < 0) return;
 
             var treeitem = temptaskTree.view.getItemAtIndex(idx);
-            var resumeButton = document.getElementById("resume");
-            var pauseButton = document.getElementById("pause");
-            var deleteButton = document.getElementById("delete");
+            var resumeButton = document.getElementById("MediaStealerresume");
+            var pauseButton = document.getElementById("MediaStealerpause");
+            var deleteButton = document.getElementById("MediaStealerdelete");
             var stat = treeitem.firstChild.childNodes[5].getAttribute("label"); // status
 
             if (stat=="Transferring")
@@ -663,7 +663,7 @@ MediaStealerController.prototype = {
     },
     onCopyRow: function() {
         try {
-            var temptaskTree = document.getElementById("task-tree");
+            var temptaskTree = document.getElementById("MediaStealertask-tree");
             var idx = temptaskTree.currentIndex;
             if(idx < 0) return;
 
@@ -685,7 +685,7 @@ MediaStealerController.prototype = {
     },
     onCopyURL: function() {
         try {
-            var temptaskTree = document.getElementById("task-tree");
+            var temptaskTree = document.getElementById("MediaStealertask-tree");
             var idx = temptaskTree.currentIndex;
             if(idx < 0) return;
 
@@ -704,7 +704,7 @@ MediaStealerController.prototype = {
 
     onCopyAllRows: function() {
         try {
-            var tasklist = document.getElementById("tasklist");
+            var tasklist = document.getElementById("MediaStealertasklist");
             var str = "";
             for(var i = 0; i < tasklist.childNodes.length; i++) {
 
@@ -729,7 +729,7 @@ MediaStealerController.prototype = {
     },
     onCopyAllURLS: function() {
         try {
-            var tasklist = document.getElementById("tasklist");
+            var tasklist = document.getElementById("MediaStealertasklist");
             var str = "";
             for(var i = 0; i < tasklist.childNodes.length; i++) {
 
@@ -758,8 +758,8 @@ MediaStealerController.prototype = {
 
     //------------------------  Option panel  -----------------------------
     onVideoClick: function() {
-        var state = document.getElementById("videoCheck").checked;
-        var tasklist = document.getElementById("rulelist");
+        var state = document.getElementById("MediaStealervideoCheck").checked;
+        var tasklist = document.getElementById("MediaStealerrulelist");
         for(var i = 0; i < tasklist.childNodes.length; i++) {
             var treeitem = tasklist.childNodes[i];
             if(treeitem.firstChild.getAttribute("rtype") == "1") {
@@ -771,8 +771,8 @@ MediaStealerController.prototype = {
         }
     },
     onAudioClick: function() {
-        var state = document.getElementById("audioCheck").checked;
-        var tasklist = document.getElementById("rulelist");
+        var state = document.getElementById("MediaStealeraudioCheck").checked;
+        var tasklist = document.getElementById("MediaStealerrulelist");
         for(var i = 0; i < tasklist.childNodes.length; i++) {
             var treeitem = tasklist.childNodes[i];
             if(treeitem.firstChild.getAttribute("rtype") == "2") {
@@ -784,8 +784,8 @@ MediaStealerController.prototype = {
         }
     },
     onFlashClick: function() {
-        var state = document.getElementById("flashCheck").checked;
-        var tasklist = document.getElementById("rulelist");
+        var state = document.getElementById("MediaStealerflashCheck").checked;
+        var tasklist = document.getElementById("MediaStealerrulelist");
         for(var i = 0; i < tasklist.childNodes.length; i++) {
             var treeitem = tasklist.childNodes[i];
             if(treeitem.firstChild.getAttribute("rtype") == "3") {
@@ -797,7 +797,7 @@ MediaStealerController.prototype = {
         }
     },
     onDirChanged: function() {  // monitor the defaultDir input
-        var text = String(document.getElementById("defaultDir").value);
+        var text = String(document.getElementById("MediaStealerdefaultDir").value);
         if(text.replace(/[ \t]+/g, "") == "")
             alert("Download directory must not be empty!");
 
@@ -810,7 +810,7 @@ MediaStealerController.prototype = {
         var ret = fp.show();
         if (ret == Components.interfaces.nsIFilePicker.returnOK) {
             var path = fp.file.path + (fp.file.path[0] == "/" ? "/" : "\\");
-            document.getElementById("defaultDir").value = path;
+            document.getElementById("MediaStealerdefaultDir").value = path;
         }
     },
     //-------------------------------------------------------------------------------
@@ -886,7 +886,7 @@ MediaStealerController.prototype = {
         }
     },
     editRuleList: function(mode) {
-        var tempruleTree = document.getElementById("ruleTree");
+        var tempruleTree = document.getElementById("MediaStealerruleTree");
         var idx = tempruleTree.currentIndex;
         //if(idx < 2) {
         //    return;
@@ -902,7 +902,7 @@ MediaStealerController.prototype = {
         tempruleTree.treeBoxObject.ensureRowIsVisible(idx);
     },
     moveItem: function(offset) {
-        var tempruleTree = document.getElementById("ruleTree");
+        var tempruleTree = document.getElementById("MediaStealerruleTree");
         var idx;
         var idx2;
         if(offset < 0) {
@@ -935,7 +935,7 @@ MediaStealerController.prototype = {
     onTreedblclick: function(event) {
         if(event.button) return; // right click
 
-        var tempruleTree = document.getElementById("ruleTree");
+        var tempruleTree = document.getElementById("MediaStealerruleTree");
         var treeitem = tempruleTree.view.getItemAtIndex(tempruleTree.currentIndex);
         this.jumptoDetailWindow(treeitem);
     },
@@ -951,7 +951,7 @@ MediaStealerController.prototype = {
             detailWindow.show(params, retParams);
             if(retParams.changed) {
                 if(treeitem == null) {
-                    this.createTreeitem("rulelist", retParams);
+                    this.createTreeitem("MediaStealerrulelist", retParams);
                 }
                 else {
                     this.setTreeitem(treeitem, retParams);
@@ -964,7 +964,7 @@ MediaStealerController.prototype = {
     },
     onTreeclick: function(event) {
 
-        var tempruleTree = document.getElementById("ruleTree");
+        var tempruleTree = document.getElementById("MediaStealerruleTree");
         var row = {}, col = {}, obj = {};
         tempruleTree.treeBoxObject.getCellAt(event.clientX, event.clientY, row, col, obj);
         if(col.value==null || row.value==null || obj.value==null)
@@ -972,7 +972,7 @@ MediaStealerController.prototype = {
         var treeitem = tempruleTree.view.getItemAtIndex(row.value);
         if(treeitem != null) {
             // update "Delete" button state
-            var deleteButton = document.getElementById("deleteButton");
+            var deleteButton = document.getElementById("MediaStealerdeleteButton");
             var rtype = treeitem.firstChild.getAttribute("rtype");
 
             if(rtype == "0")
@@ -982,8 +982,8 @@ MediaStealerController.prototype = {
 
             // update "Move" button state
             var rowcount = tempruleTree.childNodes[1].childNodes.length;
-            var upButton = document.getElementById("upButton");
-            var downButton = document.getElementById("downButton");
+            var upButton = document.getElementById("MediaStealerupButton");
+            var downButton = document.getElementById("MediaStealerdownButton");
             if(row.value == 0)
                 upButton.setAttribute("disabled", "true");
             else
@@ -1025,16 +1025,16 @@ MediaStealerController.prototype = {
         var rtype = treeitem.firstChild.getAttribute("rtype");
 
         if(rtype == "1") {
-            var videoCheck = document.getElementById("videoCheck");
-            videoCheck.checked = (value == "true") ? false : true;
+            var MediaStealervideoCheck = document.getElementById("MediaStealervideoCheck");
+            MediaStealervideoCheck.checked = (value == "true") ? false : true;
         }
         else if(rtype == "2") {
-            var audioCheck = document.getElementById("audioCheck");
-            audioCheck.checked = (value == "true") ? false : true;
+            var MediaStealeraudioCheck = document.getElementById("MediaStealeraudioCheck");
+            MediaStealeraudioCheck.checked = (value == "true") ? false : true;
         }
         else if(rtype == "3") {
-            var flashCheck = document.getElementById("flashCheck");
-            flashCheck.checked = (value == "true") ? false : true;
+            var MediaStealerflashCheck = document.getElementById("MediaStealerflashCheck");
+            MediaStealerflashCheck.checked = (value == "true") ? false : true;
         }
     },
     onNewButtonClick: function() {
@@ -1068,7 +1068,7 @@ MediaStealerController.prototype = {
                                      .getService(Components.interfaces.nsIWindowMediator);
             var browser = mediator.getMostRecentWindow("navigator:browser");
             var splitter = browser.document.getElementById("stealerPanelSplitter");
-            var vbox = browser.document.getElementById("panel-parent1");
+            var vbox = browser.document.getElementById("MediaStealerpanel-parent1");
             var menuitem = browser.document.getElementById("stealer-switch-toggle");
 
             if(oldState == "close") {
@@ -1164,8 +1164,8 @@ MediaStealerController.prototype = {
             stealerConfig.enabled = !stealerConfig.enabled;
             stealerConfig.save();
 
-            var enableCheck = document.getElementById("enableCheck");
-            enableCheck.setAttribute("checked", stealerConfig.enabled ? "true" : "false");
+            var MediaStealerenableCheck = document.getElementById("MediaStealerenableCheck");
+            MediaStealerenableCheck.setAttribute("checked", stealerConfig.enabled ? "true" : "false");
             this.initStatusbar(stealerConfig.showStatusbar, stealerConfig.enabled);
         }
         //else {
@@ -1178,8 +1178,8 @@ MediaStealerController.prototype = {
     sort: function() {
 
         try {
-            var list = document.getElementById("tasklist");
-            var temptaskTree = document.getElementById("task-tree");
+            var list = document.getElementById("MediaStealertasklist");
+            var temptaskTree = document.getElementById("MediaStealertask-tree");
             var Taskcount = list.childElementCount-1;
 
             for (Taskcount; Taskcount > -1; Taskcount--)
