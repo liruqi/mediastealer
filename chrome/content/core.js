@@ -674,6 +674,7 @@ StealerDownloader.prototype = {
                 this.curr = this.total;
                 this.task.curr = this.total;
                 this.task.stat = "Finished";
+                this.task.DownloadID = -1;
                 this.Stealer.refreshTask(this.task);
             }
         }
