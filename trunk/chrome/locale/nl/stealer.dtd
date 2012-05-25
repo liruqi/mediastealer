@@ -45,8 +45,12 @@
 <!ENTITY tasks_context_copy_all.label "Rijen copieren">
 <!ENTITY tasks_context_copyURL.label "Kopie URL">
 <!ENTITY tasks_context_copuURLs.label "Kopie URL's">
+<!ENTITY tasks_context_download.label "Downloaden">  
+<!ENTITY tasks_context_download_all.label "Download alles"> 
+<!ENTITY tasks_context_abort.label "Annuleren"> 
 
 <!-- tabpage Options -->
+<!ENTITY options_grp_displayoptions.label "Weergave opties"> 
 <!ENTITY options_grp_type.label "Content-Type">
 <!ENTITY options_type_video.label "Video (video|flv|mp4)">
 <!ENTITY options_type_audio.label "Audio (mp3|wma|mpeg|ogg)">
@@ -62,6 +66,9 @@
 <!ENTITY options_opts_filetypeunknown.label "Gebruik 'flv' extenstie wanneer bestandtype onbekend is">
 <!ENTITY options_opts_nosmallfiles "Download geen kleine bestanden (minder dan 750 000 bytes)">
 <!ENTITY options_opts_nozerofiles.label "Download geen bestanden van nul bytes">
+<!ENTITY options_opts_automaticdownload.label "Automatische download">
+<!ENTITY options_opts_togglemediastealerstatusbar.label "Toon Media Stealer bar icoon">
+<!ENTITY options_opts_wheretoputfiles.label "Vraag me altijd waar bestanden gedownload worden">
 
 <!-- tabpage Rules -->
 <!ENTITY rules_tree_warn.label "Deze tabel is enkel bedoeld voor professionelen. Verander deze regels NIET tenzij je weet waarmee je bezig bent.">

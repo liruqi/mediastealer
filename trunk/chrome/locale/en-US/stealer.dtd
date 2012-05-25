@@ -45,8 +45,12 @@
 <!ENTITY tasks_context_copy_all.label "Copy All Rows">
 <!ENTITY tasks_context_copyURL.label "Copy URL">
 <!ENTITY tasks_context_copuURLs.label "Copy URLs">
+<!ENTITY tasks_context_download.label "Download">  
+<!ENTITY tasks_context_download_all.label "Download all"> 
+<!ENTITY tasks_context_abort.label "Abort"> 
 
 <!-- tabpage Options -->
+<!ENTITY options_grp_displayoptions.label "Display options"> 
 <!ENTITY options_grp_type.label "Content-Type">
 <!ENTITY options_type_video.label "Video (video|flv|mp4)">
 <!ENTITY options_type_audio.label "Audio (mp3|wma|mpeg|ogg)">
@@ -62,6 +66,9 @@
 <!ENTITY options_opts_filetypeunknown.label "Use 'flv' extension when filetype is unknown">
 <!ENTITY options_opts_nosmallfiles "Do not download small files (less than 750 000 bytes)">
 <!ENTITY options_opts_nozerofiles.label "Do not download files with zero bytes">
+<!ENTITY options_opts_automaticdownload.label "Automatic download">
+<!ENTITY options_opts_togglemediastealerstatusbar.label "Show toggle status bar">
+<!ENTITY options_opts_wheretoputfiles.label "Always ask me where to put files">
 
 <!-- tabpage Rules -->
 <!ENTITY rules_tree_warn.label "This table is intended for professonals. DO NOT modify the rules if you are not clear about them.">

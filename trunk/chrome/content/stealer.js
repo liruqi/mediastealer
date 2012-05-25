@@ -69,33 +69,57 @@ MediaStealerController.prototype = {
             }
 
             var enabled = config.enabled;
+            var firstrun = config.firstrun;
             var showStatusbar = config.showStatusbar;
             var useCache = config.useCache;
-            var alwaysConfirm = config.alwaysConfirm;
+            //var alwaysConfirm = config.alwaysConfirm;
             var filetypeunknown = config.filetypeunknown;
             var nozerofiles = config.nozerofiles;
             var nosmallfiles = config.nosmallfiles;
             var alwaysaskdownloadfolder = config.alwaysaskdownloadfolder;
+            var showToggleStatusbar = config.showToggleStatusbar;
+            var automaticdownload = config.automaticdownload;
 
             this.initStatusbar(showStatusbar, enabled);
+            this.initToggleStatusbar(showToggleStatusbar, enabled);
 
             var MediaStealerenableCheck = document.getElementById("MediaStealerenableCheck");
             var MediaStealershowStatusbarCheck = document.getElementById("MediaStealershowStatusbarCheck");
             var MediaStealercacheCheck = document.getElementById("MediaStealercacheCheck");
-            var MediaStealerconfirmCheck = document.getElementById("MediaStealerconfirmCheck");
+            //var MediaStealerconfirmCheck = document.getElementById("MediaStealerconfirmCheck");
             var MediaStealerfiletypeunknownCheck = document.getElementById("MediaStealerfiletypeunknownCheck");
             var MediaStealernosmallfilesCheck = document.getElementById("MediaStealernosmallfilesCheck");
             var MediaStealernozerofilesCheck = document.getElementById("MediaStealernozerofilesCheck");
             var MediaStealeralwaysaskdownloadfolderCheck = document.getElementById("MediaStealeralwaysaskdownloadfolderCheck");
+            var MediaStealerToggleCheck = document.getElementById("MediaStealerToggleCheck");
+            var MediaStealerAutomaticdownloadCheck = document.getElementById("MediaStealerAutomaticdownloadCheck");
 
             MediaStealerenableCheck.setAttribute("checked", (enabled ? "true":"false"));
             MediaStealershowStatusbarCheck.setAttribute("checked", (showStatusbar ? "true" : "false"));
             MediaStealercacheCheck.setAttribute("checked", (useCache ? "true" : "false"));
-            MediaStealerconfirmCheck.setAttribute("checked", (alwaysConfirm ? "true" : "false"));
+            //MediaStealerconfirmCheck.setAttribute("checked", (alwaysConfirm ? "true" : "false"));
             MediaStealerfiletypeunknownCheck.setAttribute("checked", (filetypeunknown ? "true" : "false"));
             MediaStealernosmallfilesCheck.setAttribute("checked", (nosmallfiles ? "true" : "false"));
             MediaStealernozerofilesCheck.setAttribute("checked", (nozerofiles ? "true" : "false"));
             MediaStealeralwaysaskdownloadfolderCheck.setAttribute("checked", (alwaysaskdownloadfolder ? "true" : "false"));
+            MediaStealerToggleCheck.setAttribute("checked", (showToggleStatusbar ? "true" : "false"));
+            MediaStealerAutomaticdownloadCheck.setAttribute("checked", (automaticdownload ? "true" : "false"));
+            if (firstrun == true)
+            {
+              var kToolBarID = "nav-bar";
+              var kTBItemID = "Media_Stealer_Button";
+              var tbElem = document.getElementById(kToolBarID);
+              var tbItemElem = document.getElementById(kTBItemID);
+              if (tbElem && !tbItemElem)
+              {
+                var newSet = tbElem.currentSet + "," + kTBItemID;
+                tbElem.setAttribute("currentset", newSet);
+                tbElem.currentSet = newSet;
+                document.persist(kToolBarID, "currentset");   
+              }	
+              config.firstrun = false;
+              stealerConfig.save();              
+            }
 
             document.getElementById("MediaStealerdefaultDir").value = config.defaultDir;
 
@@ -103,12 +127,12 @@ MediaStealerController.prototype = {
             for (var i = 0; i < config.rules.length; i++) {
                 var rule = config.rules[i];
                 this.createTreeitem("MediaStealerrulelist", rule);
-                if(rule.rtype == "1" && rule.enabled == "true")
-                    document.getElementById("MediaStealervideoCheck").setAttribute("checked", "true");
-                if(rule.rtype == "2" && rule.enabled == "true")
-                    document.getElementById("MediaStealeraudioCheck").setAttribute("checked", "true");
-                if(rule.rtype == "3" && rule.enabled == "true")
-                    document.getElementById("MediaStealerflashCheck").setAttribute("checked", "true");
+                //if(rule.rtype == "1" && rule.enabled == "true")
+                //    document.getElementById("MediaStealervideoCheck").setAttribute("checked", "true");
+                //if(rule.rtype == "2" && rule.enabled == "true")
+                //    document.getElementById("MediaStealeraudioCheck").setAttribute("checked", "true");
+                //if(rule.rtype == "3" && rule.enabled == "true")
+                //    document.getElementById("MediaStealerflashCheck").setAttribute("checked", "true");
             }
         }
         catch(e) {
@@ -133,6 +157,25 @@ MediaStealerController.prototype = {
             statusbar_bt.setAttribute("tooltiptext", "");
         }
     },
+    initToggleStatusbar: function(showToggleStatusbar, enabled) {
+        var statusbar_bt = document.getElementById("MediaStealerTogglebar");
+
+        if(showToggleStatusbar) {
+            if(enabled) {
+                statusbar_bt.image = "chrome://stealer/skin/mediastealer16.png";
+                statusbar_bt.setAttribute("tooltiptext", "Toggle Media Stealer");
+            } 
+            else
+            {
+                statusbar_bt.image = "chrome://stealer/skin/mediastealer16.png";
+                statusbar_bt.setAttribute("tooltiptext", "Toggle Media Stealer");
+            }           
+        }
+        else {
+            statusbar_bt.image = "";
+            statusbar_bt.setAttribute("tooltiptext", "");
+        }
+    },   
     save: function(xconfig) {
         try {
             if(xconfig == null)
@@ -152,12 +195,14 @@ MediaStealerController.prototype = {
             config.enabled = document.getElementById("MediaStealerenableCheck").checked;
             config.showStatusbar = document.getElementById("MediaStealershowStatusbarCheck").checked;
             config.useCache = document.getElementById("MediaStealercacheCheck").checked;
-            config.alwaysConfirm = document.getElementById("MediaStealerconfirmCheck").checked;
+            //config.alwaysConfirm = document.getElementById("MediaStealerconfirmCheck").checked;
             config.filetypeunknown = document.getElementById("MediaStealerfiletypeunknownCheck").checked;
             config.nozerofiles = document.getElementById("MediaStealernozerofilesCheck").checked;
             config.nosmallfiles = document.getElementById("MediaStealernosmallfilesCheck").checked;
             config.defaultDir = document.getElementById("MediaStealerdefaultDir").value;
             config.alwaysaskdownloadfolder = document.getElementById("MediaStealeralwaysaskdownloadfolderCheck").checked;
+            config.showToggleStatusbar = document.getElementById("MediaStealerToggleCheck").checked;  
+            config.automaticdownload = document.getElementById("MediaStealerAutomaticdownloadCheck").checked;   
 
             config.rules = [];
             var list = document.getElementById("MediaStealerrulelist");
@@ -397,7 +442,7 @@ MediaStealerController.prototype = {
             var treeitem = temptaskTree.view.getItemAtIndex(idx);
             var file = treeitem.firstChild.childNodes[0].getAttribute("file");
             var stat = treeitem.firstChild.childNodes[5].getAttribute("label");
-            if ((stat == "Finished")||(stat == "Interrupted")) {
+            if ((stat == "Finished")||(stat == "Interrupted")||(stat == "Ready to download")) {
 
                 if(check.value) {
                     var fd = Components.classes["@mozilla.org/file/local;1"]
@@ -441,7 +486,7 @@ MediaStealerController.prototype = {
                 var treeitem = temptaskTree.view.getItemAtIndex(idx);
                 var file = treeitem.firstChild.childNodes[0].getAttribute("file");
                 var stat = treeitem.firstChild.childNodes[5].getAttribute("label");
-                if ((stat == "Finished")||(stat == "Interrupted"))
+                if ((stat == "Finished")||(stat == "Interrupted")||(stat == "Ready to download"))
                 {
                     if(check.value) {
                     var fd = Components.classes["@mozilla.org/file/local;1"]
@@ -994,8 +1039,8 @@ MediaStealerController.prototype = {
                 downButton.setAttribute("disabled", "false");
 
             // update checkbox state
-            if(col.value.type == Components.interfaces.nsITreeColumn.TYPE_CHECKBOX)
-                this.reverseCheckbox(treeitem);
+            //if(col.value.type == Components.interfaces.nsITreeColumn.TYPE_CHECKBOX)
+            //    this.reverseCheckbox(treeitem);
         }
 
     },
@@ -1203,6 +1248,163 @@ MediaStealerController.prototype = {
         }
         catch(e) {
         //   alert("sort:\n"+e.name+": "+e.message);
+        }
+
+    },
+onDownload: function() {      
+   try {
+            var downloadManager = Components.classes["@mozilla.org/download-manager;1"].getService(Components.interfaces.nsIDownloadManager);
+            var prompts = Components.classes["@mozilla.org/embedcomp/prompt-service;1"].getService(Components.interfaces.nsIPromptService);
+            var title = "Stealer";
+            var list = document.getElementById("MediaStealertasklist");
+            var Taskcount = list.childElementCount;
+
+            // do the deed
+            var temptaskTree = document.getElementById("MediaStealertask-tree");
+
+            var idx = temptaskTree.currentIndex;
+            if(idx < 0) return;
+
+            if(idx == Taskcount) return;           
+
+            var treeitem = temptaskTree.view.getItemAtIndex(idx);
+            var file = treeitem.firstChild.childNodes[0].getAttribute("file");
+            var filename = treeitem.firstChild.childNodes[0].getAttribute("label");
+            var dir = treeitem.firstChild.childNodes[0].getAttribute("dir");
+            var id = treeitem.firstChild.childNodes[0].getAttribute("id");
+            var downloadID = treeitem.firstChild.childNodes[0].getAttribute("DownloadID");
+            var url = treeitem.firstChild.childNodes[1].getAttribute("label");
+            var type = treeitem.firstChild.childNodes[2].getAttribute("label");
+            var size = treeitem.firstChild.childNodes[3].getAttribute("label");
+            var mode = treeitem.firstChild.childNodes[4].getAttribute("mode");
+            var currvalue = treeitem.firstChild.childNodes[4].getAttribute("value");
+            var curr = treeitem.firstChild.childNodes[4].getAttribute("curr");
+            var stat = treeitem.firstChild.childNodes[5].getAttribute("label");
+            var taskdir = treeitem.firstChild.childNodes[6].getAttribute("label");            
+
+            if (stat == "Ready to download")
+            {
+            var task = new Task();
+            task.id = id;
+            task.file = file;
+            task.dir = dir;
+            task.filename = filename;
+            task.url = url;
+            task.type = type;
+            task.size = size;
+            task.curr = curr;
+            task.stat = stat;
+            task.DownloadID = downloadID;
+
+            var file2 = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
+            file2.initWithPath(task.file);
+            var persist = Components.classes["@mozilla.org/embedding/browser/nsWebBrowserPersist;1"].createInstance(Components.interfaces.nsIWebBrowserPersist);
+            var nsIWBP = Components.interfaces.nsIWebBrowserPersist;
+            var flags = nsIWBP.PERSIST_FLAGS_REPLACE_EXISTING_FILES;
+            persist.persistFlags = flags |nsIWBP.PERSIST_FLAGS_BYPASS_CACHE|nsIWBP.PERSIST_FLAGS_CLEANUP_ON_FAILURE
+            var IOservice = Components.classes['@mozilla.org/network/io-service;1'].getService(Components.interfaces.nsIIOService);
+            var obj_URI_Source = IOservice.newURI(task.url, null, null);
+            var obj_File_Target = IOservice.newFileURI(file2);
+            
+            var dl = downloadManager.addDownload(downloadManager.DOWNLOAD_TYPE_DOWNLOAD, obj_URI_Source, obj_File_Target, '', null, Math.round(Date.now() * 1000), null, persist);
+            var persistListener = new StealerDownloader(Stealer, task);
+            downloadManager.addListener(persistListener);
+            persist.progressListener = dl;
+            persist.saveURI(dl.source, null, null, null, null, dl.targetFile);
+
+            task.curr = 0;
+            task.DownloadID = dl.id;
+            treeitem.firstChild.childNodes[0].setAttribute("DownloadID", task.DownloadID);
+            task.stat = "Transferring"; 
+            }
+            else if (stat == "Paused")
+            {
+                downloadManager.resumeDownload(downloadID);
+            }
+        }
+        catch(e) {
+            alert("onDownload:\n"+e.name+": "+e.message);
+        }
+
+    },
+onDownloadAll: function() {      
+   try {
+            var downloadManager = Components.classes["@mozilla.org/download-manager;1"].getService(Components.interfaces.nsIDownloadManager);
+            var prompts = Components.classes["@mozilla.org/embedcomp/prompt-service;1"].getService(Components.interfaces.nsIPromptService);
+            var title = "Stealer";
+            var list = document.getElementById("MediaStealertasklist");
+            var Taskcount = list.childElementCount;
+
+            // do the deed
+            var temptaskTree = document.getElementById("MediaStealertask-tree");
+
+            
+               
+            if(idx < 0) return;
+
+            if(idx == Taskcount) return;             
+  
+            for (Taskcount; Taskcount > 0; Taskcount--)
+            {      
+              var idx = Taskcount-1;
+              var treeitem = temptaskTree.view.getItemAtIndex(idx);
+              var file = treeitem.firstChild.childNodes[0].getAttribute("file");
+              var filename = treeitem.firstChild.childNodes[0].getAttribute("label");
+              var dir = treeitem.firstChild.childNodes[0].getAttribute("dir");
+              var id = treeitem.firstChild.childNodes[0].getAttribute("id");
+              var downloadID = treeitem.firstChild.childNodes[0].getAttribute("DownloadID");
+              var url = treeitem.firstChild.childNodes[1].getAttribute("label");
+              var type = treeitem.firstChild.childNodes[2].getAttribute("label");
+              var size = treeitem.firstChild.childNodes[3].getAttribute("label");
+              var mode = treeitem.firstChild.childNodes[4].getAttribute("mode");
+              var currvalue = treeitem.firstChild.childNodes[4].getAttribute("value");
+              var curr = treeitem.firstChild.childNodes[4].getAttribute("curr");
+              var stat = treeitem.firstChild.childNodes[5].getAttribute("label");
+              var taskdir = treeitem.firstChild.childNodes[6].getAttribute("label");            
+
+              if (stat == "Ready to download")
+              {
+              var task = new Task();
+              task.id = id;
+              task.file = file;
+              task.dir = dir;
+              task.filename = filename;
+              task.url = url;
+              task.type = type;
+              task.size = size;
+              task.curr = curr;
+              task.stat = stat;
+              task.DownloadID = downloadID;
+
+              var file2 = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
+              file2.initWithPath(task.file);
+              var persist = Components.classes["@mozilla.org/embedding/browser/nsWebBrowserPersist;1"].createInstance(Components.interfaces.nsIWebBrowserPersist);
+              var nsIWBP = Components.interfaces.nsIWebBrowserPersist;
+              var flags = nsIWBP.PERSIST_FLAGS_REPLACE_EXISTING_FILES;
+              persist.persistFlags = flags |nsIWBP.PERSIST_FLAGS_BYPASS_CACHE|nsIWBP.PERSIST_FLAGS_CLEANUP_ON_FAILURE
+              var IOservice = Components.classes['@mozilla.org/network/io-service;1'].getService(Components.interfaces.nsIIOService);
+              var obj_URI_Source = IOservice.newURI(task.url, null, null);
+              var obj_File_Target = IOservice.newFileURI(file2);
+            
+              var dl = downloadManager.addDownload(downloadManager.DOWNLOAD_TYPE_DOWNLOAD, obj_URI_Source, obj_File_Target, '', null, Math.round(Date.now() * 1000), null, persist);
+              var persistListener = new StealerDownloader(Stealer, task);
+              downloadManager.addListener(persistListener);
+              persist.progressListener = dl;
+              persist.saveURI(dl.source, null, null, null, null, dl.targetFile);
+
+              task.curr = 0;
+              task.DownloadID = dl.id;
+              treeitem.firstChild.childNodes[0].setAttribute("DownloadID", task.DownloadID);
+              task.stat = "Transferring"; 
+              }
+              else if (stat == "Paused")
+              {
+                  downloadManager.resumeDownload(downloadID);
+              }
+            }
+        }
+        catch(e) {
+            alert("onDownloadAll:\n"+e.name+": "+e.message);
         }
 
     },

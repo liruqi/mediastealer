@@ -129,6 +129,53 @@ StealerHttpObserver.prototype = {
             if(ct) msg += "   " + ct + "\n";
             this.Stealer.dbgPrintln(msg); */
 
+            var theString = unescape(uri);
+            var test1 = theString.indexOf("youtube");
+            var test2 = theString.indexOf("range");
+            var test3 = theString.indexOf("signature");
+            var newString2 = "";
+            if (test1 != -1 && test2 != -1)
+            {
+              var newString = "";
+              var counter = theString.length; 
+              var testchar = '\u0026';
+              var foundchar = false;
+              var foundchar2 = false;
+
+              for (counter=0  ; counter <(theString.length+1) ;counter++ ) {
+
+                   if (counter > (test3)) //finds signature
+                   {
+
+                    if (theString.charAt(counter) == testchar)
+                    {
+                       foundchar2 = true;
+                    }
+                    else if (foundchar2 == false)
+                    {
+                         newString2 += theString.substring(counter-1, counter);   
+                    } 
+                  } 
+                    
+                   
+                   if (counter < (test2)) //finds and deletes range information
+                   {                     
+                     newString += theString.substring(counter-1, counter); 
+                   }
+                   else if (counter > (test2+5))
+                   {
+                     if (foundchar == true)
+                     {
+                     newString += theString.substring(counter-1, counter);   
+                     }     
+                     else if (theString.charAt(counter) == testchar)
+                     {
+                        foundchar = true;
+                     }    
+                   }
+              } 
+              uri = newString;
+            }
             //test if there are duplicates
             var testunique = true;
             var temptaskTree = document.getElementById("MediaStealertask-tree");
@@ -139,8 +186,13 @@ StealerHttpObserver.prototype = {
                 var idx = Taskcount-1;
                 var treeitem = temptaskTree.view.getItemAtIndex(idx);
                 var url = treeitem.firstChild.childNodes[1].getAttribute("label"); //url
+                var url2 = unescape(url);
                 var filesize = treeitem.firstChild.childNodes[3].getAttribute("label");    //filesize
-                if (url == uri)
+                if (newString2 != "" && (url2.indexOf(newString2) != -1))
+                {
+                    testunique = false;
+                }
+                else if (url == uri)
                 {
                     testunique = false;
                 }
@@ -361,14 +413,14 @@ StealerHttpObserver.prototype = {
                     }
                     //end of directory verification
 
-                    var choice;
-                    if(stealerConfig.alwaysConfirm)
-                    {
-                        choice = prompts.confirmCheck(null, title, "Content ["+task.type+"] found\nDo you want to download it to "+task.dir+" ?\n", checkstr, askcheck);
-                    }
-                    else
-                        choice = true;
-                    if(choice) {
+                    //var choice;
+                    //if(stealerConfig.alwaysConfirm)
+                    //{
+                    //    choice = prompts.confirmCheck(null, title, "Content ["+task.type+"] found\nDo you want to download it to "+task.dir+" ?\n", checkstr, askcheck);
+                    //}
+                    //else
+                    //    choice = true;
+                    //if(choice) {
                         //old method
                         //var newListener = new StealerStreamListener(this.Stealer, task);
                         //httpChannel.QueryInterface(Components.interfaces.nsITraceableChannel);
@@ -405,6 +457,9 @@ StealerHttpObserver.prototype = {
                             }
                         }
 
+                        var automaticdownload = stealerConfig.automaticdownload;
+                        if (automaticdownload)
+                        {     
                         //new method
                         var file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
                         file.initWithPath(task.file);
@@ -425,24 +480,31 @@ StealerHttpObserver.prototype = {
                         task.curr = 0;
                         task.DownloadID = dl.id;
                         task.stat = "Transferring";
+                        }
+                        else
+                        {
+                        task.stat = "Ready to download";
+                        task.curr = 0;
+                        task.DownloadID = -1;
+                        }
                         this.Stealer.addTask(task);
 
-                        var message = "\n----------  Download started  ----------\n";
-                        message    += "  Time: " + new Date().toLocaleString() + "\n";
-                        message    += "  File: " + task.file + "\n";
-                        message    += "  URL:  " + task.url  + "\n";
-                        message    += "  Type: " + task.type + "\n";
-                        message    += "  Size: " + task.size + "\n";
-                        message    += "  DownloadID: "+ task.DownloadID + "\n";
-                        this.Stealer.dbgPrintln(message);
-                    }
-                    if(!askcheck.value)
-                    {
-                        stealerConfig.alwaysConfirm = !stealerConfig.alwaysConfirm;
-                        stealerConfig.save();
-                        var MediaStealerconfirmCheck = document.getElementById("MediaStealerconfirmCheck");
-                        MediaStealerconfirmCheck.setAttribute("checked", stealerConfig.alwaysConfirm ? "true" : "false");
-                    }
+                        //var message = "\n----------  Download started  ----------\n";
+                        //message    += "  Time: " + new Date().toLocaleString() + "\n";
+                        //message    += "  File: " + task.file + "\n";
+                        //message    += "  URL:  " + task.url  + "\n";
+                        //message    += "  Type: " + task.type + "\n";
+                        //message    += "  Size: " + task.size + "\n";
+                        //message    += "  DownloadID: "+ task.DownloadID + "\n";
+                        //this.Stealer.dbgPrintln(message);
+                    
+                    //if(!askcheck.value)
+                    //{
+                   //     stealerConfig.alwaysConfirm = !stealerConfig.alwaysConfirm;
+                   //     stealerConfig.save();
+                   //     var MediaStealerconfirmCheck = document.getElementById("MediaStealerconfirmCheck");
+                   //     MediaStealerconfirmCheck.setAttribute("checked", stealerConfig.alwaysConfirm ? "true" : "false");
+                    //}
                 }
             }
         }
@@ -661,6 +723,7 @@ StealerDownloader.prototype = {
             this.task.stat = "Transferring";
             this.curr = aDownload.amountTransferred;
             this.task.curr = aDownload.amountTransferred;
+            this.task.size = aDownload.size;
             this.Stealer.refreshTask(this.task);
         }
     },
@@ -671,6 +734,7 @@ StealerDownloader.prototype = {
         {
             if (aDownload.state == 7 || aDownload.state == 1)
             {
+                this.total = this.task.size;
                 this.curr = this.total;
                 this.task.curr = this.total;
                 this.task.stat = "Finished";
@@ -690,9 +754,10 @@ StealerDownloader.prototype = {
                 this.task.stat = "Paused";
                 this.Stealer.refreshTask(this.task);
             }
-            else   //something went terribly wrong
+            else if (aDownload.state == 3 || aDownload.state == 2)  //something went terribly wrong
             {
                 this.task.stat = "Interrupted";
+                this.DownloadID = -1;
                 this.Stealer.refreshTask(this.task);
             }
         }
@@ -727,20 +792,21 @@ StealerCacheFetcher.prototype = {
                 this.content_length = RegExp.$1;
 
                 if(new RegExp(this.task.type, "i").exec(this.content_type)) {
-                    var choice;
-                    if(stealerConfig.alwaysConfirm) {
+                    //var choice;
+                    //if(stealerConfig.alwaysConfirm) {
                         var msg= "[*Cached*] URI: "+this.task.url+"\n==> "+this.task.file+"\nIs it OK?";
                         choice = confirm(msg);
-                    }
-                    else
-                        choice = true;
-                    if(choice) {
+                        if(!choice) return;
+                    //}
+                    //else
+                   //     choice = true;
+                    //if(choice) {
                         this.task.type = this.content_type;
                         this.task.size = Number(this.content_length);
                         this.task.curr = 0;
                         this.task.stat = "Transferring";
                         this.Stealer.addTask(this.task);
-
+                        this.task.DownloadID = -1;
                         var message = "\n----------  Download started  ----------\n";
                         message    += "  Time: " + new Date().toLocaleString() + "\n";
                         message    += "  File: " + this.task.file + "\n";
@@ -751,7 +817,7 @@ StealerCacheFetcher.prototype = {
                         this.Stealer.dbgPrintln(message);
 
                         this.fetch(descriptor);  // fetch it!
-                    }
+                    
                 }
             }
         }

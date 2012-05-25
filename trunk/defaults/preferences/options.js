@@ -1,9 +1,11 @@
 pref("extensions.MediaStealer.defaultDir", "");
 pref("extensions.MediaStealer.enabled", true);
+pref("extensions.MediaStealer.firstrun", true);
 pref("extensions.MediaStealer.showStatusbar", true);
+pref("extensions.MediaStealer.showToggleStatusbar", true);
 pref("extensions.MediaStealer.useCache", true);
-pref("extensions.MediaStealer.alwaysConfirm", true);
-pref("extensions.MediaStealer.filetypeunknown", true);
+pref("extensions.MediaStealer.automaticdownload", false);
+pref("extensions.MediaStealer.filetypeunknown", false);
 pref("extensions.MediaStealer.nosmallfiles", false);
 pref("extensions.MediaStealer.nozerofiles", true);
 pref("extensions.MediaStealer.alwaysaskdownloadfolder", false);

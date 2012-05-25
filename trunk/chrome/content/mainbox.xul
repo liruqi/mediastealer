@@ -10,15 +10,19 @@
     <menupopup id="MediaStealertasklistPopup">
       <!--<menuitem label="Abort" accesskey="A" oncommand="Stealer.onAbort();"/>
       <menuseparator/>-->
+      <menuitem label="&tasks_context_download.label;" accesskey="O" oncommand="Stealer.onDownload();"/>
+      <menuitem label="&tasks_context_download_all.label;" accesskey="O" oncommand="Stealer.onDownloadAll();"/>
       <menuitem label="&tasks_context_open.label;" accesskey="O" oncommand="Stealer.onOpenFile();"/>
       <menuitem label="&tasks_context_open_folder.label;" accesskey="F" oncommand="Stealer.onOpenFolder();"/>
       <menuseparator/>
       <menuitem label="&tasks_context_rename.label;" accesskey="R" oncommand="Stealer.onRenameFile();"/>
       <menuitem label="&tasks_context_delete.label;" accesskey="D" oncommand="Stealer.onDeleteTask();"/>
       <menuitem label="&tasks_context_delete_all.label;" oncommand="Stealer.onDeleteAllTask();"/>
+<!--
       <menuitem label="Pause" oncommand="Stealer.onPause();"/>
       <menuitem label="Resume" oncommand="Stealer.onResume();"/>
-      <menuitem label="MediaStealerAbort" oncommand="Stealer.onAbort();"/> 
+-->
+      <menuitem label="&tasks_context_abort.label;" oncommand="Stealer.onAbort();"/> 
       <menuseparator/>
       <menuitem label="&tasks_context_copyURL.label;" oncommand="Stealer.onCopyURL();"/>
       <menuitem label="&tasks_context_copuURLs.label;" oncommand="Stealer.onCopyAllURLS();"/>
@@ -32,6 +36,7 @@
         <tab label="&tab_options.label;"/>
         <tab label="&tab_rules.label;"/>
         <tab label="&tab_messages.label;"/>
+        <checkbox id="MediaStealerenableCheck" label="&options_opts_enable.label;" oncommand="Stealer.onApply();"/>
         <spacer flex="1" width="2000"/>
         <image src="chrome://stealer/skin/mediastealer24.png"/>
         <toolbarbutton id="MediaStealerAbout" label="About Media Stealer" oncommand="Stealer.onAbout();"/>
@@ -50,7 +55,7 @@
                   enableColumnDrag="true" class="tree" rows=""
                   onclick="Stealer.onTaskTreeClick(event);" ondblclick="Stealer.onTaskTreeDoubleClick(event);">
  
-              <treecols>
+              <treecols>                
                 <treecol id="MediaStealerfile-col"   label="&tasks_tree_file.label;"     flex="1" persist="width hidden ordinal" primary="true"/>
                 <splitter class="tree-splitter" />       
                 <treecol id="MediaStealerres-col"    label="&tasks_tree_url.label;"      flex="1" persist="width hidden ordinal" />
@@ -71,16 +76,24 @@
             </tree>
 
             <hbox pack="center">
+              <button label="&tasks_context_download.label;" id="MediaStealerDownload" oncommand="Stealer.onDownload();"/>
+              <button label="&tasks_context_download_all.label;" id="MediaStealerDownload" oncommand="Stealer.onDownloadAll();"/>
+              <button label="&tasks_context_delete.label;" id="MediaStealerdelete" oncommand="Stealer.onDeleteTask();" accesskey="D"/> 
+              <button label="&tasks_context_delete_all.label;" id="MediaStealerdeleteall" oncommand="Stealer.onDeleteAllTask();"/>
+              <button label="&tasks_context_copyURL.label;" id="MediaStealercopyURL" oncommand="Stealer.onCopyURL();"/>
+              <button label="&tasks_context_copuURLs.label;" id="MediaStealercopyURLs" oncommand="Stealer.onCopyAllURLS();"/>
+<!--
+              <button label="Pause" id="MediaStealerpause" oncommand="Stealer.onPause();"/>
+              <button label="Resume" id="MediaStealerresume" oncommand="Stealer.onResume();"/>
+-->
+              <button label="&tasks_context_abort.label;" id="MediaStealerabort" oncommand="Stealer.onAbort();"/>
+            </hbox>
+            <hbox pack="center">
               <button label="&tasks_context_rename.label;" id="MediaStealerrename" oncommand="Stealer.onRenameFile();" accesskey="R"/>
               <button label="&tasks_context_open.label;" id="MediaStealeropenfile" oncommand="Stealer.onOpenFile();" accesskey="O"/>
               <button label="&tasks_context_open_folder.label;" id="MediaStealeropenfolder" oncommand="Stealer.onOpenFolder();" accesskey="F"/>
-              <button label="&tasks_context_delete.label;" id="MediaStealerdelete" oncommand="Stealer.onDeleteTask();" accesskey="D"/> 
-              <button label="&tasks_context_copyURL.label;" id="MediaStealercopyURL" oncommand="Stealer.onCopyURL();"/>
-              <button label="&tasks_context_copuURLs.label;" id="MediaStealercopyURLs" oncommand="Stealer.onCopyAllURLS();"/>
-              <button label="&tasks_context_delete_all.label;" id="MediaStealerdeleteall" oncommand="Stealer.onDeleteAllTask();"/>
-              <button label="Pause" id="MediaStealerpause" oncommand="Stealer.onPause();"/>
-              <button label="Resume" id="MediaStealerresume" oncommand="Stealer.onResume();"/>
-              <button label="Abort" id="MediaStealerabort" oncommand="Stealer.onAbort();"/>
+
+              
             </hbox>
           </vbox>
         </tabpanel>
@@ -89,29 +102,34 @@
             <hbox flex="1">
               <vbox flex="1">
                 <groupbox flex="1">
-                  <caption label="&options_grp_type.label;" />
+<!--             <caption label="&options_grp_type.label;" /> -->
+                 <caption label="&options_grp_displayoptions.label;" />
+                 <checkbox id="MediaStealershowStatusbarCheck" label="&options_opts_statusbar.label;" />
+                 <checkbox id="MediaStealerToggleCheck" label="&options_opts_togglemediastealerstatusbar.label;" />
+                 <checkbox id="MediaStealeralwaysaskdownloadfolderCheck" label="&options_opts_wheretoputfiles.label;" />
+<!--
+                
                   <checkbox id="MediaStealervideoCheck" label="&options_type_video.label;" onclick="Stealer.onVideoClick();"/>
                   <checkbox id="MediaStealeraudioCheck" label="&options_type_audio.label;" onclick="Stealer.onAudioClick();"/>
                   <checkbox id="MediaStealerflashCheck" label="&options_type_flash.label;" onclick="Stealer.onFlashClick();"/>
-                  <spacer flex="1" />
-                  <hbox>
-                    <label id="MediaStealerlabelDefaultDir" value="&options_type_dir.label;"/>
-                    <textbox id="MediaStealerdefaultDir" flex="1" type="timed" timeout="500" oncommand="Stealer.onDirChanged();"/>
-                    <button label="&options_type_browse.label;" oncommand="Stealer.changeDir();"/>
-                  </hbox>
+-->
+                  
                 </groupbox>
               </vbox>
             <groupbox flex="1">
-              <caption label="&options_grp_opts.label;" />
-              <checkbox id="MediaStealerenableCheck" label="&options_opts_enable.label;" />
-              <checkbox id="MediaStealerconfirmCheck" label="&options_opts_confirm.label;" />
+              <caption label="&options_grp_opts.label;" />   
               <checkbox id="MediaStealercacheCheck" label="&options_opts_cache.label;" />
-              <checkbox id="MediaStealershowStatusbarCheck" label="&options_opts_statusbar.label;" />
+
+              <checkbox id="MediaStealerAutomaticdownloadCheck" label="&options_opts_automaticdownload.label;" />
               <checkbox id="MediaStealerfiletypeunknownCheck" label="&options_opts_filetypeunknown.label;" />
               <checkbox id="MediaStealernosmallfilesCheck" label="&options_opts_nosmallfiles;" />
-              <checkbox id="MediaStealernozerofilesCheck" label="&options_opts_nozerofiles.label;" />
-              <checkbox id="MediaStealeralwaysaskdownloadfolderCheck" label="Always ask me where to put files" />
+              <checkbox id="MediaStealernozerofilesCheck" label="&options_opts_nozerofiles.label;" />      
               <spacer flex="1" />
+                <hbox>
+                <label id="MediaStealerlabelDefaultDir" value="&options_type_dir.label;"/>
+                <textbox id="MediaStealerdefaultDir" flex="1" type="timed" timeout="500" oncommand="Stealer.onDirChanged();"/>
+                <button label="&options_type_browse.label;" oncommand="Stealer.changeDir();"/>
+                </hbox>
             </groupbox>
             </hbox>
             <hbox >
