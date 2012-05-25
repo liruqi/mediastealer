@@ -10,12 +10,15 @@ function StealerConfig() {
     this.enabled = true;
     this.showStatusbar = true;
     this.useCache = true;
-    this.alwaysConfirm = true;
+    //this.alwaysConfirm = true;
     this.defaultDir = "";
     this.filetypeunknown = true;
+    this.firstrun = true;
     this.nosmallfiles = true;
     this.nozerofiles = true;
     this.alwaysaskdownloadfolder = true;
+    this.showToggleStatusbar = true;
+    this.automaticdownload = true;
     this.rules = [];
     this.home = Components.classes["@mozilla.org/file/directory_service;1"]
                                .getService(Components.interfaces.nsIProperties)
@@ -36,11 +39,14 @@ StealerConfig.prototype = {
             this.enabled = stealerBranch.getBoolPref("enabled");
             this.showStatusbar = stealerBranch.getBoolPref("showStatusbar");
             this.useCache = stealerBranch.getBoolPref("useCache");
-            this.alwaysConfirm = stealerBranch.getBoolPref("alwaysConfirm");
+            //this.alwaysConfirm = stealerBranch.getBoolPref("alwaysConfirm");
             this.filetypeunknown = stealerBranch.getBoolPref("filetypeunknown");
             this.nosmallfiles = stealerBranch.getBoolPref("nosmallfiles");
             this.nozerofiles = stealerBranch.getBoolPref("nozerofiles");
             this.alwaysaskdownloadfolder = stealerBranch.getBoolPref("alwaysaskdownloadfolder");
+            this.showToggleStatusbar = stealerBranch.getBoolPref("showToggleStatusbar");
+            this.automaticdownload = stealerBranch.getBoolPref("automaticdownload");
+            this.firstrun = stealerBranch.getBoolPref("firstrun");
 
 
             this.rules = JSON.parse(stealerBranch.getCharPref("rulesJSON"));
@@ -66,11 +72,14 @@ StealerConfig.prototype = {
             stealerBranch.setBoolPref("enabled", this.enabled);
             stealerBranch.setBoolPref("showStatusbar", this.showStatusbar);
             stealerBranch.setBoolPref("useCache", this.useCache);
-            stealerBranch.setBoolPref("alwaysConfirm", this.alwaysConfirm);
+            //stealerBranch.setBoolPref("alwaysConfirm", this.alwaysConfirm);
             stealerBranch.setBoolPref("filetypeunknown", this.filetypeunknown);
             stealerBranch.setBoolPref("nozerofiles", this.nozerofiles);
             stealerBranch.setBoolPref("nosmallfiles", this.nosmallfiles);
+            stealerBranch.setBoolPref("firstrun", this.firstrun);
             stealerBranch.setBoolPref("alwaysaskdownloadfolder",this.alwaysaskdownloadfolder);
+            stealerBranch.setBoolPref("showToggleStatusbar",this.showToggleStatusbar);
+            stealerBranch.setBoolPref("automaticdownload",this.automaticdownload);
 
             var rules = [];
             for(var i = 0; i < this.rules.length; i++) {
@@ -177,12 +186,12 @@ StealerConfig.prototype = {
                 for (var i = 0; i < rules.length; i++) {
                     var rule = rules[i];
                     Stealer.createTreeitem("MediaStealerrulelist", rule);
-                    if(rule.rtype == "1" && rule.enabled == "true")
-                        document.getElementById("MediaStealervideoCheck").setAttribute("checked", "true");
-                    if(rule.rtype == "2" && rule.enabled == "true")
-                        document.getElementById("MediaStealeraudioCheck").setAttribute("checked", "true");
-                    if(rule.rtype == "3" && rule.enabled == "true")
-                        document.getElementById("MediaStealerflashCheck").setAttribute("checked", "true");
+                    //if(rule.rtype == "1" && rule.enabled == "true")
+                    //    document.getElementById("MediaStealervideoCheck").setAttribute("checked", "true");
+                    //if(rule.rtype == "2" && rule.enabled == "true")
+                    //    document.getElementById("MediaStealeraudioCheck").setAttribute("checked", "true");
+                    //if(rule.rtype == "3" && rule.enabled == "true")
+                    //    document.getElementById("MediaStealerflashCheck").setAttribute("checked", "true");
                 }
                 inputFile.close();
                 readInputStream.close();
