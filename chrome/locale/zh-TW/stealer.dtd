@@ -45,8 +45,12 @@
 <!ENTITY tasks_context_copy_all.label "複製全部">
 <!ENTITY tasks_context_copyURL.label "複製此URL">
 <!ENTITY tasks_context_copuURLs.label "複製所有URL">
+<!ENTITY tasks_context_download.label "下載">  
+<!ENTITY tasks_context_download_all.label "下載全部"> 
+<!ENTITY tasks_context_abort.label "終止"> 
 
 <!-- tabpage Options -->
+<!ENTITY options_grp_displayoptions.label "顯示選項"> 
 <!ENTITY options_grp_type.label "資源型別">
 <!ENTITY options_type_video.label "視訊 (video|flv|mp4)">
 <!ENTITY options_type_audio.label "音訊 (mp3|wma|mpeg|ogg)">
@@ -62,6 +66,9 @@
 <!ENTITY options_opts_filetypeunknown.label "資料型別不明時儲存為'flv'檔案">
 <!ENTITY options_opts_nosmallfiles "不要下載小檔案 (不足 750 000 位元組)">
 <!ENTITY options_opts_nozerofiles.label "不要下載空檔案 (0 位元組)">
+<!ENTITY options_opts_automaticdownload.label "自動開始下載">
+<!ENTITY options_opts_togglemediastealerstatusbar.label "顯示開閉窗口的狀態欄圖示">
+<!ENTITY options_opts_wheretoputfiles.label "總是詢問檔案存放位置">
 
 <!-- tabpage Rules -->
 <!ENTITY rules_tree_warn.label "這個表是為專業人士準備的，如果你不清楚其涵義則請勿修改。">
