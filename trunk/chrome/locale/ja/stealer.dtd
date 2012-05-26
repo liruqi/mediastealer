@@ -45,8 +45,12 @@
 <!ENTITY tasks_context_copy_all.label "すべてのテキストをコピーする">
 <!ENTITY tasks_context_copyURL.label "URLをコピーする">
 <!ENTITY tasks_context_copuURLs.label "すべてのURLをコピーする">
+<!ENTITY tasks_context_download.label "ダウンロード">  
+<!ENTITY tasks_context_download_all.label "全ておダウンロードする"> 
+<!ENTITY tasks_context_abort.label "中止する"> 
 
 <!-- tabpage Options -->
+<!ENTITY options_grp_displayoptions.label "表示オプション"> 
 <!ENTITY options_grp_type.label "MIMEタイプ">
 <!ENTITY options_type_video.label "ビデオ (video|flv|mp4)">
 <!ENTITY options_type_audio.label "オーディオ (mp3|wma|mpeg|ogg)">
@@ -62,6 +66,9 @@
 <!ENTITY options_opts_filetypeunknown.label "ファイルタイプが不明な場合FLVの拡張子を使用し">
 <!ENTITY options_opts_nosmallfiles "小さなファイルをダウンロードしない (未満で750 000バイト)">
 <!ENTITY options_opts_nozerofiles.label "空のファイルをダウンロードしない (0 バイト)">
+<!ENTITY options_opts_automaticdownload.label "自動ダウンロード">
+<!ENTITY options_opts_togglemediastealerstatusbar.label "トグルのアイコンを表示する">
+<!ENTITY options_opts_wheretoputfiles.label "常にファイルをどこに保存したいかを尋ねます">
 
 <!-- tabpage Rules -->
 <!ENTITY rules_tree_warn.label "ここはプロオンリー。分からないならルールを編集しないで下さい。">
