@@ -1039,8 +1039,8 @@ MediaStealerController.prototype = {
                 downButton.setAttribute("disabled", "false");
 
             // update checkbox state
-            //if(col.value.type == Components.interfaces.nsITreeColumn.TYPE_CHECKBOX)
-            //    this.reverseCheckbox(treeitem);
+            if(col.value.type == Components.interfaces.nsITreeColumn.TYPE_CHECKBOX)
+                this.reverseCheckbox(treeitem);
         }
 
     },
@@ -1069,18 +1069,18 @@ MediaStealerController.prototype = {
 
         var rtype = treeitem.firstChild.getAttribute("rtype");
 
-        if(rtype == "1") {
-            var MediaStealervideoCheck = document.getElementById("MediaStealervideoCheck");
-            MediaStealervideoCheck.checked = (value == "true") ? false : true;
-        }
-        else if(rtype == "2") {
-            var MediaStealeraudioCheck = document.getElementById("MediaStealeraudioCheck");
-            MediaStealeraudioCheck.checked = (value == "true") ? false : true;
-        }
-        else if(rtype == "3") {
-            var MediaStealerflashCheck = document.getElementById("MediaStealerflashCheck");
-            MediaStealerflashCheck.checked = (value == "true") ? false : true;
-        }
+        //if(rtype == "1") {
+        //    var MediaStealervideoCheck = document.getElementById("MediaStealervideoCheck");
+        //    MediaStealervideoCheck.checked = (value == "true") ? false : true;
+        //}
+        //else if(rtype == "2") {
+        //    var MediaStealeraudioCheck = document.getElementById("MediaStealeraudioCheck");
+        //    MediaStealeraudioCheck.checked = (value == "true") ? false : true;
+        //}
+        //else if(rtype == "3") {
+        //    var MediaStealerflashCheck = document.getElementById("MediaStealerflashCheck");
+        //    MediaStealerflashCheck.checked = (value == "true") ? false : true;
+        //}
     },
     onNewButtonClick: function() {
         this.jumptoDetailWindow(null);
