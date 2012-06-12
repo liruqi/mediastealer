@@ -167,8 +167,8 @@
               <button label="&delete.label;" id="MediaStealerdeleteButton" oncommand="Stealer.onDeleteButtonClick();"/>
               <button label="&up.label;" id="MediaStealerupButton" oncommand="Stealer.moveItem(-1);"/>
               <button label="&down.label;" id="MediaStealerdownButton" oncommand="Stealer.moveItem(1);"/>
-              <button label="&import.label;" id="MediaStealerImportButton" oncommand="stealerConfig.importrules();"/>
-              <button label="&export.label;" id="MediaStealerExportButton" oncommand="stealerConfig.exportrules();"/>
+              <button label="&import.label;" id="MediaStealerImportButton" oncommand="MediastealerConfig.importrules();"/>
+              <button label="&export.label;" id="MediaStealerExportButton" oncommand="MediastealerConfig.exportrules();"/>
               <spacer flex="1" />
               <button label="&apply.label;" oncommand="Stealer.onApply();"/>
               <button label="&ok.label;" oncommand="Stealer.onOK();"/>

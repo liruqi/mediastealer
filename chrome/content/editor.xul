@@ -20,17 +20,17 @@
       </hbox>
       <hbox>
         <textbox id="labelDir" flex="1" />
-        <button id="configButton" label="&config.label;" oncommand="detailWindow.config();"/>
+        <button id="configButton" label="&config.label;" oncommand="MediaStealerdetailWindow.config();"/>
       </hbox>
     </groupbox>
     <hbox>
       <spacer flex="1"/>
-      <button id="MediaStealerOKButton" label="&ok.label;" default="true" oncommand="if(detailWindow.save()){close();}"/>
+      <button id="MediaStealerOKButton" label="&ok.label;" default="true" oncommand="if(MediaStealerdetailWindow.save()){close();}"/>
       <button id="discardButton" label="&discard.label;" oncommand="close();"/>
     </hbox>
     <spacer style="height: 5px"/>
   </vbox>
 
   <script type="application/javascript" src="chrome://stealer/content/editor.js"/>
-  <script type="application/javascript"><![CDATA[detailWindow.init();]]></script>
+  <script type="application/javascript"><![CDATA[MediaStealerdetailWindow.init();]]></script>
 </window>

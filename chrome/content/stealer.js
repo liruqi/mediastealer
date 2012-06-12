@@ -64,8 +64,8 @@ MediaStealerController.prototype = {
             if(xconfig != null)
                 config = xconfig;
             else {
-                stealerConfig.load();
-                config = stealerConfig;
+                MediastealerConfig.load();
+                config = MediastealerConfig;
             }
 
             var enabled = config.enabled;
@@ -118,7 +118,7 @@ MediaStealerController.prototype = {
                 document.persist(kToolBarID, "currentset");   
               }	
               config.firstrun = false;
-              stealerConfig.save();              
+              MediastealerConfig.save();              
             }
 
             document.getElementById("MediaStealerdefaultDir").value = config.defaultDir;
@@ -179,11 +179,11 @@ MediaStealerController.prototype = {
     save: function(xconfig) {
         try {
             if(xconfig == null)
-                stealerConfig = this.collectConfig();
+                MediastealerConfig = this.collectConfig();
             else {
-                stealerConfig = xconfig;
+                MediastealerConfig = xconfig;
             }
-            stealerConfig.save();  //  (*)
+            MediastealerConfig.save();  //  (*)
         }
         catch(e) {
             //alert("Exception raised in Stealer.save():\n"+e.name+": "+e.message);
@@ -191,7 +191,7 @@ MediaStealerController.prototype = {
     },
     collectConfig: function() {
         try {
-            var config = new StealerConfig();
+            var config = new MediaStealerConfig();
             config.enabled = document.getElementById("MediaStealerenableCheck").checked;
             config.showStatusbar = document.getElementById("MediaStealershowStatusbarCheck").checked;
             config.useCache = document.getElementById("MediaStealercacheCheck").checked;
@@ -544,11 +544,11 @@ MediaStealerController.prototype = {
             if((idx2 < 1) || (idx == idx2) || (idx == -1)) {
                 var fd = Components.classes["@mozilla.org/file/local;1"]
                                    .createInstance(Components.interfaces.nsILocalFile);
-                var tempdownloaddir = stealerConfig.defaultDir;
+                var tempdownloaddir = MediastealerConfig.defaultDir;
                 fd.initWithPath(tempdownloaddir);
 
                 if( !fd.exists() || !fd.isDirectory()) {
-                    var tempdownloaddir = stealerConfig.home.path;
+                    var tempdownloaddir = MediastealerConfig.home.path;
                     fd.initWithPath(tempdownloaddir);
                 }
                 try {
@@ -569,10 +569,13 @@ MediaStealerController.prototype = {
 
             var treeitem = temptaskTree.view.getItemAtIndex(idx);
             var file = treeitem.firstChild.childNodes[0].getAttribute("file");  // full path
+            var dir = treeitem.firstChild.childNodes[0].getAttribute("dir");
 
             var fd = Components.classes["@mozilla.org/file/local;1"].
                         createInstance(Components.interfaces.nsILocalFile);
             fd.initWithPath(file);
+            if (!fd.exists())  
+             fd.initWithPath(dir);
 
             try {
                 fd.reveal();
@@ -988,12 +991,12 @@ MediaStealerController.prototype = {
         try {
             var params = {};
             if(treeitem == null)
-                params = {rtype:"0", enabled:"true", des:"", url:"", ct:"", dir:stealerConfig.defaultDir};
+                params = {rtype:"0", enabled:"true", des:"", url:"", ct:"", dir:MediastealerConfig.defaultDir};
             else
                 params = this.getTreeitem(treeitem);
 
             var retParams = {rtype:params.rtype, enabled:params.enabled, des:"", url:"", ct:"", dir:"", changed:false};
-            detailWindow.show(params, retParams);
+            MediaStealerdetailWindow.show(params, retParams);
             if(retParams.changed) {
                 if(treeitem == null) {
                     this.createTreeitem("MediaStealerrulelist", retParams);
@@ -1205,13 +1208,13 @@ MediaStealerController.prototype = {
     // for the statusbarpanel
     onStatusbarClick: function(event) {
         if(event.button == 0) {
-            stealerConfig.load();
-            stealerConfig.enabled = !stealerConfig.enabled;
-            stealerConfig.save();
+            MediastealerConfig.load();
+            MediastealerConfig.enabled = !MediastealerConfig.enabled;
+            MediastealerConfig.save();
 
             var MediaStealerenableCheck = document.getElementById("MediaStealerenableCheck");
-            MediaStealerenableCheck.setAttribute("checked", stealerConfig.enabled ? "true" : "false");
-            this.initStatusbar(stealerConfig.showStatusbar, stealerConfig.enabled);
+            MediaStealerenableCheck.setAttribute("checked", MediastealerConfig.enabled ? "true" : "false");
+            this.initStatusbar(MediastealerConfig.showStatusbar, MediastealerConfig.enabled);
         }
         //else {
         //    Stealer.onToggle();
@@ -1284,7 +1287,7 @@ onDownload: function() {
 
             if (stat == "Ready to download")
             {
-            var task = new Task();
+            var task = new MediaStealerTask();
             task.id = id;
             task.file = file;
             task.dir = dir;
@@ -1364,7 +1367,7 @@ onDownloadAll: function() {
 
               if (stat == "Ready to download")
               {
-              var task = new Task();
+              var task = new MediaStealerTask();
               task.id = id;
               task.file = file;
               task.dir = dir;

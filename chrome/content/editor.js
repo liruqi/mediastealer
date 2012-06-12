@@ -1,9 +1,9 @@
 //--------------------------------------------------------------------
-function detailWindow() {
+function MediaStealerdetailWindow() {
 }
-detailWindow.prototype = {
+MediaStealerdetailWindow.prototype = {
     show: function(params, retParams) {
-        this.openWindow("stealer.detailWindow", "chrome://stealer/content/editor.xul", 
+        this.openWindow("stealer.MediaStealerdetailWindow", "chrome://stealer/content/editor.xul", 
                 "modal,chrome=yes,centerscreen", params, retParams);
     },
     openWindow: function(windowName, url, flags, params, retParams) {
@@ -77,5 +77,5 @@ detailWindow.prototype = {
             document.getElementById("labelDir").value = fp.file.path + "\\";
     }
 }// detailWindow
-var detailWindow = new detailWindow;
+var MediaStealerdetailWindow = new MediaStealerdetailWindow;
 //--------------------------------------------------------------------
