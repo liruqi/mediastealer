@@ -5,8 +5,8 @@
 //   StealerCacheFetcher
 //--------------------------------------------------------------------
 
-function Task() {}
-Task.prototype = {
+function MediaStealerTask() {}
+MediaStealerTask.prototype = {
     _id: null,
     _file: null,
     _dir:  null,
@@ -97,8 +97,8 @@ StealerHttpObserver.prototype = {
         this.Stealer = controller;
     },
     observe: function(aSubject, aTopic, aData) {
-        stealerConfig.load();
-        if(!stealerConfig.enabled)
+        MediastealerConfig.load();
+        if(!MediastealerConfig.enabled)
             return;
         if(aTopic == 'http-on-modify-request') {
             aSubject.QueryInterface(Components.interfaces.nsIHttpChannel);
@@ -200,10 +200,10 @@ StealerHttpObserver.prototype = {
 
             if (testunique == true)
             {
-                var task = new Task();  // file, url, type, size, stat ; dir, xlen
+                var task = new MediaStealerTask();  // file, url, type, size, stat ; dir, xlen
 
-                for (var i = 0; i < stealerConfig.rules.length; i++) {
-                    var rule = stealerConfig.rules[i];
+                for (var i = 0; i < MediastealerConfig.rules.length; i++) {
+                    var rule = MediastealerConfig.rules[i];
                     if(rule.enabled == "true") {
 
                         if(rs.match(/20\d/)) {
@@ -304,7 +304,7 @@ StealerHttpObserver.prototype = {
             var httpCacheSession;
 
             if(query_cache) {
-                if(!stealerConfig.useCache)
+                if(!MediastealerConfig.useCache)
                     return;
 
                 // open cache service
@@ -339,16 +339,16 @@ StealerHttpObserver.prototype = {
 
 
             //check extention, gives flv extention when unknown extention is found
-            var unknown = stealerConfig.filetypeunknown;
+            var unknown = MediastealerConfig.filetypeunknown;
 
             if(unknown == true)
                     {
                         var help_known = false;
                         var fileextention = file.charAt(file.length-3) + file.charAt(file.length-2) + file.charAt(file.length-1);
 
-                        for (var i = 0; i < stealerConfig.rules.length; i++)
+                        for (var i = 0; i < MediastealerConfig.rules.length; i++)
                         {
-                        var rule = stealerConfig.rules[i];
+                        var rule = MediastealerConfig.rules[i];
                         if(rule.enabled == "true")
                             {
                                 var help_ct = (rule.ct);
@@ -371,7 +371,7 @@ StealerHttpObserver.prototype = {
             task.file = task.dir + task.filename;
 
 
-            var nosmall = stealerConfig.nosmallfiles;
+            var nosmall = MediastealerConfig.nosmallfiles;
 
             if(nosmall==true && task.size <750000)
             {
@@ -383,7 +383,7 @@ StealerHttpObserver.prototype = {
             }
 
             //avoid files with zero bytes such as cookies
-            var nozero = stealerConfig.nozerofiles;
+            var nozero = MediastealerConfig.nozerofiles;
             if(nozero==true && task.size ==0)
             {
                 var permission = false;
@@ -405,9 +405,9 @@ StealerHttpObserver.prototype = {
 
                     dir.initWithPath(task.dir);
                     if( !dir.exists() || !dir.isDirectory() ) {   // if it doesn't exist, set to HOME
-                        homeDir =  stealerConfig.home.path + (stealerConfig.home.path[0]=="/" ? "/": "\\");
+                        homeDir =  MediastealerConfig.home.path + (MediastealerConfig.home.path[0]=="/" ? "/": "\\");
                         alert("Task directory " + task.dir + "not exist. Change to home directory " + homeDir);
-                        stealerConfig.defaultDir = homeDir;
+                        MediastealerConfig.defaultDir = homeDir;
                         task.dir = homeDir;
                         task.file = task.dir + task.filename;
                     }
@@ -426,9 +426,9 @@ StealerHttpObserver.prototype = {
                         //httpChannel.QueryInterface(Components.interfaces.nsITraceableChannel);
                         //newListener.originalListener = httpChannel.setNewListener(newListener);
 
-                        var alwaysaskdownloadfolder = stealerConfig.alwaysaskdownloadfolder;
+                        var alwaysaskdownloadfolder = MediastealerConfig.alwaysaskdownloadfolder;
 
-                        if ((alwaysaskdownloadfolder == true) && (stealerConfig.alwaysConfirm == true))
+                        if (alwaysaskdownloadfolder == true) 
                         {
 
                             var __file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
@@ -457,7 +457,7 @@ StealerHttpObserver.prototype = {
                             }
                         }
 
-                        var automaticdownload = stealerConfig.automaticdownload;
+                        var automaticdownload = MediastealerConfig.automaticdownload;
                         if (automaticdownload)
                         {     
                         //new method
@@ -525,7 +525,7 @@ StealerHttpObserver.prototype = {
         return ret;
     },
     make_taskid: function() {
-        var time = this.getTimestamp();
+        var time = "MediaStealer"+this.getTimestamp();
         var rand = Math.round(Math.random()*1000);
         return time + "." + rand;
     },
@@ -626,7 +626,7 @@ StealerStreamListener.prototype = {
                 this.fd.initWithPath(this.task.file);
             }
             catch(e) {
-                this.task.dir = stealerConfig.defaultDir;
+                this.task.dir = MediastealerConfig.defaultDir;
                 this.task.filename = "~damnedfilename";
                 this.task.file = this.task.dir + this.task.filename;
                 this.fd.initWithPath(this.task.file);

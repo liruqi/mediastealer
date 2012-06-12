@@ -6,7 +6,7 @@
 
 
 
-function StealerConfig() {
+function MediaStealerConfig() {
     this.enabled = true;
     this.showStatusbar = true;
     this.useCache = true;
@@ -25,7 +25,7 @@ function StealerConfig() {
                                .get("Home", Components.interfaces.nsIFile);
 }
 
-StealerConfig.prototype = {
+MediaStealerConfig.prototype = {
     load: function() {
         try {
             var stealerPrefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService);
@@ -230,4 +230,4 @@ StealerConfig.prototype = {
         }
     } // of exportrules
 }
-var stealerConfig = new StealerConfig();
+var MediastealerConfig = new MediaStealerConfig();
