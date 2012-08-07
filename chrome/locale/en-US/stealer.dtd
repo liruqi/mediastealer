@@ -69,6 +69,7 @@
 <!ENTITY options_opts_automaticdownload.label "Automatic download">
 <!ENTITY options_opts_togglemediastealerstatusbar.label "Show toggle status bar">
 <!ENTITY options_opts_wheretoputfiles.label "Always ask me where to put files">
+<!ENTITY options_opts_autoclear.label "Autoclear">
 
 <!-- tabpage Rules -->
 <!ENTITY rules_tree_warn.label "This table is intended for professonals. DO NOT modify the rules if you are not clear about them.">

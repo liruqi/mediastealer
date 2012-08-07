@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<!DOCTYPE overlay SYSTEM "chrome://stealer/locale/stealer.dtd">
+       
+<prefwindow id="Media Stealer options"  
+     title="&title.label;"  
+     xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">  
+   
+<prefpane id="MediaStealer" label="Media Stealer options"> 
+		<script type="application/x-javascript" src="chrome://stealer/content/stealer.js"/> 
+  <preferences>  
+    <preference id="enabledpref" name="extensions.MediaStealer.enabled" type="bool"/>
+    <preference id="showStatusbarpref" name="extensions.MediaStealer.showStatusbar" type="bool"/>
+    <preference id="showToggleStatusbarpref" name="extensions.MediaStealer.showToggleStatusbar" type="bool"/>
+    <preference id="alwaysaskdownloadfolderpref" name="extensions.MediaStealer.alwaysaskdownloadfolder" type="bool"/>
+    <preference id="autoclearpref" name="extensions.MediaStealer.autoclear" type="bool"/>  
+    <preference id="useCachepref" name="extensions.MediaStealer.useCache" type="bool"/>
+    <preference id="automaticdownloadpref" name="extensions.MediaStealer.automaticdownload" type="bool"/>
+    <preference id="filetypeunknownpref" name="extensions.MediaStealer.filetypeunknown" type="bool"/>
+    <preference id="nosmallfilespref" name="extensions.MediaStealer.nosmallfiles" type="bool"/>
+    <preference id="nozerofilespref" name="extensions.MediaStealer.nozerofiles" type="bool"/>
+    <preference id="defaultDirpref" name="extensions.MediaStealer.defaultDir" type="string"/>  
+  </preferences>
+<groupbox>
+<caption label="&options_grp_displayoptions.label;" />
+<checkbox label="&options_opts_enable.label;" preference="enabledpref" />
+<checkbox label="&options_opts_statusbar.label;" preference="showStatusbarpref" />
+<checkbox label="&options_opts_togglemediastealerstatusbar.label;" preference="showToggleStatusbarpref"  />
+<checkbox label="&options_opts_wheretoputfiles.label;" preference="alwaysaskdownloadfolderpref"  />
+<checkbox label="&options_opts_autoclear.label;" preference="autoclearpref" />
+</groupbox>
+<groupbox>
+<caption label="&options_grp_opts.label;" />
+<checkbox label="&options_opts_cache.label;" preference="useCachepref" />
+<checkbox label="&options_opts_automaticdownload.label;" preference="automaticdownloadpref"  />
+<checkbox label="&options_opts_filetypeunknown.label;" preference="filetypeunknownpref" />
+<checkbox label="&options_opts_nosmallfiles;" preference="nosmallfilespref" />
+<checkbox label="&options_opts_nozerofiles.label;" preference="nozerofilespref" />
+<label id="MediaStealerlabelDefaultDir" value="&options_type_dir.label;"/>
+<textbox preference="defaultDirpref" id="MediaStealerdefaultDir" flex="1" type="timed" timeout="500" oncommand="Stealer.onDirChanged();"/>
+<button label="&options_type_browse.label;" oncommand="Stealer.changeDir();"/>   
+</groupbox>
+</prefpane>  
+   
+</prefwindow>  

@@ -79,6 +79,7 @@ MediaStealerController.prototype = {
             var alwaysaskdownloadfolder = config.alwaysaskdownloadfolder;
             var showToggleStatusbar = config.showToggleStatusbar;
             var automaticdownload = config.automaticdownload;
+            var autoclear = config.autoclear;
 
             this.initStatusbar(showStatusbar, enabled);
             this.initToggleStatusbar(showToggleStatusbar, enabled);
@@ -93,6 +94,7 @@ MediaStealerController.prototype = {
             var MediaStealeralwaysaskdownloadfolderCheck = document.getElementById("MediaStealeralwaysaskdownloadfolderCheck");
             var MediaStealerToggleCheck = document.getElementById("MediaStealerToggleCheck");
             var MediaStealerAutomaticdownloadCheck = document.getElementById("MediaStealerAutomaticdownloadCheck");
+            var MediaStealerAutoclearCheck = document.getElementById("MediaStealerAutoclearCheck");
 
             MediaStealerenableCheck.setAttribute("checked", (enabled ? "true":"false"));
             MediaStealershowStatusbarCheck.setAttribute("checked", (showStatusbar ? "true" : "false"));
@@ -104,6 +106,7 @@ MediaStealerController.prototype = {
             MediaStealeralwaysaskdownloadfolderCheck.setAttribute("checked", (alwaysaskdownloadfolder ? "true" : "false"));
             MediaStealerToggleCheck.setAttribute("checked", (showToggleStatusbar ? "true" : "false"));
             MediaStealerAutomaticdownloadCheck.setAttribute("checked", (automaticdownload ? "true" : "false"));
+            MediaStealerAutoclearCheck.setAttribute("checked", (autoclear ? "true" : "false"));
             if (firstrun == true)
             {
               var kToolBarID = "nav-bar";
@@ -203,6 +206,7 @@ MediaStealerController.prototype = {
             config.alwaysaskdownloadfolder = document.getElementById("MediaStealeralwaysaskdownloadfolderCheck").checked;
             config.showToggleStatusbar = document.getElementById("MediaStealerToggleCheck").checked;  
             config.automaticdownload = document.getElementById("MediaStealerAutomaticdownloadCheck").checked;   
+            config.autoclear = document.getElementById("MediaStealerAutoclearCheck").checked;
 
             config.rules = [];
             var list = document.getElementById("MediaStealerrulelist");
@@ -462,6 +466,30 @@ MediaStealerController.prototype = {
         }
         catch(e) {
             alert("onDeleteTask:\n"+e.name+": "+e.message);
+        }
+    },
+   autoclear: function() {
+        try {  
+            // do the deed
+            var temptaskTree = document.getElementById("MediaStealertask-tree");
+            var list = document.getElementById("MediaStealertasklist");
+            var Taskcount = list.childElementCount;
+            for (Taskcount; Taskcount > 0; Taskcount--)
+            {
+                var idx = Taskcount-1;
+                var treeitem = temptaskTree.view.getItemAtIndex(idx);
+                var file = treeitem.firstChild.childNodes[0].getAttribute("file");
+                var stat = treeitem.firstChild.childNodes[5].getAttribute("label");
+                if (stat == "Finished")
+                {                    
+                    treeitem.parentNode.removeChild(treeitem);
+                    temptaskTree.view.selection.select(idx);
+                    temptaskTree.treeBoxObject.ensureRowIsVisible(idx);
+                }
+            }
+        }
+        catch(e) {
+            alert("autoclear:\n"+e.name+": "+e.message);
         }
     },
     onDeleteAllTask: function() {

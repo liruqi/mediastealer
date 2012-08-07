@@ -69,6 +69,7 @@
 <!ENTITY options_opts_automaticdownload.label "Automatische download">
 <!ENTITY options_opts_togglemediastealerstatusbar.label "Toon Media Stealer bar icoon">
 <!ENTITY options_opts_wheretoputfiles.label "Vraag me altijd waar bestanden gedownload worden">
+<!ENTITY options_opts_autoclear.label "Automatisch opruimen">
 
 <!-- tabpage Rules -->
 <!ENTITY rules_tree_warn.label "Deze tabel is enkel bedoeld voor professionelen. Verander deze regels NIET tenzij je weet waarmee je bezig bent.">
@@ -80,7 +81,7 @@
 
 
 <!-- for editor window-->
-<!ENTITY showoptions.label "Optties">
+<!ENTITY showoptions.label "Opties">
 <!ENTITY config.label "Map selecteren">
 <!ENTITY description.label "Beschrijving">
 <!ENTITY directory.label "Map">

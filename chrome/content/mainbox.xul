@@ -107,6 +107,7 @@
                  <checkbox id="MediaStealershowStatusbarCheck" label="&options_opts_statusbar.label;" />
                  <checkbox id="MediaStealerToggleCheck" label="&options_opts_togglemediastealerstatusbar.label;" />
                  <checkbox id="MediaStealeralwaysaskdownloadfolderCheck" label="&options_opts_wheretoputfiles.label;" />
+                 <checkbox id="MediaStealerAutoclearCheck" label="&options_opts_autoclear.label;" />
 <!--
                 
                   <checkbox id="MediaStealervideoCheck" label="&options_type_video.label;" onclick="Stealer.onVideoClick();"/>

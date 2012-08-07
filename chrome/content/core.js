@@ -740,6 +740,9 @@ StealerDownloader.prototype = {
                 this.task.stat = "Finished";
                 this.task.DownloadID = -1;
                 this.Stealer.refreshTask(this.task);
+                var autoclear = MediastealerConfig.autoclear;
+                if (autoclear == true)
+                this.Stealer.autoclear();
             }
         }
     },
