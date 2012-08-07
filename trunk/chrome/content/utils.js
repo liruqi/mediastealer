@@ -19,6 +19,7 @@ function MediaStealerConfig() {
     this.alwaysaskdownloadfolder = true;
     this.showToggleStatusbar = true;
     this.automaticdownload = true;
+    this.autoclear = true;
     this.rules = [];
     this.home = Components.classes["@mozilla.org/file/directory_service;1"]
                                .getService(Components.interfaces.nsIProperties)
@@ -47,6 +48,7 @@ MediaStealerConfig.prototype = {
             this.showToggleStatusbar = stealerBranch.getBoolPref("showToggleStatusbar");
             this.automaticdownload = stealerBranch.getBoolPref("automaticdownload");
             this.firstrun = stealerBranch.getBoolPref("firstrun");
+            this.autoclear = stealerBranch.getBoolPref("autoclear");
 
 
             this.rules = JSON.parse(stealerBranch.getCharPref("rulesJSON"));
@@ -80,6 +82,7 @@ MediaStealerConfig.prototype = {
             stealerBranch.setBoolPref("alwaysaskdownloadfolder",this.alwaysaskdownloadfolder);
             stealerBranch.setBoolPref("showToggleStatusbar",this.showToggleStatusbar);
             stealerBranch.setBoolPref("automaticdownload",this.automaticdownload);
+            stealerBranch.setBoolPref("autoclear",this.autoclear);
 
             var rules = [];
             for(var i = 0; i < this.rules.length; i++) {

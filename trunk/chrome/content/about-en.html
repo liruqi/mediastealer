@@ -43,76 +43,89 @@ Media Stealer is a Firefox Add-on dedicated to download Internet resource transf
 </p>
 <img src="chrome://stealer/skin/0.jpg">
 <p>
-It's highly recommended to activate the add-on menu. In the Firefox menu, click on View, Toolbars and finally Add-on bar. You can also access the main program via Firefox menu, Tools and finally Media Stealer.
+It's highly recommended to activate the add-on bar. In the Firefox menu, click on View, Toolbars and finally Add-on bar. You can also access the main program via Firefox menu, Tools and finally Media Stealer.
 </p>
 <p>
-<strong><u>Media Stealer icons</u></strong>
+<img src="chrome://stealer/skin/ms5.PNG">
+</p>
+<p>
+You can also access Media Stealer through the Media Stealer button, located near the location bar.
+</p>
+<p>
+<strong><u>Media Stealer icons on the addon bar</u></strong>
 </p>
 <img src="chrome://stealer/skin/1.jpg">
 <p>
-You'll see two icons on the Firefox Add-on bar. One is a start/stop icon, which enables/disables Media stealer. Once disabled, Media Stealer will not show a download dialog and will not download content, except previous tasks. The other icon is to toggle the main program. 
-</p>
-<p>
-<strong><u>A download dialog</u></strong>
-</p>
-<img src="chrome://stealer/skin/2.jpg">
-<p>
-When content such as Flash is detected, Media Stealer will automatically display the dialog above. When 'Ask every time. Can be (re)activated via Firefox menu or Add-on bar' is unchecked, it will automatically download content without asking. It can be reactivated via the Media Stealer icon. 
+You'll see two icons on the Firefox Add-on bar. One is a start/stop icon, which enables/disables Media stealer. Once disabled, Media Stealer will only continue downloading previous tasks. The other icon is to toggle the main program. 
+<br>
+When enabled, Media Stealer wil automatically place a download task when video content has been detected. When Autodownload is enabled, it will automatically initiate the download. Other media is possible as well. Read on for more.
 </p>
 <p>
 <strong><u>Tasks panel of media stealer</u></strong>
 </p>
-<img src="chrome://stealer/skin/3.jpg">
+<img src="chrome://stealer/skin/ms1.PNG">
 
 <p>
 Click on the Media Stealer icon to toggle the main program. 
 <br>
-You'll see four panels. Let's focus on the first panel, called "tasks". It shows all the current downloads and their destination folder. You can monitor their progress. The status can be "downloading", "paused", "interrupted" or "finished". 
+You'll see four panels. Next to the four panels, you can quickly enable/disable Media Stealer.<br><br>
+ Let's focus on the first panel, called "tasks". It shows all the current tasks and their destination folder. You can monitor their progress. The status can be "Ready to download", "downloading", "paused", "interrupted" or "finished". 
+<br>
+<br>
+When a task is "Ready to download", you can select it and press the "download" button. If you wish to download all the files simultaneously, click the "Download all" button.
+<br>
 <br>
 You can always open the download directory by pressing "Open folder", so you know where the download will go. You can always copy the URL or URL's from task(s).
 <br>
-When downloading, the task can be paused by pressing the "pause" button. And can be resumed by the "resume" button.
 <br>
 When downloading, the task can also be aborted by pressing the "abort" button. This will effectively abort the task and delete the downloaded file. Please be careful.
 <br>
+<br>
 Once the download is finished, you can rename the file, open the file. Double clicking on the task, will also open the file.
 <br>
-When clicked on "Delete", a dialog will be represented. It will ask you to delete the task with the option to remove the downloaded file. Be careful, when the option to remove the download is checked and you press OK, the downloaded file will be removed from disc. The same applies to "delete all".
+<br>
+When clicked on "Delete", a dialog will be represented. It will ask you to delete the task with the option to remove the downloaded file from hard disc. Be careful, when the option to remove the download is checked and you press OK, the downloaded file will be removed from disc. The same applies to "delete all".
 <br>
 You can also right click on any task for a menu with the same functions as the buttons.
 </p>
 <p>
 <strong><u>Options panel of media stealer</u></strong>
 </p>
-<img src="chrome://stealer/skin/4.jpg">
+<img src="chrome://stealer/skin/ms2.PNG">
 
 <p>
 The next panel is called "options". Here you can finetune the behavior of Media Stealer. Here you can set the download directory. This will only apples to the standard rules. For rules, please read section "rules". 
 <br>
-In the options panel, on left side, you can quickly activate/deactivate video, audio and flash. 
 <br>
-On the right side, the first option is to enable/disable Media Stealer. When disabled, media stealer will not ask to download content and content will be not downloaded except previous tasks. Enabled by default.
+In the options panel, on left side, you have display options.
 <br>
-The second option ensures you'll be immediately asked to download content. When this option is unchecked, it will automatically download content, without asking. Enabled by default.
 <br>
-The third option retrieves data (content) from cache, which is faster than downloading it again. Enabled by default.
+You can choose not the show icons on the add-on bar. You can also activate "Always ask me where to put files", disabled by default. Once activated, when content has been detected, it will ask each time where to put files. The Autoclear option, when activated, will automatically clear the finished (downloaded) tasks without removing the file from disc. Autoclear is disabled by default.
 <br>
-The fourth option, when unchecked, disables the start/stop icon of Media Stealer. Enabled by default.
 <br>
-The firth one ensures that all files are given the "flv" extention when the filetype is unknown. This is entirely based on the content-type. The content type is defined in the "Rules" panel. Enabled by default.
+The first option on the right retrieves data (content) from cache, which is faster than downloading it again. Enabled by default.
 <br>
-The sixth one is a bit tricky one. When this option is enabled, unwanted files can be avoided (such as flash players). However, if a valid file is smaller than than 750 000 bytes, you'll not be prompted to download something. Disabled by default.
 <br>
-The seventh options ensures that empty files (such as cookies) will not be downloaded. Enabled by default.
+The second option, when enabled, will automatically initiate the download. You don't have to press the "download" or "download all" button. This option is disabled by default.
 <br>
-The eight option ensures when you download something, Media Stealer will ask where you want the download on your hard disk. You can also rename at the same time. This is disabled by default.
+<br>
+The third one ensures that all files are given the "flv" extention when the filetype is unknown. This is entirely based on the content-type. The content type is defined in the "Rules" panel. Disabled by default.
+<br>
+<br>
+The fourth one is a bit tricky one. When this option is enabled, unwanted files can be avoided (such as flash players). However, if a valid file is smaller than than 750 000 bytes, Media Stealer will no nothing. Disabled by default.
+<br>
+<br>
+The fifth option ensures that empty files (such as cookies) will not be downloaded. Enabled by default.
+<br>
+<br>
+Beneath the fifth option, you can choose your download folder. This is recommended when you use Media Stealer for the first time.
 <br>
 Please chose "Apply" or "OK" to save the new settings. "OK", will close Media Stealer.
 </p>
 <p>
 <strong><u>Rules panel of media stealer</u></strong>
 </p>
-<img src="chrome://stealer/skin/5.jpg">
+<img src="chrome://stealer/skin/ms3.PNG">
 <p>
 The "Rules" panels opens rules. There are two kinds, builtin ones, such as Video. The other kind are custom rules, which is entirely defined and made by the end user. The builtin ones can be changed. It's strongly recommend that this can only changed by an experienced/professional user. If you don't know what you're doing, stay away.
 <br>
@@ -123,8 +136,11 @@ You can import/export rules. You can rearrange the order of the rules. This will
 </p>
 <img src="chrome://stealer/skin/6.jpg">
 <p>
-When you create a new rule a window should popup. Here you can enter a description (for example Images), a URL based on regex. For any URL's, please enter "http://\/\/" without quotes. Content-type can be for example "png|jpg|tiff|png", please use "|" (piping symbol) as a separator. Each custom rule can have a separate download directory.
-<br>
+When you create a new rule a window should popup. Here you can enter a description (for example Images), a URL based on regex. For any URL's, please enter "http://\/\/" without quotes. Content-type can be for example "jpg|gif|png", please use "|" (piping symbol) as a separator. Each custom rule can have a separate download directory.
+<p>
+<img src="chrome://stealer/skin/ms4.PNG">
+</p>
+You can also edit an existing one, click for example on "Video" and click on "edit". Some flash website use "octet-stream", so you could add with a piping symbol.
 <br>
 More detailed information:
 <br>
@@ -137,11 +153,12 @@ You need to have some knowledge about HTTP protocol and javascript regular expre
 </ol>
 </p>
 <p>
-<p>
 <strong><u>Messages panel of Media Stealer</u></strong>
 </p>
+<p>
 As to the last Messages panel, it is for those who want to read, debug or modify the source code of this add-on. It's convient.
 </p>
+<p>
 <a name="licensing"></a>
 <strong><u>Licensing</u></strong>
 </p>
