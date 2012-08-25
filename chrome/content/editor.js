@@ -19,9 +19,11 @@ MediaStealerdetailWindow.prototype = {
         return thisWindow;
     },
     init: function() {
+        var stringsBundle = document.getElementById("string-bundle");
+        var newrule = stringsBundle.getString('editor_newrule') + " ";
         var des = window.arguments[0]["des"];
         if(des == "")
-            des = "new rule";
+            des = newrule;
         document.getElementById("editDes").value = des;
 
         var url = window.arguments[0]["url"];
@@ -71,7 +73,9 @@ MediaStealerdetailWindow.prototype = {
     config: function() {
         var fp = Components.classes["@mozilla.org/filepicker;1"]
                    .createInstance(Components.interfaces.nsIFilePicker);
-        fp.init(window, "Please select a directory for saving downloaded files", Components.interfaces.nsIFilePicker.modeGetFolder);
+        var stringsBundle = document.getElementById("string-bundle");
+        var dircomment = stringsBundle.getString('editor_dircomment') + " ";
+        fp.init(window, dircomment, Components.interfaces.nsIFilePicker.modeGetFolder);
         var ret = fp.show();
         if (ret == Components.interfaces.nsIFilePicker.returnOK)
             document.getElementById("labelDir").value = fp.file.path + "\\";

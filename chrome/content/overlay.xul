@@ -10,6 +10,9 @@
   <script type="application/javascript" src="chrome://stealer/content/overlay.js"/> 
   <script type="application/javascript" src="chrome://stealer/content/editor.js"/>
 
+ <stringbundleset id="stringbundleset">
+   <stringbundle id="string-bundle" src="chrome://stealer/locale/mediastealer.properties"/>
+ </stringbundleset>
   <keyset id="mainKeyset">
     <key id="MediaStealerkey_toggle"
          keycode="m"

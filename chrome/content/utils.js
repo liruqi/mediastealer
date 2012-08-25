@@ -134,9 +134,14 @@ MediaStealerConfig.prototype = {
 
         var prompts = Components.classes["@mozilla.org/embedcomp/prompt-service;1"].getService(Components.interfaces.nsIPromptService);
 
-        var title = "Confirm importing files";
-        var question = "Are you certain you wish to import rules? Incorrent rules shall cause damage.";
-        var checkstr = "I'm sure";
+        //var title = "Confirm importing files";
+        //var question = "Are you certain you wish to import rules? Incorrent rules shall cause damage.";
+        //var checkstr = "I'm sure";
+        var stringsBundle = document.getElementById("string-bundle");
+        var question = stringsBundle.getString('utils_importquestion') + " ";
+        var checkstr = stringsBundle.getString('utils_importcheckstr') + " ";  
+        var title = stringsBundle.getString('utils_importtitle') + " ";
+        var openrules = stringsBundle.getString('utils_openrules') + " ";
         var check = {value: false};
         var stealerPrefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService);
         var stealerBranch = stealerPrefs.getBranch("extensions.MediaStealer.");
@@ -152,7 +157,7 @@ MediaStealerConfig.prototype = {
         if(check.value) {
             var nsIFilePicker = Components.interfaces.nsIFilePicker;
             var fp = Components.classes["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
-            fp.init(window, "Open rules", nsIFilePicker.modeOpen);
+            fp.init(window, openrules, nsIFilePicker.modeOpen);
             fp.appendFilter("JSON files (*.json)","*.json");
             var res = fp.show();
             if (res == nsIFilePicker.returnOK)
@@ -203,6 +208,8 @@ MediaStealerConfig.prototype = {
     }, // of importrules
     exportrules: function() {
 
+        var stringsBundle = document.getElementById("string-bundle");
+        var saverules = stringsBundle.getString('utils_saverules') + " "; 
         var exportrules = [];
         for(var i = 0; i < this.rules.length; i++) {
             var exportrule = {};
@@ -218,7 +225,7 @@ MediaStealerConfig.prototype = {
 
         var nsIFilePicker = Components.interfaces.nsIFilePicker;
         var fp = Components.classes["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
-        fp.init(window, "Save rules as ", nsIFilePicker.modeSave);
+        fp.init(window, saverules, nsIFilePicker.modeSave);
         fp.defaultString = "Rules.json";
         fp.appendFilter("JSON files (*.json)","*.json");
         fp.defaultExtension = ".json";
