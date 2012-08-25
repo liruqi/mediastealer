@@ -229,6 +229,8 @@ MediaStealerController.prototype = {
     //------------------  Task panel (tasklist and popup) -------------------------
     addTask: function(task) {
         try {
+            var stringsBundle = document.getElementById("string-bundle");
+            var readytodownload = stringsBundle.getString('task_readytodownload') + " ";
             var cell_file   = document.createElement("treecell");
             var cell_url    = document.createElement("treecell");
             var cell_type   = document.createElement("treecell");
@@ -249,7 +251,8 @@ MediaStealerController.prototype = {
             cell_curr.setAttribute("mode", "normal");
             cell_curr.setAttribute("value", task.curr/task.size*100);
             cell_curr.setAttribute("curr", task.curr);
-            cell_stat.setAttribute("label", task.stat);
+            cell_stat.setAttribute("label", readytodownload);
+            cell_stat.setAttribute("status", task.stat);
             cell_folder.setAttribute("label", task.dir);
 
             var row = document.createElement("treerow");
@@ -271,9 +274,15 @@ MediaStealerController.prototype = {
     },
     setTask: function(index, task) {
         if(index == -1 || !task) return;
+        var status = "";
         var tasklist = document.getElementById("MediaStealertasklist");
         var treerow = tasklist.childNodes[index].firstChild;
-
+        var stringsBundle = document.getElementById("string-bundle");
+        var transferring = stringsBundle.getString('task_transferring') + " ";
+        var paused = stringsBundle.getString('task_paused') + " ";
+        var interrupted = stringsBundle.getString('task_interrupted') + " ";
+        var readytodownload = stringsBundle.getString('task_readytodownload') + " ";
+        var finished = stringsBundle.getString('task_finished') + " ";
         treerow.childNodes[0].setAttribute("label", task.filename);
         treerow.childNodes[0].setAttribute("file", task.file);
         treerow.childNodes[0].setAttribute("dir", task.dir);
@@ -284,7 +293,28 @@ MediaStealerController.prototype = {
         treerow.childNodes[4].setAttribute("mode", "normal");
         treerow.childNodes[4].setAttribute("value", task.curr/task.size*100);
         treerow.childNodes[4].setAttribute("curr", task.curr);
-        treerow.childNodes[5].setAttribute("label", task.stat);
+       if (task.stat == "Ready to download")
+        {
+           status = readytodownload;
+        }
+        else if (task.stat == "Transferring")
+        {
+           status = transferring;
+        }
+        else if (task.stat == "Paused")
+        {
+            status = paused;
+        }
+         else if (task.stat == "Interrupted")
+        {
+            status = interrupted;
+        }
+         else if (task.stat == "Finished")
+        {
+            status = finished;
+        }
+        treerow.childNodes[5].setAttribute("label", status);
+        treerow.childNodes[5].setAttribute("status", task.stat);
         treerow.childNodes[6].setAttribute("label", task.dir);
     },
     findTaskById: function(task) {
@@ -333,13 +363,15 @@ MediaStealerController.prototype = {
 
             if(idx == Taskcount) return;
 
-            var choice = prompts.confirm(null, title, "Are you sure you want to abort this file and task? This will result in deleting the file and task.");
+            var stringsBundle = document.getElementById("string-bundle");
+            var question = stringsBundle.getString('task_abortquestion') + " ";
+            var choice = prompts.confirm(null, title, question);
             if(!choice) return;
 
             var treeitem = temptaskTree.view.getItemAtIndex(idx);
             var file = treeitem.firstChild.childNodes[0].getAttribute("file");
             var downloadID = treeitem.firstChild.childNodes[0].getAttribute("DownloadID");
-            var stat = treeitem.firstChild.childNodes[5].getAttribute("label");
+            var stat = treeitem.firstChild.childNodes[5].getAttribute("status");
 
             if (stat == "Transferring" || stat == "Paused")
             {
@@ -427,8 +459,11 @@ MediaStealerController.prototype = {
             var prompts = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
                     .getService(Components.interfaces.nsIPromptService);
             var title = "Stealer";
-            var question = "Do you really want to delete this task?";
-            var checkstr = "Also remove downloaded file";
+            //var question = "Do you really want to delete this task?";
+            //var checkstr = "Also remove downloaded file";
+            var stringsBundle = document.getElementById("string-bundle");
+            var question = stringsBundle.getString('task_deletequestion') + " ";
+            var checkstr = stringsBundle.getString('task_deletecheck') + " ";
             var check = {value: false};
             var list = document.getElementById("MediaStealertasklist");
             var Taskcount = list.childElementCount;
@@ -445,7 +480,7 @@ MediaStealerController.prototype = {
 
             var treeitem = temptaskTree.view.getItemAtIndex(idx);
             var file = treeitem.firstChild.childNodes[0].getAttribute("file");
-            var stat = treeitem.firstChild.childNodes[5].getAttribute("label");
+            var stat = treeitem.firstChild.childNodes[5].getAttribute("status");
             if ((stat == "Finished")||(stat == "Interrupted")||(stat == "Ready to download")) {
 
                 if(check.value) {
@@ -461,7 +496,9 @@ MediaStealerController.prototype = {
                 temptaskTree.treeBoxObject.ensureRowIsVisible(temptaskTree.currentIndex);
             }
             else {
-                alert("Please wait until download is complete");
+                var stringsBundle = document.getElementById("string-bundle");
+                var pleasewait = stringsBundle.getString('task_pleasewait') + " ";
+                alert(pleasewait);
             }
         }
         catch(e) {
@@ -498,8 +535,11 @@ MediaStealerController.prototype = {
             var prompts = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
                     .getService(Components.interfaces.nsIPromptService);
             var title = "Stealer";
-            var question = "Do you really want to delete all the tasks?";
-            var checkstr = "Also remove downloaded files";
+            //var question = "Do you really want to delete all the tasks?";
+            //var checkstr = "Also remove downloaded files";
+            var stringsBundle = document.getElementById("string-bundle");
+            var question = stringsBundle.getString('task_deleteallquestion') + " ";
+            var checkstr = stringsBundle.getString('task_deleteallcheck') + " ";  
             var check = {value: false};
             var result = prompts.confirmCheck(null, title, question, checkstr, check);
             if(!result) return;
@@ -513,7 +553,7 @@ MediaStealerController.prototype = {
                 var idx = Taskcount-1;
                 var treeitem = temptaskTree.view.getItemAtIndex(idx);
                 var file = treeitem.firstChild.childNodes[0].getAttribute("file");
-                var stat = treeitem.firstChild.childNodes[5].getAttribute("label");
+                var stat = treeitem.firstChild.childNodes[5].getAttribute("status");
                 if ((stat == "Finished")||(stat == "Interrupted")||(stat == "Ready to download"))
                 {
                     if(check.value) {
@@ -542,7 +582,7 @@ MediaStealerController.prototype = {
 
             var treeitem = temptaskTree.view.getItemAtIndex(idx);
             var file = treeitem.firstChild.childNodes[0].getAttribute("file");  // full path
-            var stat = treeitem.firstChild.childNodes[5].getAttribute("label"); // status
+            var stat = treeitem.firstChild.childNodes[5].getAttribute("status"); // status
             if ((stat == "Finished") || (stat == "Interrupted")) {
 
                 var fd = Components.classes["@mozilla.org/file/local;1"]
@@ -556,7 +596,9 @@ MediaStealerController.prototype = {
             }
             else
             {
-                alert("Please wait until download is complete");
+                var stringsBundle = document.getElementById("string-bundle");
+                var pleasewait = stringsBundle.getString('task_pleasewait') + " ";
+                alert(pleasewait); 
             }
         }
         catch(e) {
@@ -672,7 +714,7 @@ MediaStealerController.prototype = {
 
             var treeitem = temptaskTree.view.getItemAtIndex(idx);
             var file = treeitem.firstChild.childNodes[0].getAttribute("file");  // full path
-            var stat = treeitem.firstChild.childNodes[5].getAttribute("label"); // status
+            var stat = treeitem.firstChild.childNodes[5].getAttribute("status"); // status
             if ((stat == "Finished")||(stat == "Interrupted")) {
 
                 var fd = Components.classes["@mozilla.org/file/local;1"].
@@ -686,7 +728,9 @@ MediaStealerController.prototype = {
             }
             else
             {
-                alert("Please wait until download is complete");
+                var stringsBundle = document.getElementById("string-bundle");
+                var pleasewait = stringsBundle.getString('task_pleasewait') + " ";
+                alert(pleasewait);  
             }
 
         }
@@ -881,8 +925,9 @@ MediaStealerController.prototype = {
     changeDir: function() {  // the Browse button is clicked
         var fp = Components.classes["@mozilla.org/filepicker;1"]
                    .createInstance(Components.interfaces.nsIFilePicker);
-        fp.init(window, "Please choose a default download directory:",
-                    Components.interfaces.nsIFilePicker.modeGetFolder);
+        var stringsBundle = document.getElementById("string-bundle");
+        var dircomment = stringsBundle.getString('options_dircomment') + " ";
+        fp.init(window, dircomment,Components.interfaces.nsIFilePicker.modeGetFolder);
         var ret = fp.show();
         if (ret == Components.interfaces.nsIFilePicker.returnOK) {
             var path = fp.file.path + (fp.file.path[0] == "/" ? "/" : "\\");
@@ -972,6 +1017,14 @@ MediaStealerController.prototype = {
             this.jumptoDetailWindow(treeitem);
         }
         else if(mode == "delete") {
+            var prompts = Components.classes["@mozilla.org/embedcomp/prompt-service;1"].getService(Components.interfaces.nsIPromptService);
+            var stringsBundle = document.getElementById("string-bundle");
+            var title = stringsBundle.getString('rule_title') + " ";
+            var question = stringsBundle.getString('rule_deleterule') + " ";
+            var choice = prompts.confirm(null, title, question);
+
+            if(!choice) return;
+
             treeitem.parentNode.removeChild(treeitem);
             tempruleTree.view.selection.select(idx);
         }
@@ -1310,7 +1363,7 @@ onDownload: function() {
             var mode = treeitem.firstChild.childNodes[4].getAttribute("mode");
             var currvalue = treeitem.firstChild.childNodes[4].getAttribute("value");
             var curr = treeitem.firstChild.childNodes[4].getAttribute("curr");
-            var stat = treeitem.firstChild.childNodes[5].getAttribute("label");
+            var stat = treeitem.firstChild.childNodes[5].getAttribute("status");
             var taskdir = treeitem.firstChild.childNodes[6].getAttribute("label");            
 
             if (stat == "Ready to download")
@@ -1390,7 +1443,7 @@ onDownloadAll: function() {
               var mode = treeitem.firstChild.childNodes[4].getAttribute("mode");
               var currvalue = treeitem.firstChild.childNodes[4].getAttribute("value");
               var curr = treeitem.firstChild.childNodes[4].getAttribute("curr");
-              var stat = treeitem.firstChild.childNodes[5].getAttribute("label");
+              var stat = treeitem.firstChild.childNodes[5].getAttribute("status");
               var taskdir = treeitem.firstChild.childNodes[6].getAttribute("label");            
 
               if (stat == "Ready to download")

@@ -134,6 +134,7 @@ StealerHttpObserver.prototype = {
             var test2 = theString.indexOf("range");
             var test3 = theString.indexOf("signature");
             var newString2 = "";
+            var testunique = true;
             if (test1 != -1 && test2 != -1)
             {
               var newString = "";
@@ -155,9 +156,7 @@ StealerHttpObserver.prototype = {
                     {
                          newString2 += theString.substring(counter-1, counter);   
                     } 
-                  } 
-                    
-                   
+                  }       
                    if (counter < (test2)) //finds and deletes range information
                    {                     
                      newString += theString.substring(counter-1, counter); 
@@ -174,10 +173,21 @@ StealerHttpObserver.prototype = {
                      }    
                    }
               } 
+
+            var signature = Application.storage.get("signature", signature); 
+            var url2 = unescape(uri);
+            
+            if (signature != "Undefined")
+            {
+              if (url2.indexOf(signature) != -1)
+              {
+                var testunique = false;
+              }
+            }
+            Application.storage.set("signature", newString2);
               uri = newString;
             }
             //test if there are duplicates
-            var testunique = true;
             var temptaskTree = document.getElementById("MediaStealertask-tree");
             var list = document.getElementById("MediaStealertasklist");
             var Taskcount = list.childElementCount;
@@ -405,8 +415,11 @@ StealerHttpObserver.prototype = {
 
                     dir.initWithPath(task.dir);
                     if( !dir.exists() || !dir.isDirectory() ) {   // if it doesn't exist, set to HOME
+                       var stringsBundle = document.getElementById("string-bundle");
+                       var taskdirpart1 = stringsBundle.getString('core_taskdirpart1') + " ";
+                       var taskdirpart2 = stringsBundle.getString('core_taskdirpart2') + " ";
                         homeDir =  MediastealerConfig.home.path + (MediastealerConfig.home.path[0]=="/" ? "/": "\\");
-                        alert("Task directory " + task.dir + "not exist. Change to home directory " + homeDir);
+                        alert(taskdirpart1+" " +task.dir+ taskdirpart2 + " " + homeDir);
                         MediastealerConfig.defaultDir = homeDir;
                         task.dir = homeDir;
                         task.file = task.dir + task.filename;
@@ -431,12 +444,14 @@ StealerHttpObserver.prototype = {
                         if (alwaysaskdownloadfolder == true) 
                         {
 
+                            var stringsBundle = document.getElementById("string-bundle");
+                            var askfileandpath = stringsBundle.getString('core_askfileandpath') + " ";
                             var __file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
                             __file.initWithPath(task.dir);
 
                             var nsIFilePicker = Components.interfaces.nsIFilePicker;
                             var fp = Components.classes["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
-                            fp.init(window, "Please select a folder and enter a filename", nsIFilePicker.modeSave);
+                            fp.init(window, askfileandpath, nsIFilePicker.modeSave);
                             fp.defaultString = task.filename;
                             fp.displayDirectory = __file;
                             var res = fp.show();
