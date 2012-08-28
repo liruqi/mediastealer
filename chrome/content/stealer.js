@@ -927,6 +927,14 @@ MediaStealerController.prototype = {
                    .createInstance(Components.interfaces.nsIFilePicker);
         var stringsBundle = document.getElementById("string-bundle");
         var dircomment = stringsBundle.getString('options_dircomment') + " ";
+        var fd = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
+        var tempdownloaddir = MediastealerConfig.defaultDir;
+        fd.initWithPath(tempdownloaddir);
+        if( !fd.exists() || !fd.isDirectory()) {
+        var tempdownloaddir = MediastealerConfig.home.path;
+        fd.initWithPath(tempdownloaddir);
+        }
+        fp.displayDirectory = fd;
         fp.init(window, dircomment,Components.interfaces.nsIFilePicker.modeGetFolder);
         var ret = fp.show();
         if (ret == Components.interfaces.nsIFilePicker.returnOK) {

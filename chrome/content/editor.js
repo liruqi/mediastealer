@@ -71,10 +71,21 @@ MediaStealerdetailWindow.prototype = {
         return true;
     },
     config: function() {
+        this.home = Components.classes["@mozilla.org/file/directory_service;1"]
+                               .getService(Components.interfaces.nsIProperties)
+                               .get("Home", Components.interfaces.nsIFile);
         var fp = Components.classes["@mozilla.org/filepicker;1"]
                    .createInstance(Components.interfaces.nsIFilePicker);
         var stringsBundle = document.getElementById("string-bundle");
         var dircomment = stringsBundle.getString('editor_dircomment') + " ";
+        var dir = window.arguments[0]["dir"];
+        var fd = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
+        fd.initWithPath(dir);
+        if( !fd.exists() || !fd.isDirectory()) {
+          var dir = this.home.path;
+          fd.initWithPath(dir);
+        }
+        fp.displayDirectory = fd;
         fp.init(window, dircomment, Components.interfaces.nsIFilePicker.modeGetFolder);
         var ret = fp.show();
         if (ret == Components.interfaces.nsIFilePicker.returnOK)
