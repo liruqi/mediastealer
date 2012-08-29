@@ -516,7 +516,7 @@ MediaStealerController.prototype = {
                 var idx = Taskcount-1;
                 var treeitem = temptaskTree.view.getItemAtIndex(idx);
                 var file = treeitem.firstChild.childNodes[0].getAttribute("file");
-                var stat = treeitem.firstChild.childNodes[5].getAttribute("label");
+                var stat = treeitem.firstChild.childNodes[5].getAttribute("status");
                 if (stat == "Finished")
                 {                    
                     treeitem.parentNode.removeChild(treeitem);
