@@ -69,6 +69,7 @@
 <!ENTITY options_opts_automaticdownload.label "自动开始下载">
 <!ENTITY options_opts_togglemediastealerstatusbar.label "在状态栏显示切换窗口的按钮">
 <!ENTITY options_opts_wheretoputfiles.label "总是询问文件保存位置">
+<!ENTITY options_opts_autoclear.label "自动清除已完成的任务">
 
 <!-- tabpage Rules -->
 <!ENTITY rules_tree_warn.label "这张表是为专业人士准备的，如果你不清楚其涵义的话请不要修改。">
