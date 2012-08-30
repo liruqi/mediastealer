@@ -69,6 +69,7 @@
 <!ENTITY options_opts_automaticdownload.label "自動ダウンロード">
 <!ENTITY options_opts_togglemediastealerstatusbar.label "トグルのアイコンを表示する">
 <!ENTITY options_opts_wheretoputfiles.label "常にファイルをどこに保存したいかを尋ねます">
+<!ENTITY options_opts_autoclear.label "自動的に完了したタスクを削除する">
 
 <!-- tabpage Rules -->
 <!ENTITY rules_tree_warn.label "ここはプロオンリー。分からないならルールを編集しないで下さい。">
