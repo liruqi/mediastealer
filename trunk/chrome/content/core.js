@@ -415,7 +415,7 @@ StealerHttpObserver.prototype = {
 
                     dir.initWithPath(task.dir);
                     if( !dir.exists() || !dir.isDirectory() ) {   // if it doesn't exist, set to HOME
-                       var stringsBundle = document.getElementById("string-bundle");
+                       var stringsBundle = document.getElementById("MediaStealerstring-bundle");
                        var taskdirpart1 = stringsBundle.getString('core_taskdirpart1') + " ";
                        var taskdirpart2 = stringsBundle.getString('core_taskdirpart2') + " ";
                         homeDir =  MediastealerConfig.home.path + (MediastealerConfig.home.path[0]=="/" ? "/": "\\");
@@ -444,7 +444,7 @@ StealerHttpObserver.prototype = {
                         if (alwaysaskdownloadfolder == true) 
                         {
 
-                            var stringsBundle = document.getElementById("string-bundle");
+                            var stringsBundle = document.getElementById("MediaStealerstring-bundle");
                             var askfileandpath = stringsBundle.getString('core_askfileandpath') + " ";
                             var __file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
                             __file.initWithPath(task.dir);
