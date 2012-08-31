@@ -19,7 +19,7 @@ MediaStealerdetailWindow.prototype = {
         return thisWindow;
     },
     init: function() {
-        var stringsBundle = document.getElementById("string-bundle");
+        var stringsBundle = document.getElementById("MediaStealerstring-bundle");
         var newrule = stringsBundle.getString('editor_newrule') + " ";
         var des = window.arguments[0]["des"];
         if(des == "")
@@ -76,7 +76,7 @@ MediaStealerdetailWindow.prototype = {
                                .get("Home", Components.interfaces.nsIFile);
         var fp = Components.classes["@mozilla.org/filepicker;1"]
                    .createInstance(Components.interfaces.nsIFilePicker);
-        var stringsBundle = document.getElementById("string-bundle");
+        var stringsBundle = document.getElementById("MediaStealerstring-bundle");
         var dircomment = stringsBundle.getString('editor_dircomment') + " ";
         var dir = window.arguments[0]["dir"];
         var fd = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);

@@ -7,7 +7,7 @@
   xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul" >
 
  <stringbundleset id="stringbundleset">
-   <stringbundle id="string-bundle" src="chrome://stealer/locale/mediastealer.properties"/>
+   <stringbundle id="MediaStealerstring-bundle" src="chrome://stealer/locale/mediastealer.properties"/>
  </stringbundleset>
   <vbox width="400">
     <groupbox>

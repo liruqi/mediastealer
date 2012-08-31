@@ -229,7 +229,7 @@ MediaStealerController.prototype = {
     //------------------  Task panel (tasklist and popup) -------------------------
     addTask: function(task) {
         try {
-            var stringsBundle = document.getElementById("string-bundle");
+            var stringsBundle = document.getElementById("MediaStealerstring-bundle");
             var readytodownload = stringsBundle.getString('task_readytodownload') + " ";
             var cell_file   = document.createElement("treecell");
             var cell_url    = document.createElement("treecell");
@@ -277,7 +277,7 @@ MediaStealerController.prototype = {
         var status = "";
         var tasklist = document.getElementById("MediaStealertasklist");
         var treerow = tasklist.childNodes[index].firstChild;
-        var stringsBundle = document.getElementById("string-bundle");
+        var stringsBundle = document.getElementById("MediaStealerstring-bundle");
         var transferring = stringsBundle.getString('task_transferring') + " ";
         var paused = stringsBundle.getString('task_paused') + " ";
         var interrupted = stringsBundle.getString('task_interrupted') + " ";
@@ -363,7 +363,7 @@ MediaStealerController.prototype = {
 
             if(idx == Taskcount) return;
 
-            var stringsBundle = document.getElementById("string-bundle");
+            var stringsBundle = document.getElementById("MediaStealerstring-bundle");
             var question = stringsBundle.getString('task_abortquestion') + " ";
             var choice = prompts.confirm(null, title, question);
             if(!choice) return;
@@ -461,7 +461,7 @@ MediaStealerController.prototype = {
             var title = "Stealer";
             //var question = "Do you really want to delete this task?";
             //var checkstr = "Also remove downloaded file";
-            var stringsBundle = document.getElementById("string-bundle");
+            var stringsBundle = document.getElementById("MediaStealerstring-bundle");
             var question = stringsBundle.getString('task_deletequestion') + " ";
             var checkstr = stringsBundle.getString('task_deletecheck') + " ";
             var check = {value: false};
@@ -496,7 +496,7 @@ MediaStealerController.prototype = {
                 temptaskTree.treeBoxObject.ensureRowIsVisible(temptaskTree.currentIndex);
             }
             else {
-                var stringsBundle = document.getElementById("string-bundle");
+                var stringsBundle = document.getElementById("MediaStealerstring-bundle");
                 var pleasewait = stringsBundle.getString('task_pleasewait') + " ";
                 alert(pleasewait);
             }
@@ -537,7 +537,7 @@ MediaStealerController.prototype = {
             var title = "Stealer";
             //var question = "Do you really want to delete all the tasks?";
             //var checkstr = "Also remove downloaded files";
-            var stringsBundle = document.getElementById("string-bundle");
+            var stringsBundle = document.getElementById("MediaStealerstring-bundle");
             var question = stringsBundle.getString('task_deleteallquestion') + " ";
             var checkstr = stringsBundle.getString('task_deleteallcheck') + " ";  
             var check = {value: false};
@@ -596,7 +596,7 @@ MediaStealerController.prototype = {
             }
             else
             {
-                var stringsBundle = document.getElementById("string-bundle");
+                var stringsBundle = document.getElementById("MediaStealerstring-bundle");
                 var pleasewait = stringsBundle.getString('task_pleasewait') + " ";
                 alert(pleasewait); 
             }
@@ -728,7 +728,7 @@ MediaStealerController.prototype = {
             }
             else
             {
-                var stringsBundle = document.getElementById("string-bundle");
+                var stringsBundle = document.getElementById("MediaStealerstring-bundle");
                 var pleasewait = stringsBundle.getString('task_pleasewait') + " ";
                 alert(pleasewait);  
             }
@@ -925,7 +925,7 @@ MediaStealerController.prototype = {
     changeDir: function() {  // the Browse button is clicked
         var fp = Components.classes["@mozilla.org/filepicker;1"]
                    .createInstance(Components.interfaces.nsIFilePicker);
-        var stringsBundle = document.getElementById("string-bundle");
+        var stringsBundle = document.getElementById("MediaStealerstring-bundle");
         var dircomment = stringsBundle.getString('options_dircomment') + " ";
         var fd = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
         var tempdownloaddir = MediastealerConfig.defaultDir;
@@ -1026,7 +1026,7 @@ MediaStealerController.prototype = {
         }
         else if(mode == "delete") {
             var prompts = Components.classes["@mozilla.org/embedcomp/prompt-service;1"].getService(Components.interfaces.nsIPromptService);
-            var stringsBundle = document.getElementById("string-bundle");
+            var stringsBundle = document.getElementById("MediaStealerstring-bundle");
             var title = stringsBundle.getString('rule_title') + " ";
             var question = stringsBundle.getString('rule_deleterule') + " ";
             var choice = prompts.confirm(null, title, question);

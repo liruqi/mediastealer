@@ -137,7 +137,7 @@ MediaStealerConfig.prototype = {
         //var title = "Confirm importing files";
         //var question = "Are you certain you wish to import rules? Incorrent rules shall cause damage.";
         //var checkstr = "I'm sure";
-        var stringsBundle = document.getElementById("string-bundle");
+        var stringsBundle = document.getElementById("MediaStealerstring-bundle");
         var question = stringsBundle.getString('utils_importquestion') + " ";
         var checkstr = stringsBundle.getString('utils_importcheckstr') + " ";  
         var title = stringsBundle.getString('utils_importtitle') + " ";
@@ -208,7 +208,7 @@ MediaStealerConfig.prototype = {
     }, // of importrules
     exportrules: function() {
 
-        var stringsBundle = document.getElementById("string-bundle");
+        var stringsBundle = document.getElementById("MediaStealerstring-bundle");
         var saverules = stringsBundle.getString('utils_saverules') + " "; 
         var exportrules = [];
         for(var i = 0; i < this.rules.length; i++) {
