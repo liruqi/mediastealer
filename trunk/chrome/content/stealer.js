@@ -683,7 +683,7 @@ MediaStealerController.prototype = {
             var fp = Components.classes["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
             fp.init(window, "Please select a folder and enter a filename", nsIFilePicker.modeSave);
             fp.defaultString = label;
-            fp.displayDirectory = fd;
+            fp.displayDirectory = fd.parent;
             var res = fp.show();
             if (res == nsIFilePicker.returnOK || res == nsIFilePicker.returnReplace) {
                 var fileleafname = fp.file.leafName;
@@ -1397,12 +1397,13 @@ onDownload: function() {
             var IOservice = Components.classes['@mozilla.org/network/io-service;1'].getService(Components.interfaces.nsIIOService);
             var obj_URI_Source = IOservice.newURI(task.url, null, null);
             var obj_File_Target = IOservice.newFileURI(file2);
-            
-            var dl = downloadManager.addDownload(downloadManager.DOWNLOAD_TYPE_DOWNLOAD, obj_URI_Source, obj_File_Target, '', null, Math.round(Date.now() * 1000), null, persist);
+            var isPrivate = true;
+            var dl = downloadManager.addDownload(downloadManager.DOWNLOAD_TYPE_DOWNLOAD, obj_URI_Source, obj_File_Target, '', null, Math.round(Date.now() * 1000), null, persist, isPrivate);
             var persistListener = new StealerDownloader(Stealer, task);
             downloadManager.addListener(persistListener);
             persist.progressListener = dl;
-            persist.saveURI(dl.source, null, null, null, null, dl.targetFile);
+            var privacyContext = null;
+            persist.saveURI(dl.source, null, null, null, null, dl.targetFile, privacyContext);
 
             task.curr = 0;
             task.DownloadID = dl.id;
@@ -1477,12 +1478,13 @@ onDownloadAll: function() {
               var IOservice = Components.classes['@mozilla.org/network/io-service;1'].getService(Components.interfaces.nsIIOService);
               var obj_URI_Source = IOservice.newURI(task.url, null, null);
               var obj_File_Target = IOservice.newFileURI(file2);
-            
-              var dl = downloadManager.addDownload(downloadManager.DOWNLOAD_TYPE_DOWNLOAD, obj_URI_Source, obj_File_Target, '', null, Math.round(Date.now() * 1000), null, persist);
+              var isPrivate = true;
+              var dl = downloadManager.addDownload(downloadManager.DOWNLOAD_TYPE_DOWNLOAD, obj_URI_Source, obj_File_Target, '', null, Math.round(Date.now() * 1000), null, persist, isPrivate);
               var persistListener = new StealerDownloader(Stealer, task);
               downloadManager.addListener(persistListener);
               persist.progressListener = dl;
-              persist.saveURI(dl.source, null, null, null, null, dl.targetFile);
+              var privacyContext = null;
+              persist.saveURI(dl.source, null, null, null, null, dl.targetFile, privacyContext);
 
               task.curr = 0;
               task.DownloadID = dl.id;

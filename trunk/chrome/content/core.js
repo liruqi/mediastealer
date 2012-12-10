@@ -486,11 +486,13 @@ StealerHttpObserver.prototype = {
                         var obj_URI_Source = IOservice.newURI(task.url, null, null);
                         var obj_File_Target = IOservice.newFileURI(file);
                         var dm = Components.classes['@mozilla.org/download-manager;1'].createInstance(Components.interfaces.nsIDownloadManager);
-                        var dl = dm.addDownload(dm.DOWNLOAD_TYPE_DOWNLOAD, obj_URI_Source, obj_File_Target, '', null, Math.round(Date.now() * 1000), null, persist);
+                        var isPrivate = true;
+                        var dl = dm.addDownload(dm.DOWNLOAD_TYPE_DOWNLOAD, obj_URI_Source, obj_File_Target, '', null, Math.round(Date.now() * 1000), null, persist, isPrivate);
                         var persistListener = new StealerDownloader(this.Stealer, task);
                         dm.addListener(persistListener);
                         persist.progressListener = dl;
-                        persist.saveURI(dl.source, null, null, null, null, dl.targetFile);
+                        var privacyContext = null;
+                        persist.saveURI(dl.source, null, null, null, null, dl.targetFile, privacyContext);
 
                         task.curr = 0;
                         task.DownloadID = dl.id;
