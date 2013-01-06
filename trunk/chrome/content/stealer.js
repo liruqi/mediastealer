@@ -540,14 +540,16 @@ MediaStealerController.prototype = {
             var stringsBundle = document.getElementById("MediaStealerstring-bundle");
             var question = stringsBundle.getString('task_deleteallquestion') + " ";
             var checkstr = stringsBundle.getString('task_deleteallcheck') + " ";  
-            var check = {value: false};
-            var result = prompts.confirmCheck(null, title, question, checkstr, check);
-            if(!result) return;
+            var check = {value: false};            
 
             // do the deed
             var temptaskTree = document.getElementById("MediaStealertask-tree");
             var list = document.getElementById("MediaStealertasklist");
             var Taskcount = list.childElementCount;
+            if (Taskcount == 0) return;
+            var result = prompts.confirmCheck(null, title, question, checkstr, check);  
+            if(!result) return;            
+            
             for (Taskcount; Taskcount > 0; Taskcount--)
             {
                 var idx = Taskcount-1;
@@ -1386,7 +1388,7 @@ onDownload: function() {
             task.size = size;
             task.curr = curr;
             task.stat = stat;
-            task.DownloadID = downloadID;
+            //task.DownloadID = downloadID;
 
             var file2 = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
             file2.initWithPath(task.file);
@@ -1467,7 +1469,7 @@ onDownloadAll: function() {
               task.size = size;
               task.curr = curr;
               task.stat = stat;
-              task.DownloadID = downloadID;
+              //task.DownloadID = downloadID;
 
               var file2 = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
               file2.initWithPath(task.file);
