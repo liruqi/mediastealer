@@ -375,11 +375,26 @@ MediaStealerController.prototype = {
 
             if (stat == "Transferring" || stat == "Paused")
             {
-                downloadManager.cancelDownload(downloadID);
+            var appinfo = Components.classes["@mozilla.org/xre/app-info;1"].getService(Components.interfaces.nsIXULAppInfo);
+		    var versionchecker = Components.classes["@mozilla.org/xpcom/version-comparator;1"].getService(Components.interfaces.nsIVersionComparator);
+            if (versionchecker.compare(appinfo.version, 20) >=0) {
+            downloadManager.getDownloadByGUID(downloadID, function(aStatus, aResult) {
+			var canceleddownload = aResult;
+			canceleddownload.cancel();
+            });
             }
+            else {
+            downloadManager.cancelDownload(downloadID);
             var fd = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
             fd.initWithPath(file);
             if(fd.exists()) fd.remove(false);
+            } 
+            }
+            else {
+            var fd = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
+            fd.initWithPath(file);
+            if(fd.exists()) fd.remove(false);
+            }
             treeitem.parentNode.removeChild(treeitem);
             temptaskTree.view.selection.select(idx);
             temptaskTree.treeBoxObject.ensureRowIsVisible(temptaskTree.currentIndex);
@@ -1401,6 +1416,19 @@ onDownload: function() {
             var obj_File_Target = IOservice.newFileURI(file2);
             var isPrivate = true;
             var dl = downloadManager.addDownload(downloadManager.DOWNLOAD_TYPE_DOWNLOAD, obj_URI_Source, obj_File_Target, '', null, Math.round(Date.now() * 1000), null, persist, isPrivate);
+            var appinfo = Components.classes["@mozilla.org/xre/app-info;1"].getService(Components.interfaces.nsIXULAppInfo);
+		    var versionchecker = Components.classes["@mozilla.org/xpcom/version-comparator;1"].getService(Components.interfaces.nsIVersionComparator);
+            if (versionchecker.compare(appinfo.version, 20) >=0) {
+            var persistListener = new StealerDownloader2(Stealer, task);
+            downloadManager.addPrivacyAwareListener(persistListener);
+            persist.progressListener = dl;
+            var privacyContext = null;
+            persist.saveURI(dl.source, null, null, null, null, dl.targetFile, privacyContext);
+            task.curr = 0;
+            task.DownloadID = dl.guid; 
+            task.stat = "Transferring";
+            }
+            else {
             var persistListener = new StealerDownloader(Stealer, task);
             downloadManager.addListener(persistListener);
             persist.progressListener = dl;
@@ -1409,8 +1437,9 @@ onDownload: function() {
 
             task.curr = 0;
             task.DownloadID = dl.id;
+            task.stat = "Transferring";
+            } 
             treeitem.firstChild.childNodes[0].setAttribute("DownloadID", task.DownloadID);
-            task.stat = "Transferring"; 
             }
             else if (stat == "Paused")
             {
