@@ -488,6 +488,20 @@ StealerHttpObserver.prototype = {
                         var dm = Components.classes['@mozilla.org/download-manager;1'].createInstance(Components.interfaces.nsIDownloadManager);
                         var isPrivate = true;
                         var dl = dm.addDownload(dm.DOWNLOAD_TYPE_DOWNLOAD, obj_URI_Source, obj_File_Target, '', null, Math.round(Date.now() * 1000), null, persist, isPrivate);
+                        
+                        var appinfo = Components.classes["@mozilla.org/xre/app-info;1"].getService(Components.interfaces.nsIXULAppInfo);
+		                var versionchecker = Components.classes["@mozilla.org/xpcom/version-comparator;1"].getService(Components.interfaces.nsIVersionComparator);
+                        if (versionchecker.compare(appinfo.version, 20) >=0) {
+                        var persistListener = new StealerDownloader2(this.Stealer, task);
+                        dm.addPrivacyAwareListener(persistListener);
+                        persist.progressListener = dl;
+                        var privacyContext = null;
+                        persist.saveURI(dl.source, null, null, null, null, dl.targetFile, privacyContext);
+                        task.curr = 0;
+                        task.DownloadID = dl.guid; 
+                        task.stat = "Transferring";
+                        }
+                        else {
                         var persistListener = new StealerDownloader(this.Stealer, task);
                         dm.addListener(persistListener);
                         persist.progressListener = dl;
@@ -497,6 +511,7 @@ StealerHttpObserver.prototype = {
                         task.curr = 0;
                         task.DownloadID = dl.id;
                         task.stat = "Transferring";
+                        } 
                         }
                         else
                         {
@@ -786,6 +801,100 @@ StealerDownloader.prototype = {
     onStatusChange : function(aWebProgress, aRequest, aStatus, aMessage, aDownload)
     {
         if (aDownload.id == this.task.DownloadID)
+            {
+                this.task.stat = "Interrupted";
+                this.Stealer.refreshTask(this.task);
+            }
+    },
+
+    onSecurityChange : function(aWebProgress, aRequest, aState)
+    {
+    }
+}
+function StealerDownloader2(stealer, task) {
+    this.Stealer = stealer;
+    this.task = task;
+
+    this.stack = [];           // data trunk (buffer) list
+    this.total = task.size;    // Content-Length
+    this.curr = 0;             // total bytes of received data
+    this.percent = 0;          // percentage of received data
+    this.curr_stack = 0;       // bytes of data in `stack'
+
+    this.originalListener = null;
+}
+
+StealerDownloader2.prototype = {
+    QueryInterface : function(aIID)
+    {
+        if(aIID.equals(Components.interfaces.Components.interfaces.nsIDownloadProgressListener))
+            return this;
+        throw Components.results.NS_NOINTERFACE;
+    },
+
+    init : function()
+    {
+    },
+
+    destroy : function()
+    {
+    },
+
+    onProgressChange : function (aWebProgress, aRequest,
+                       aCurSelfProgress, aMaxSelfProgress,
+                       aCurTotalProgress, aMaxTotalProgress, aDownload)
+    {
+        if (aDownload.guid == this.task.DownloadID)
+        {
+            this.task.stat = "Transferring";
+            this.curr = aDownload.amountTransferred;
+            this.task.curr = aDownload.amountTransferred;
+            this.task.size = aDownload.size;
+            this.Stealer.refreshTask(this.task);
+        }
+    },
+
+    onDownloadStateChange: function(aState, aDownload)
+    {
+        if (aDownload.guid == this.task.DownloadID)
+        {
+            if (aDownload.state == 7 || aDownload.state == 1)
+            {
+                this.total = this.task.size;
+                this.curr = this.total;
+                this.task.curr = this.total;
+                this.task.stat = "Finished";
+                this.task.DownloadID = -1;
+                this.Stealer.refreshTask(this.task);
+                var autoclear = MediastealerConfig.autoclear;
+                if (autoclear == true)
+                this.Stealer.autoclear();
+            }
+        }
+    },
+
+    onStateChange : function(aWebProgress, aRequest, aStateFlags, aStatus, aDownload)
+    {
+        if (aDownload.guid == this.task.DownloadID)
+        {
+            var downloadManager = Components.classes["@mozilla.org/download-manager;1"].getService(Components.interfaces.nsIDownloadManager);
+            if (aDownload.state == 4)
+            {
+                this.task.stat = "Paused";
+                this.Stealer.refreshTask(this.task);
+            }
+            else if (aDownload.state == 3 || aDownload.state == 2)  //something went terribly wrong
+            {
+                this.task.stat = "Interrupted";
+                this.DownloadID = -1;
+                this.Stealer.refreshTask(this.task);
+            }
+        }
+    },
+
+    onStatusChange : function(aWebProgress, aRequest, aStatus, aMessage, aDownload)
+    {
+        if (aDownload.guid == this.task.DownloadID)
             {
                 this.task.stat = "Interrupted";
                 this.Stealer.refreshTask(this.task);
