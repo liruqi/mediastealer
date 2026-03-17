@@ -12,6 +12,7 @@
       <h1>Media Stealer</h1>
     </div>
     <div class="actions">
+      <button id="popout-btn" title="Open in dedicated window to keep open">Popout</button>
       <button id="clear-btn" title="Clear All">Clear</button>
       <button id="options-btn" title="Options">⚙️</button>
     </div>
@@ -33,6 +34,13 @@
     </table>
     <div id="empty-state" class="empty-state">
       <p>No media captured yet.</p>
+    </div>
+  </div>
+
+  <div class="logs-section">
+    <h4>Extension Logs <button id="clear-logs-btn" style="float: right; font-size: 10px; padding: 2px 4px;">Clear Logs</button></h4>
+    <div id="logs-container" class="logs-container">
+      <!-- Logs populate here -->
     </div>
   </div>
 

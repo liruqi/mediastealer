@@ -2,6 +2,24 @@ document.addEventListener('DOMContentLoaded', () => {
   const tbody = document.getElementById('media-tbody');
   const emptyState = document.getElementById('empty-state');
   const mediaList = document.getElementById('media-list');
+  const logsContainer = document.getElementById('logs-container');
+
+  function addLogToUI(logStr) {
+    const div = document.createElement('div');
+    div.className = 'log-entry';
+    div.textContent = logStr;
+    logsContainer.prepend(div);
+  }
+
+  function renderLogs(logs) {
+    logsContainer.innerHTML = '';
+    logs.forEach(log => {
+      const div = document.createElement('div');
+      div.className = 'log-entry';
+      div.textContent = log;
+      logsContainer.appendChild(div);
+    });
+  }
 
   function formatBytes(bytes, decimals = 2) {
     if (!+bytes) return '0 Bytes';
@@ -59,6 +77,20 @@ document.addEventListener('DOMContentLoaded', () => {
     renderList(result.capturedMedia || []);
   });
 
+  // Load initial logs
+  chrome.runtime.sendMessage({ type: "GET_LOGS" }, (response) => {
+    if (response && response.logs) {
+      renderLogs(response.logs);
+    }
+  });
+
+  // Listen for real-time logs from background
+  chrome.runtime.onMessage.addListener((message) => {
+    if (message.type === "NEW_LOG") {
+      addLogToUI(message.output);
+    }
+  });
+
   // Listen for changes
   chrome.storage.onChanged.addListener((changes, namespace) => {
     if (namespace === 'local' && changes.capturedMedia) {
@@ -75,5 +107,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('options-btn').addEventListener('click', () => {
     chrome.runtime.openOptionsPage();
+  });
+
+  document.getElementById('clear-logs-btn').addEventListener('click', () => {
+    chrome.storage.local.set({ capturedLogs: [] }, () => {
+      renderLogs([]);
+    });
+  });
+
+  document.getElementById('popout-btn').addEventListener('click', () => {
+    chrome.windows.create({
+      url: chrome.runtime.getURL("popup.html"),
+      type: "popup",
+      width: 520,
+      height: 600
+    });
+    window.close(); // Close the current flyout
   });
 });
