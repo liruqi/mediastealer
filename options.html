@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Media Stealer Options</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+      color: #333;
+      background-color: #f9f9f9;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .card {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    h2 {
+      margin-top: 0;
+      font-size: 18px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 10px;
+    }
+    .setting-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .setting-row input[type="checkbox"] {
+      margin-right: 10px;
+      width: 16px;
+      height: 16px;
+    }
+    .setting-desc {
+      color: #666;
+      font-size: 13px;
+      margin-left: 26px;
+      margin-top: -5px;
+      margin-bottom: 15px;
+    }
+    button {
+      background-color: #0078d7;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0063b1;
+    }
+    button:disabled {
+      background-color: #ccc;
+    }
+    .danger {
+      background-color: #d83b01;
+    }
+    .danger:hover {
+      background-color: #a80000;
+    }
+    /* Rules Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #f5f5f5;
+    }
+    .actions button {
+      padding: 4px 8px;
+      font-size: 12px;
+      margin-right: 5px;
+    }
+    #add-rule-form {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    #add-rule-form input {
+      flex: 1;
+      padding: 6px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    #save-msg {
+      color: green;
+      margin-left: 15px;
+      font-weight: bold;
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <img src="icons/mediastealer48.png" alt="Media Stealer" width="48">
+    <h1>Media Stealer Options</h1>
+  </div>
+
+  <div class="card">
+    <h2>General Settings</h2>
+    
+    <div class="setting-row">
+      <input type="checkbox" id="enabled">
+      <label for="enabled"><strong>Enable Media Stealer</strong></label>
+    </div>
+    
+    <div class="setting-row">
+      <input type="checkbox" id="automaticdownload">
+      <label for="automaticdownload"><strong>Automatic Download</strong></label>
+    </div>
+    <div class="setting-desc">Automatically download intercepted media files. Be careful, this may download lots of files!</div>
+
+    <div class="setting-row">
+      <input type="checkbox" id="nosmallfiles">
+      <label for="nosmallfiles"><strong>Ignore Small Files</strong></label>
+    </div>
+    <div class="setting-desc">Do not intercept files smaller than 750KB.</div>
+
+    <div class="setting-row">
+      <input type="checkbox" id="nozerofiles">
+      <label for="nozerofiles"><strong>Ignore Zero Byte Files</strong></label>
+    </div>
+    
+    <div style="margin-top: 20px;">
+      <button id="save-settings">Save Settings</button>
+      <span id="save-msg">Saved!</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Intercept Rules</h2>
+    <p class="setting-desc">Configure which URLs and Content-Types should be intercepted. Uses regular expressions.</p>
+    
+    <table id="rules-table">
+      <thead>
+        <tr>
+          <th width="5%">Enabled</th>
+          <th width="40%">URL Regex</th>
+          <th width="35%">Content-Type Regex</th>
+          <th width="20%">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- JS will populate rules -->
+      </tbody>
+    </table>
+
+    <div id="add-rule-form">
+      <input type="text" id="new-url" placeholder="URL Pattern (e.g. .*)">
+      <input type="text" id="new-ct" placeholder="Content-Type Pattern (e.g. video/.*)">
+      <button id="add-rule-btn">Add Rule</button>
+    </div>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>

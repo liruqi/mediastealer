@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Media Stealer</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="header">
+    <div class="logo-title">
+      <img src="icons/mediastealer24.png" alt="Logo" class="logo">
+      <h1>Media Stealer</h1>
+    </div>
+    <div class="actions">
+      <button id="clear-btn" title="Clear All">Clear</button>
+      <button id="options-btn" title="Options">⚙️</button>
+    </div>
+  </div>
+  
+  <div class="list-container">
+    <table id="media-list" class="hidden">
+      <thead>
+        <tr>
+          <th>File</th>
+          <th>Type</th>
+          <th>Size</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="media-tbody">
+        <!-- JS will populate rows -->
+      </tbody>
+    </table>
+    <div id="empty-state" class="empty-state">
+      <p>No media captured yet.</p>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

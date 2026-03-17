@@ -1,0 +1,44 @@
+{
+  "manifest_version": 3,
+  "name": "Media Stealer",
+  "version": "2.0.0",
+  "description": "Help you download stream media easily",
+  "permissions": [
+    "webRequest",
+    "downloads",
+    "storage",
+    "notifications"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/mediastealer16.png",
+      "24": "icons/mediastealer24.png",
+      "48": "icons/mediastealer.png",
+      "128": "icons/mediastealer.png"
+    }
+  },
+  "icons": {
+    "16": "icons/mediastealer16.png",
+    "24": "icons/mediastealer24.png",
+    "48": "icons/mediastealer.png",
+    "128": "icons/mediastealer.png"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": false
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "stealer@physacco.com",
+      "strict_min_version": "109.0"
+    }
+  }
+}
