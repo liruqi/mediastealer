@@ -119,11 +119,15 @@ chrome.webRequest.onHeadersReceived.addListener(
         
         if (config.automaticdownload) {
           addLog(`Auto-downloading: ${mediaItem.filename}`);
+          
+          let safeFilename = mediaItem.filename.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+          if (!safeFilename || safeFilename === "_") safeFilename = "downloaded_media";
+
           chrome.downloads.download({
-            url: details.url,
-            filename: mediaItem.filename,
+            url: mediaItem.url,
+            filename: safeFilename,
             saveAs: false
-          }).catch(err => addLog(`Download failed: ${err}`));
+          }).catch(err => addLog(`Download failed: ${err.message || err}`));
         }
       } else {
         addLog(`Ignored duplicate: ${details.url}`);

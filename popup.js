@@ -116,12 +116,13 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('popout-btn').addEventListener('click', () => {
+    document.windows_create_pending = true;
     chrome.windows.create({
       url: chrome.runtime.getURL("popup.html"),
       type: "popup",
       width: 520,
-      height: 600
+    }, () => {
+      window.close(); // Close the current flyout after the new one opens
     });
-    window.close(); // Close the current flyout
   });
 });
