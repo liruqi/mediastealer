@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "Media Stealer",
-  "version": "2.0.0",
+  "name": "Fluxon",
+  "version": "1.3",
   "description": "Help you download stream media easily",
   "permissions": [
     "webRequest",
@@ -18,17 +18,17 @@
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
-      "16": "icons/mediastealer16.png",
-      "24": "icons/mediastealer24.png",
-      "48": "icons/mediastealer.png",
-      "128": "icons/mediastealer.png"
+      "16": "icons/fluxon16.png",
+      "24": "icons/fluxon24.png",
+      "48": "icons/fluxon.png",
+      "128": "icons/fluxon.png"
     }
   },
   "icons": {
-    "16": "icons/mediastealer16.png",
-    "24": "icons/mediastealer24.png",
-    "48": "icons/mediastealer.png",
-    "128": "icons/mediastealer.png"
+    "16": "icons/fluxon16.png",
+    "24": "icons/fluxon24.png",
+    "48": "icons/fluxon.png",
+    "128": "icons/fluxon.png"
   },
   "options_ui": {
     "page": "options.html",
