@@ -105,6 +105,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  document.getElementById('download-all-btn').addEventListener('click', () => {
+    chrome.storage.local.get(['capturedMedia'], (result) => {
+      const items = result.capturedMedia || [];
+      items.forEach(item => {
+        chrome.downloads.download({
+          url: item.url,
+          filename: item.filename,
+          saveAs: false
+        });
+      });
+    });
+  });
+
   document.getElementById('options-btn').addEventListener('click', () => {
     chrome.runtime.openOptionsPage();
   });

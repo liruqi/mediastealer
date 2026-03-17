@@ -36,9 +36,9 @@ function addLog(message) {
   console.log(logStr);
   capturedLogs.unshift(logStr);
   if (capturedLogs.length > 50) capturedLogs.pop();
-  
+
   chrome.storage.local.set({ capturedLogs });
-  chrome.runtime.sendMessage({ type: "NEW_LOG", output: logStr }).catch(() => {});
+  chrome.runtime.sendMessage({ type: "NEW_LOG", output: logStr }).catch(() => { });
 }
 
 // Initialize captured media from storage on service worker start
@@ -55,7 +55,7 @@ chrome.webRequest.onHeadersReceived.addListener(
 
     let contentLength = -1; // -1 means unknown (e.g., chunked transfer)
     let contentType = "";
-    
+
     // Firefox uses lowercase header names in details.responseHeaders
     for (let header of details.responseHeaders) {
       let name = header.name.toLowerCase();
@@ -76,17 +76,17 @@ chrome.webRequest.onHeadersReceived.addListener(
     let matched = false;
     for (let rule of config.rules) {
       if (!rule.enabled) continue;
-      
+
       try {
         let urlRegex = new RegExp(rule.url, "i");
         let ctRegex = new RegExp(rule.ct, "i");
-        
+
         if (urlRegex.test(details.url) && ctRegex.test(contentType)) {
           addLog(`MATCHED RULE (url=${rule.url}, ct=${rule.ct}): ${details.url}`);
           matched = true;
           break;
         }
-      } catch(e) {
+      } catch (e) {
         // Ignore invalid regex
         console.error("Invalid rule regex", e);
       }
@@ -97,29 +97,56 @@ chrome.webRequest.onHeadersReceived.addListener(
       // Check for duplicates
       let isDuplicate = capturedMedia.some(m => m.url === details.url);
       if (!isDuplicate) {
-        let filename = details.url.split('?')[0].split('/').pop() || "media_file";
+        let originalName = details.url.split('?')[0].split('/').pop() || "media_file";
+        let baseName = originalName;
+
+        // Generate timestamp
+        const d = new Date();
+        const pfx = d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0') + "_" +
+          String(d.getHours()).padStart(2, '0') + String(d.getMinutes()).padStart(2, '0') + String(d.getSeconds()).padStart(2, '0');
+
+        // Find existing extension or generate one
+        let ext = "";
+        let finalFilename = "";
+        if (baseName.includes('.')) {
+          ext = baseName.substring(baseName.lastIndexOf('.'));
+          baseName = baseName.substring(0, baseName.lastIndexOf('.'));
+        } else {
+          if (contentType.includes("video/mp4")) ext = ".mp4";
+          else if (contentType.includes("video/webm")) ext = ".webm";
+          else if (contentType.includes("audio/mpeg")) ext = ".mp3";
+          else if (contentType.includes("audio/wav")) ext = ".wav";
+          else if (contentType.includes("image/jpeg")) ext = ".jpg";
+          else if (contentType.includes("image/png")) ext = ".png";
+          else if (contentType.includes("image/gif")) ext = ".gif";
+          else if (contentType.includes("image/webp")) ext = ".webp";
+          else if (contentType.split('/')[1]) ext = "." + contentType.split('/')[1].split(';')[0];
+        }
+
+        finalFilename = `${pfx}_${baseName}${ext}`;
+
         let mediaItem = {
           id: Date.now() + "_" + Math.floor(Math.random() * 1000),
           url: details.url,
-          filename: filename,
+          filename: finalFilename,
           type: contentType,
           size: contentLength,
           timestamp: Date.now(),
           status: config.automaticdownload ? "Downloading" : "Ready"
         };
-        
+
         capturedMedia.unshift(mediaItem);
         // Keep max 100 items
         if (capturedMedia.length > 100) {
           capturedMedia.pop();
         }
-        
+
         chrome.storage.local.set({ capturedMedia });
-        
-        
+
+
         if (config.automaticdownload) {
           addLog(`Auto-downloading: ${mediaItem.filename}`);
-          
+
           let safeFilename = mediaItem.filename.replace(/[^a-zA-Z0-9.\-_]/g, '_');
           if (!safeFilename || safeFilename === "_") safeFilename = "downloaded_media";
 
