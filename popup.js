@@ -79,6 +79,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Load initial logs
   chrome.runtime.sendMessage({ type: "GET_LOGS" }, (response) => {
+    if (chrome.runtime.lastError) {
+      console.log("Background script not ready or asleep:", chrome.runtime.lastError);
+      return;
+    }
     if (response && response.logs) {
       renderLogs(response.logs);
     }

@@ -56,14 +56,17 @@ chrome.webRequest.onHeadersReceived.addListener(
     let contentLength = -1; // -1 means unknown (e.g., chunked transfer)
     let contentType = "";
 
-    // Firefox uses lowercase header names in details.responseHeaders
-    for (let header of details.responseHeaders) {
-      let name = header.name.toLowerCase();
-      if (name === "content-length") {
-        contentLength = parseInt(header.value, 10);
-      }
-      if (name === "content-type") {
-        contentType = header.value;
+    // Firefox uses lowercase header names in details.responseHeaders, Chrome can be either
+    if (details.responseHeaders) {
+      for (let header of details.responseHeaders) {
+        if (!header || !header.name) continue;
+        let name = header.name.toLowerCase();
+        if (name === "content-length") {
+          contentLength = parseInt(header.value, 10);
+        }
+        if (name === "content-type" && header.value) {
+          contentType = header.value;
+        }
       }
     }
 
@@ -162,7 +165,7 @@ chrome.webRequest.onHeadersReceived.addListener(
     }
   },
   { urls: ["<all_urls>"] },
-  ["responseHeaders"]
+  ["responseHeaders", "extraHeaders"]
 );
 
 // Allow popup to request logs
