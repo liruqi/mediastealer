@@ -47,23 +47,52 @@ document.addEventListener('DOMContentLoaded', () => {
           <td class="type">${item.type.split(';')[0]}</td>
           <td>${formatBytes(item.size)}</td>
           <td>
-            <button class="action-btn" data-url="${item.url}" data-filename="${item.filename}">Download</button>
+            <button class="action-btn" id="btn-${item.id}" data-id="${item.id}" data-url="${item.url}" data-filename="${item.filename}">Download</button>
           </td>
         `;
         
         tbody.appendChild(tr);
+
+        // If it has a downloadId, check status
+        if (item.downloadId) {
+          checkDownloadStatus(item.downloadId, item.id);
+        }
       });
 
-      // Add click listeners to download buttons
+      // Add click listeners to action buttons
       document.querySelectorAll('.action-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
+          const action = e.target.textContent;
+          const id = e.target.getAttribute('data-id');
           const url = e.target.getAttribute('data-url');
           const filename = e.target.getAttribute('data-filename');
-          chrome.downloads.download({
-            url: url,
-            filename: filename,
-            saveAs: false
-          });
+
+          if (action === 'Download') {
+            chrome.downloads.download({
+              url: url,
+              filename: filename,
+              saveAs: false
+            }).then(downloadId => {
+              // Store downloadId in capturedMedia
+              chrome.storage.local.get(['capturedMedia'], (result) => {
+                const media = result.capturedMedia || [];
+                const item = media.find(m => m.id === id);
+                if (item) {
+                  item.downloadId = downloadId;
+                  chrome.storage.local.set({ capturedMedia: media });
+                  checkDownloadStatus(downloadId, id);
+                }
+              });
+            });
+          } else if (action === 'Open') {
+            // Get downloadId from storage again to be sure (or from some mapping)
+            chrome.storage.local.get(['capturedMedia'], (result) => {
+              const item = (result.capturedMedia || []).find(m => m.id === id);
+              if (item && item.downloadId) {
+                chrome.downloads.show(item.downloadId);
+              }
+            });
+          }
         });
       });
     } else {
@@ -150,4 +179,17 @@ document.addEventListener('DOMContentLoaded', () => {
       window.close();
     });
   });
+
+  function checkDownloadStatus(downloadId, itemId) {
+    chrome.downloads.search({ id: downloadId }, (results) => {
+      if (results && results[0]) {
+        const download = results[0];
+        const btn = document.getElementById(`btn-${itemId}`);
+        if (btn && download.state === 'complete' && download.exists) {
+          btn.textContent = 'Open';
+          btn.classList.add('open-btn');
+        }
+      }
+    });
+  }
 });

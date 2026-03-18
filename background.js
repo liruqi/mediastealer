@@ -170,13 +170,15 @@ chrome.webRequest.onHeadersReceived.addListener(
               url: mediaItem.url,
               filename: safeFilename,
               saveAs: false
-            }).then(() => {
+            }).then((downloadId) => {
               downloadHistory[mediaItem.url] = now;
+              mediaItem.downloadId = downloadId;
+              
               // Clean up history (remove entries older than 24h)
               for (const [url, time] of Object.entries(downloadHistory)) {
                 if (now - time > ONE_DAY) delete downloadHistory[url];
               }
-              chrome.storage.local.set({ downloadHistory });
+              chrome.storage.local.set({ downloadHistory, capturedMedia });
             }).catch(err => addLog(`Download failed: ${err.message || err}`));
           }
         }

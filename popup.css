@@ -135,6 +135,14 @@ body.is-popout .filename {
   background-color: #0063b1;
 }
 
+.action-btn.open-btn {
+  background-color: #28a745;
+}
+
+.action-btn.open-btn:hover {
+  background-color: #218838;
+}
+
 .empty-state {
   text-align: center;
   padding: 40px 20px;
