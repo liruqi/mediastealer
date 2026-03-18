@@ -132,14 +132,22 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Detect if we are in a popout window
+  chrome.windows.getCurrent((win) => {
+    if (win.type === 'popup') {
+      document.body.classList.add('is-popout');
+      document.getElementById('popout-btn').style.display = 'none';
+    }
+  });
+
   document.getElementById('popout-btn').addEventListener('click', () => {
-    document.windows_create_pending = true;
     chrome.windows.create({
       url: chrome.runtime.getURL("popup.html"),
       type: "popup",
-      width: 520,
+      width: 600,
+      height: 600
     }, () => {
-      window.close(); // Close the current flyout after the new one opens
+      window.close();
     });
   });
 });
