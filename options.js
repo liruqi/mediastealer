@@ -2,10 +2,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const enabledInput = document.getElementById('enabled');
   const autoDownloadInput = document.getElementById('automaticdownload');
   const noSmallFilesInput = document.getElementById('nosmallfiles');
-  const noZeroFilesInput = document.getElementById('nozerofiles');
+   const noZeroFilesInput = document.getElementById('nozerofiles');
+  const deduplicateInput = document.getElementById('deduplicate');
   const rulesTableBody = document.querySelector('#rules-table tbody');
-  const saveBtn = document.getElementById('save-settings');
-  const saveMsg = document.getElementById('save-msg');
   const addRuleBtn = document.getElementById('add-rule-btn');
 
   let currentConfig = {};
@@ -24,13 +23,15 @@ document.addEventListener('DOMContentLoaded', () => {
         rules: defaultRules,
         automaticdownload: false,
         nosmallfiles: true,
-        nozerofiles: true
+        nozerofiles: true,
+        deduplicate: true
       };
       
       enabledInput.checked = currentConfig.enabled;
       autoDownloadInput.checked = currentConfig.automaticdownload;
       noSmallFilesInput.checked = currentConfig.nosmallfiles;
       noZeroFilesInput.checked = currentConfig.nozerofiles;
+      deduplicateInput.checked = currentConfig.deduplicate;
       
       renderRules(currentConfig.rules);
     });
@@ -118,18 +119,15 @@ document.addEventListener('DOMContentLoaded', () => {
     chrome.storage.local.set({ config: currentConfig });
   }
 
-  // Save main settings
-  saveBtn.addEventListener('click', () => {
-    currentConfig.enabled = enabledInput.checked;
-    currentConfig.automaticdownload = autoDownloadInput.checked;
-    currentConfig.nosmallfiles = noSmallFilesInput.checked;
-    currentConfig.nozerofiles = noZeroFilesInput.checked;
-    
-    chrome.storage.local.set({ config: currentConfig }, () => {
-      saveMsg.style.opacity = 1;
-      setTimeout(() => {
-        saveMsg.style.opacity = 0;
-      }, 2000);
+  // Save main settings automatically on change
+  [enabledInput, autoDownloadInput, noSmallFilesInput, noZeroFilesInput, deduplicateInput].forEach(el => {
+    el.addEventListener('change', () => {
+      currentConfig.enabled = enabledInput.checked;
+      currentConfig.automaticdownload = autoDownloadInput.checked;
+      currentConfig.nosmallfiles = noSmallFilesInput.checked;
+      currentConfig.nozerofiles = noZeroFilesInput.checked;
+      currentConfig.deduplicate = deduplicateInput.checked;
+      saveConfigSilently();
     });
   });
 

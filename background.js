@@ -9,7 +9,8 @@ let config = {
   rules: defaultRules,
   automaticdownload: false,
   nosmallfiles: true,
-  nozerofiles: true
+  nozerofiles: true,
+  deduplicate: true
 };
 
 chrome.storage.local.get(["config"], (result) => {
@@ -30,6 +31,9 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
 
 let capturedMedia = [];
 let capturedLogs = [];
+let downloadHistory = {}; // { url: timestamp }
+
+// ... other code ...
 
 function addLog(message) {
   const logStr = `[${new Date().toLocaleTimeString()}] ${message}`;
@@ -41,10 +45,11 @@ function addLog(message) {
   chrome.runtime.sendMessage({ type: "NEW_LOG", output: logStr }).catch(() => { });
 }
 
-// Initialize captured media from storage on service worker start
-chrome.storage.local.get(["capturedMedia", "capturedLogs"], (result) => {
+// Initialize captured media and history from storage on service worker start
+chrome.storage.local.get(["capturedMedia", "capturedLogs", "downloadHistory"], (result) => {
   if (result.capturedMedia) capturedMedia = result.capturedMedia;
   if (result.capturedLogs) capturedLogs = result.capturedLogs;
+  if (result.downloadHistory) downloadHistory = result.downloadHistory;
 });
 
 chrome.webRequest.onHeadersReceived.addListener(
@@ -148,16 +153,32 @@ chrome.webRequest.onHeadersReceived.addListener(
 
 
         if (config.automaticdownload) {
-          addLog(`Auto-downloading: ${mediaItem.filename}`);
+          addLog(`Auto-download triggered: ${mediaItem.filename}`);
 
-          let safeFilename = mediaItem.filename.replace(/[^a-zA-Z0-9.\-_]/g, '_');
-          if (!safeFilename || safeFilename === "_") safeFilename = "downloaded_media";
+          // Deduplication check
+          const now = Date.now();
+          const lastDownload = downloadHistory[mediaItem.url];
+          const ONE_DAY = 24 * 60 * 60 * 1000;
 
-          chrome.downloads.download({
-            url: mediaItem.url,
-            filename: safeFilename,
-            saveAs: false
-          }).catch(err => addLog(`Download failed: ${err.message || err}`));
+          if (config.deduplicate && lastDownload && (now - lastDownload < ONE_DAY)) {
+            addLog(`Skipping download: Already downloaded in the last 24 hours.`);
+          } else {
+            let safeFilename = mediaItem.filename.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+            if (!safeFilename || safeFilename === "_") safeFilename = "downloaded_media";
+
+            chrome.downloads.download({
+              url: mediaItem.url,
+              filename: safeFilename,
+              saveAs: false
+            }).then(() => {
+              downloadHistory[mediaItem.url] = now;
+              // Clean up history (remove entries older than 24h)
+              for (const [url, time] of Object.entries(downloadHistory)) {
+                if (now - time > ONE_DAY) delete downloadHistory[url];
+              }
+              chrome.storage.local.set({ downloadHistory });
+            }).catch(err => addLog(`Download failed: ${err.message || err}`));
+          }
         }
       } else {
         addLog(`Ignored duplicate: ${details.url}`);
