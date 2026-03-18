@@ -23,6 +23,7 @@
     "default_icon": {
       "16": "icons/fluxon16.png",
       "24": "icons/fluxon24.png",
+      "32": "icons/fluxon32.png",
       "48": "icons/fluxon48.png",
       "128": "icons/fluxon128.png"
     }
@@ -30,6 +31,7 @@
   "icons": {
     "16": "icons/fluxon16.png",
     "24": "icons/fluxon24.png",
+    "32": "icons/fluxon32.png",
     "48": "icons/fluxon48.png",
     "128": "icons/fluxon128.png"
   },
