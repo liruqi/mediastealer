@@ -8,7 +8,8 @@
     "webRequest",
     "downloads",
     "storage",
-    "notifications"
+    "notifications",
+    "alarms"
   ],
   "host_permissions": [
     "<all_urls>"

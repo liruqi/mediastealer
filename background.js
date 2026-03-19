@@ -11,6 +11,7 @@ let config = {
   nosmallfiles: true,
   nozerofiles: true,
   deduplicate: true,
+  autoClean: true,
   minSize: 800,
   maxSize: 0
 };
@@ -54,6 +55,57 @@ chrome.storage.local.get(["capturedMedia", "capturedLogs", "downloadHistory"], (
   if (result.capturedMedia) capturedMedia = result.capturedMedia;
   if (result.capturedLogs) capturedLogs = result.capturedLogs;
   if (result.downloadHistory) downloadHistory = result.downloadHistory;
+  
+  // Perform initial cleanup on startup
+  setTimeout(performCleanup, 5000);
+});
+
+function performCleanup() {
+  const now = Date.now();
+  const ONE_DAY = 24 * 60 * 60 * 1000;
+  let changed = false;
+
+  // 1. Clean downloadHistory (Deduplication)
+  for (const [url, time] of Object.entries(downloadHistory)) {
+    if (now - time > ONE_DAY) {
+      delete downloadHistory[url];
+      changed = true;
+    }
+  }
+
+  // 2. Clean capturedMedia (Popup List) and files
+  if (config.autoClean !== false) {
+    const originalCount = capturedMedia.length;
+    
+    // We process items to be removed
+    const itemsToRemove = capturedMedia.filter(item => (now - item.timestamp) > ONE_DAY);
+    
+    if (itemsToRemove.length > 0) {
+      itemsToRemove.forEach(item => {
+        if (item.downloadId) {
+          // Attempt to delete physical file and record from browser history
+          chrome.downloads.removeFile(item.downloadId).catch(() => {});
+          chrome.downloads.erase({ id: item.downloadId }).catch(() => {});
+        }
+      });
+      
+      capturedMedia = capturedMedia.filter(item => (now - item.timestamp) <= ONE_DAY);
+      changed = true;
+    }
+  }
+
+  if (changed) {
+    chrome.storage.local.set({ downloadHistory, capturedMedia });
+    addLog(`Auto-clean performed: Removed records older than 24h.`);
+  }
+}
+
+// Setup periodic cleanup alarm
+chrome.alarms.create("cleanupAlarm", { periodInMinutes: 60 });
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === "cleanupAlarm") {
+    performCleanup();
+  }
 });
 
 chrome.webRequest.onHeadersReceived.addListener(
@@ -183,11 +235,8 @@ chrome.webRequest.onHeadersReceived.addListener(
               downloadHistory[mediaItem.url] = now;
               mediaItem.downloadId = downloadId;
 
-              // Clean up history (remove entries older than 24h)
-              for (const [url, time] of Object.entries(downloadHistory)) {
-                if (now - time > ONE_DAY) delete downloadHistory[url];
-              }
-              chrome.storage.local.set({ downloadHistory, capturedMedia });
+              // Trigger cleanup check
+              performCleanup();
             }).catch(err => addLog(chrome.i18n.getMessage("log_failed", [err.message || err])));
           }
         }

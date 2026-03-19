@@ -30,6 +30,8 @@
   "opt_ignore_zero": { "message": "忽略 0 字节文件" },
   "opt_deduplicate": { "message": "下载去重" },
   "opt_deduplicate_desc": { "message": "24小时内不对同一个文件重复触发下载。" },
+  "opt_auto_clean": { "message": "自动清理 24 小时后的记录及文件" },
+  "opt_auto_clean_desc": { "message": "24 小时后自动删除已捕获的记录及其下载的本地文件。" },
   "card_rules": { "message": "媒体捕获规则 (Regex)" },
   "opt_rules_desc": { "message": "配置需要拦截的 URL 和 Content-Type。支持正则表达式。" },
   "th_rule_enabled": { "message": "启用" },

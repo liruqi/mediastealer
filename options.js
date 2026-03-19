@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const noSmallFilesInput = document.getElementById('nosmallfiles');
   const noZeroFilesInput = document.getElementById('nozerofiles');
   const deduplicateInput = document.getElementById('deduplicate');
+  const autoCleanInput = document.getElementById('autoClean');
   const minSizeInput = document.getElementById('minSize');
   const maxSizeInput = document.getElementById('maxSize');
   const sizeRangeConfig = document.getElementById('size-range-config');
@@ -28,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
         nosmallfiles: true,
         nozerofiles: true,
         deduplicate: true,
+        autoClean: true,
         minSize: 800,
         maxSize: 0
       };
@@ -37,6 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
       noSmallFilesInput.checked = currentConfig.nosmallfiles;
       noZeroFilesInput.checked = currentConfig.nozerofiles;
       deduplicateInput.checked = currentConfig.deduplicate;
+      autoCleanInput.checked = currentConfig.autoClean !== false;
       minSizeInput.value = currentConfig.minSize || 800;
       maxSizeInput.value = currentConfig.maxSize || 0;
 
@@ -134,16 +137,18 @@ document.addEventListener('DOMContentLoaded', () => {
   noSmallFilesInput.addEventListener('change', toggleSizeRangeVisibility);
 
   // Save main settings automatically on change
-  [enabledInput, autoDownloadInput, noSmallFilesInput, noZeroFilesInput, deduplicateInput, minSizeInput, maxSizeInput].forEach(el => {
+  [enabledInput, autoDownloadInput, noSmallFilesInput, noZeroFilesInput, deduplicateInput, autoCleanInput, minSizeInput, maxSizeInput].forEach(el => {
     el.addEventListener('change', () => {
       currentConfig.enabled = enabledInput.checked;
       currentConfig.automaticdownload = autoDownloadInput.checked;
       currentConfig.nosmallfiles = noSmallFilesInput.checked;
       currentConfig.nozerofiles = noZeroFilesInput.checked;
       currentConfig.deduplicate = deduplicateInput.checked;
+      currentConfig.autoClean = autoCleanInput.checked;
       currentConfig.minSize = parseInt(minSizeInput.value, 10) || 0;
       currentConfig.maxSize = parseInt(maxSizeInput.value, 10) || 0;
       saveConfigSilently();
+      if (el === noSmallFilesInput) toggleSizeRangeVisibility();
     });
   });
 
