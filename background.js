@@ -168,10 +168,16 @@ chrome.webRequest.onHeadersReceived.addListener(
         let originalName = details.url.split('?')[0].split('/').pop() || "media_file";
         let baseName = originalName;
 
-        // Generate timestamp
+        // Generate date string for folder
         const d = new Date();
-        const pfx = d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0') + "_" +
-          String(d.getHours()).padStart(2, '0') + String(d.getMinutes()).padStart(2, '0') + String(d.getSeconds()).padStart(2, '0');
+        const dateStr = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0');
+        
+        // Extract domain
+        let domain = "unknown";
+        try {
+          const originUrl = details.initiator || details.documentUrl || details.url;
+          domain = new URL(originUrl).hostname;
+        } catch (e) {}
 
         // Find existing extension or generate one
         let ext = "";
@@ -191,12 +197,14 @@ chrome.webRequest.onHeadersReceived.addListener(
           else if (contentType.split('/')[1]) ext = "." + contentType.split('/')[1].split(';')[0];
         }
 
-        finalFilename = `${pfx}_${baseName}${ext}`;
+        finalFilename = `${baseName}${ext}`;
 
         let mediaItem = {
           id: Date.now() + "_" + Math.floor(Math.random() * 1000),
           url: details.url,
           filename: finalFilename,
+          domain: domain,
+          dateFolder: `FLX${dateStr}`,
           type: contentType,
           size: contentLength,
           timestamp: Date.now(),
@@ -227,9 +235,12 @@ chrome.webRequest.onHeadersReceived.addListener(
             let safeFilename = mediaItem.filename.replace(/[^a-zA-Z0-9.\-_]/g, '_');
             if (!safeFilename || safeFilename === "_") safeFilename = "downloaded_media";
 
+            // Use the new path structure: FLX{YYYY-MM-DD}/{domain}/{filename}
+            const downloadPath = `${mediaItem.dateFolder}/${mediaItem.domain}/${safeFilename}`;
+
             chrome.downloads.download({
               url: mediaItem.url,
-              filename: safeFilename,
+              filename: downloadPath,
               saveAs: false
             }).then((downloadId) => {
               downloadHistory[mediaItem.url] = now;

@@ -62,37 +62,42 @@ document.addEventListener('DOMContentLoaded', () => {
       // Add click listeners to action buttons
       document.querySelectorAll('.action-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
-          const action = e.target.textContent;
           const id = e.target.getAttribute('data-id');
           const url = e.target.getAttribute('data-url');
           const filename = e.target.getAttribute('data-filename');
 
-          if (e.target.classList.contains('download-btn') || e.target.textContent === chrome.i18n.getMessage('btn_download') || e.target.textContent === 'Download') {
-            chrome.downloads.download({
-              url: url,
-              filename: filename,
-              saveAs: false
-            }).then(downloadId => {
-              // Store downloadId in capturedMedia
-              chrome.storage.local.get(['capturedMedia'], (result) => {
-                const media = result.capturedMedia || [];
-                const item = media.find(m => m.id === id);
-                if (item) {
-                  item.downloadId = downloadId;
-                  chrome.storage.local.set({ capturedMedia: media });
-                  checkDownloadStatus(downloadId, id);
-                }
-              });
-            });
-          } else if (e.target.classList.contains('open-btn') || e.target.textContent === chrome.i18n.getMessage('btn_open') || e.target.textContent === 'Open') {
-            // Get downloadId from storage again to be sure (or from some mapping)
-            chrome.storage.local.get(['capturedMedia'], (result) => {
-              const item = (result.capturedMedia || []).find(m => m.id === id);
-              if (item && item.downloadId) {
-                chrome.downloads.show(item.downloadId);
+          chrome.storage.local.get(['capturedMedia'], (result) => {
+            const media = result.capturedMedia || [];
+            const item = media.find(m => m.id === id);
+            if (!item) return;
+
+            const isDownload = e.target.classList.contains('download-btn') || 
+                             e.target.textContent === chrome.i18n.getMessage('btn_download') || 
+                             e.target.textContent === 'Download';
+            
+            const isOpen = e.target.classList.contains('open-btn') || 
+                          e.target.textContent === chrome.i18n.getMessage('btn_open') || 
+                          e.target.textContent === 'Open';
+
+            if (isDownload) {
+              let downloadPath = filename;
+              if (item.dateFolder && item.domain) {
+                downloadPath = `${item.dateFolder}/${item.domain}/${filename}`;
               }
-            });
-          }
+
+              chrome.downloads.download({
+                url: url,
+                filename: downloadPath,
+                saveAs: false
+              }).then(downloadId => {
+                item.downloadId = downloadId;
+                chrome.storage.local.set({ capturedMedia: media });
+                checkDownloadStatus(downloadId, id);
+              });
+            } else if (isOpen && item.downloadId) {
+              chrome.downloads.show(item.downloadId);
+            }
+          });
         });
       });
     } else {
@@ -142,9 +147,13 @@ document.addEventListener('DOMContentLoaded', () => {
     chrome.storage.local.get(['capturedMedia'], (result) => {
       const items = result.capturedMedia || [];
       items.forEach(item => {
+        let downloadPath = item.filename;
+        if (item.dateFolder && item.domain) {
+          downloadPath = `${item.dateFolder}/${item.domain}/${item.filename}`;
+        }
         chrome.downloads.download({
           url: item.url,
-          filename: item.filename,
+          filename: downloadPath,
           saveAs: false
         });
       });
