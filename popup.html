@@ -4,18 +4,19 @@
   <meta charset="utf-8">
   <title>Fluxon</title>
   <link rel="stylesheet" href="popup.css">
+  <script src="i18n-helper.js"></script>
 </head>
 <body>
   <div class="header">
     <div class="logo-title">
       <img src="icons/fluxon24.png" alt="Logo" class="logo">
-      <h1>Fluxon</h1>
+      <h1 data-i18n="appName">Fluxon</h1>
     </div>
     <div class="actions">
-      <button id="download-all-btn" title="Download all captured files" style="background-color: #0078d7; color: white;">Download All</button>
-      <button id="popout-btn" title="Open in dedicated window to keep open">Popout</button>
-      <button id="clear-btn" title="Clear All">Clear</button>
-      <button id="options-btn" title="Options">⚙️</button>
+      <button id="download-all-btn" data-i18n-title="tt_download_all" data-i18n="btn_download_all" style="background-color: #0078d7; color: white;">Download All</button>
+      <button id="popout-btn" data-i18n-title="tt_popout" data-i18n="btn_popout">Popout</button>
+      <button id="clear-btn" data-i18n-title="tt_clear_all" data-i18n="btn_clear_logs">Clear</button>
+      <button id="options-btn" data-i18n-title="tt_options">⚙️</button>
     </div>
   </div>
   
@@ -23,10 +24,10 @@
     <table id="media-list" class="hidden">
       <thead>
         <tr>
-          <th>File</th>
-          <th>Type</th>
-          <th>Size</th>
-          <th>Action</th>
+          <th data-i18n="th_filename">File</th>
+          <th data-i18n="th_type">Type</th>
+          <th data-i18n="th_size">Size</th>
+          <th data-i18n="th_action">Action</th>
         </tr>
       </thead>
       <tbody id="media-tbody">
@@ -34,12 +35,12 @@
       </tbody>
     </table>
     <div id="empty-state" class="empty-state">
-      <p>No media captured yet.</p>
+      <p data-i18n="no_media">No media captured yet.</p>
     </div>
   </div>
 
   <div class="logs-section">
-    <h4>Extension Logs <button id="clear-logs-btn" style="float: right; font-size: 10px; padding: 2px 4px;">Clear Logs</button></h4>
+    <h4 data-i18n="title_logs">Extension Logs <button id="clear-logs-btn" data-i18n="btn_clear_logs" style="float: right; font-size: 10px; padding: 2px 4px;">Clear Logs</button></h4>
     <div id="logs-container" class="logs-container">
       <!-- Logs populate here -->
     </div>

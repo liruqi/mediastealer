@@ -108,67 +108,68 @@
       transition: opacity 0.5s;
     }
   </style>
+  <script src="i18n-helper.js"></script>
 </head>
 <body>
   <div class="header">
     <img src="icons/fluxon48.png" alt="Fluxon" width="48">
-    <h1>Fluxon Options</h1>
+    <h1 data-i18n="options_title">Fluxon Options</h1>
   </div>
 
   <div class="card">
-    <h2>General Settings</h2>
+    <h2 data-i18n="card_general">General Settings</h2>
     
     <div class="setting-row">
       <input type="checkbox" id="enabled">
-      <label for="enabled"><strong>Enable Media Stealer</strong></label>
+      <label for="enabled"><strong data-i18n="opt_enable">Enable Media Stealer</strong></label>
     </div>
     
     <div class="setting-row">
       <input type="checkbox" id="automaticdownload">
-      <label for="automaticdownload"><strong>Automatic Download</strong></label>
+      <label for="automaticdownload"><strong data-i18n="opt_auto_download">Automatic Download</strong></label>
     </div>
-    <div class="setting-desc">Automatically download intercepted media files. Be careful, this may download lots of files!</div>
+    <div class="setting-desc" data-i18n="opt_auto_download_desc">Automatically download intercepted media files. Be careful, this may download lots of files!</div>
 
     <div class="setting-row">
       <input type="checkbox" id="nosmallfiles">
-      <label for="nosmallfiles"><strong>筛选文件 size 的范围 (KB)</strong></label>
+      <label for="nosmallfiles"><strong data-i18n="opt_filter_size">筛选文件 size 的范围 (KB)</strong></label>
     </div>
     <div id="size-range-config" style="margin-left: 26px; margin-bottom: 20px;">
       <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
-        <label for="minSize">最小值:</label>
+        <label for="minSize" data-i18n="lbl_min_size">最小值:</label>
         <input type="number" id="minSize" style="width: 80px; padding: 4px; border: 1px solid #ccc; border-radius: 4px;">
-        <label for="maxSize" style="margin-left: 10px;">最大值:</label>
+        <label for="maxSize" style="margin-left: 10px;" data-i18n="lbl_max_size">最大值:</label>
         <input type="number" id="maxSize" style="width: 80px; padding: 4px; border: 1px solid #ccc; border-radius: 4px;">
-        <span style="font-size: 11px; color: #888;">(0 表示不限制)</span>
+        <span style="font-size: 11px; color: #888;" data-i18n="size_no_limit">(0 表示不限制)</span>
       </div>
-      <div class="setting-desc" style="margin: 0; line-height: 1.5; font-style: italic;">
+      <div class="setting-desc" style="margin: 0; line-height: 1.5; font-style: italic;" data-i18n="size_tips">
         推荐配置：下载视频建议 800KB 左右；下载图片建议 200KB 左右。
       </div>
     </div>
 
     <div class="setting-row">
       <input type="checkbox" id="nozerofiles">
-      <label for="nozerofiles"><strong>Ignore Zero Byte Files</strong></label>
+      <label for="nozerofiles"><strong data-i18n="opt_ignore_zero">Ignore Zero Byte Files</strong></label>
     </div>
     
     <div class="setting-row">
       <input type="checkbox" id="deduplicate">
-      <label for="deduplicate"><strong>Deduplicate Downloads</strong></label>
+      <label for="deduplicate"><strong data-i18n="opt_deduplicate">Deduplicate Downloads</strong></label>
     </div>
-    <div class="setting-desc">Do not download the same file more than once within 24 hours.</div>
+    <div class="setting-desc" data-i18n="opt_deduplicate_desc">Do not download the same file more than once within 24 hours.</div>
   </div>
 
   <div class="card">
-    <h2>Intercept Rules</h2>
-    <p class="setting-desc">Configure which URLs and Content-Types should be intercepted. Uses regular expressions.</p>
+    <h2 data-i18n="card_rules">Intercept Rules</h2>
+    <p class="setting-desc" data-i18n="opt_rules_desc">Configure which URLs and Content-Types should be intercepted. Uses regular expressions.</p>
     
     <table id="rules-table">
       <thead>
         <tr>
-          <th width="5%">Enabled</th>
-          <th width="40%">URL Regex</th>
-          <th width="35%">Content-Type Regex</th>
-          <th width="20%">Actions</th>
+          <th width="5%" data-i18n="th_rule_enabled">Enabled</th>
+          <th width="40%" data-i18n="th_url_pattern">URL Regex</th>
+          <th width="35%" data-i18n="th_content_type">Content-Type Regex</th>
+          <th width="20%" data-i18n="th_action">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -177,9 +178,9 @@
     </table>
 
     <div id="add-rule-form">
-      <input type="text" id="new-url" placeholder="URL Pattern (e.g. .*)">
-      <input type="text" id="new-ct" placeholder="Content-Type Pattern (e.g. video/.*)">
-      <button id="add-rule-btn">Add Rule</button>
+      <input type="text" id="new-url" data-i18n-placeholder="ph_url" placeholder="URL Pattern (e.g. .*)">
+      <input type="text" id="new-ct" data-i18n-placeholder="ph_ct" placeholder="Content-Type Pattern (e.g. video/.*)">
+      <button id="add-rule-btn" data-i18n="btn_add_rule">Add Rule</button>
     </div>
   </div>
 

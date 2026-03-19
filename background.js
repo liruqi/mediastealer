@@ -18,8 +18,10 @@ let config = {
 chrome.storage.local.get(["config"], (result) => {
   if (result.config) {
     config = { ...config, ...result.config };
+    addLog(config.enabled ? chrome.i18n.getMessage("log_enabled") : chrome.i18n.getMessage("log_disabled"));
   } else {
     chrome.storage.local.set({ config });
+    addLog(chrome.i18n.getMessage("log_enabled"));
   }
 });
 
@@ -155,6 +157,7 @@ chrome.webRequest.onHeadersReceived.addListener(
           capturedMedia.pop();
         }
 
+        addLog(chrome.i18n.getMessage("log_intercepted", [mediaItem.filename]));
         chrome.storage.local.set({ capturedMedia });
 
 
@@ -167,7 +170,7 @@ chrome.webRequest.onHeadersReceived.addListener(
           const ONE_DAY = 24 * 60 * 60 * 1000;
 
           if (config.deduplicate && lastDownload && (now - lastDownload < ONE_DAY)) {
-            addLog(`Skipping download: Already downloaded in the last 24 hours.`);
+            addLog(chrome.i18n.getMessage("log_skipping"));
           } else {
             let safeFilename = mediaItem.filename.replace(/[^a-zA-Z0-9.\-_]/g, '_');
             if (!safeFilename || safeFilename === "_") safeFilename = "downloaded_media";
@@ -185,11 +188,11 @@ chrome.webRequest.onHeadersReceived.addListener(
                 if (now - time > ONE_DAY) delete downloadHistory[url];
               }
               chrome.storage.local.set({ downloadHistory, capturedMedia });
-            }).catch(err => addLog(`Download failed: ${err.message || err}`));
+            }).catch(err => addLog(chrome.i18n.getMessage("log_failed", [err.message || err])));
           }
         }
       } else {
-        addLog(`Ignored duplicate: ${details.url}`);
+        addLog(chrome.i18n.getMessage("log_ignored_duplicate", [details.url]));
       }
     }
   },

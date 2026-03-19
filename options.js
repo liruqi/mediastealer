@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <input type="text" value="${rule.ct}" style="width: 100%; box-sizing: border-box;" class="rule-ct" data-index="${index}">
         </td>
         <td>
-          <button class="delete-rule danger" data-index="${index}">Delete</button>
+          <button class="delete-rule danger" data-index="${index}" data-i18n="btn_delete">${chrome.i18n.getMessage('btn_delete')}</button>
         </td>
       `;
       rulesTableBody.appendChild(tr);

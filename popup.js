@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <td class="type">${item.type.split(';')[0]}</td>
           <td>${formatBytes(item.size)}</td>
           <td>
-            <button class="action-btn" id="btn-${item.id}" data-id="${item.id}" data-url="${item.url}" data-filename="${item.filename}">Download</button>
+            <button class="action-btn" id="btn-${item.id}" data-id="${item.id}" data-url="${item.url}" data-filename="${item.filename}" data-i18n="btn_download">${chrome.i18n.getMessage('btn_download')}</button>
           </td>
         `;
         
@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
           const url = e.target.getAttribute('data-url');
           const filename = e.target.getAttribute('data-filename');
 
-          if (action === 'Download') {
+          if (e.target.classList.contains('download-btn') || e.target.textContent === chrome.i18n.getMessage('btn_download') || e.target.textContent === 'Download') {
             chrome.downloads.download({
               url: url,
               filename: filename,
@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
               });
             });
-          } else if (action === 'Open') {
+          } else if (e.target.classList.contains('open-btn') || e.target.textContent === chrome.i18n.getMessage('btn_open') || e.target.textContent === 'Open') {
             // Get downloadId from storage again to be sure (or from some mapping)
             chrome.storage.local.get(['capturedMedia'], (result) => {
               const item = (result.capturedMedia || []).find(m => m.id === id);
@@ -186,7 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const download = results[0];
         const btn = document.getElementById(`btn-${itemId}`);
         if (btn && download.state === 'complete' && download.exists) {
-          btn.textContent = 'Open';
+          btn.textContent = chrome.i18n.getMessage('btn_open');
           btn.classList.add('open-btn');
         }
       }
