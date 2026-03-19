@@ -2,8 +2,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const enabledInput = document.getElementById('enabled');
   const autoDownloadInput = document.getElementById('automaticdownload');
   const noSmallFilesInput = document.getElementById('nosmallfiles');
-   const noZeroFilesInput = document.getElementById('nozerofiles');
+  const noZeroFilesInput = document.getElementById('nozerofiles');
   const deduplicateInput = document.getElementById('deduplicate');
+  const minSizeInput = document.getElementById('minSize');
+  const maxSizeInput = document.getElementById('maxSize');
+  const sizeRangeConfig = document.getElementById('size-range-config');
   const rulesTableBody = document.querySelector('#rules-table tbody');
   const addRuleBtn = document.getElementById('add-rule-btn');
 
@@ -24,15 +27,20 @@ document.addEventListener('DOMContentLoaded', () => {
         automaticdownload: false,
         nosmallfiles: true,
         nozerofiles: true,
-        deduplicate: true
+        deduplicate: true,
+        minSize: 800,
+        maxSize: 0
       };
-      
+
       enabledInput.checked = currentConfig.enabled;
       autoDownloadInput.checked = currentConfig.automaticdownload;
       noSmallFilesInput.checked = currentConfig.nosmallfiles;
       noZeroFilesInput.checked = currentConfig.nozerofiles;
       deduplicateInput.checked = currentConfig.deduplicate;
-      
+      minSizeInput.value = currentConfig.minSize || 800;
+      maxSizeInput.value = currentConfig.maxSize || 0;
+
+      toggleSizeRangeVisibility();
       renderRules(currentConfig.rules);
     });
   }
@@ -42,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
     rulesTableBody.innerHTML = '';
     rules.forEach((rule, index) => {
       const tr = document.createElement('tr');
-      
+
       tr.innerHTML = `
         <td style="text-align: center;">
           <input type="checkbox" class="rule-enable" data-index="${index}" ${rule.enabled ? 'checked' : ''}>
@@ -68,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
         saveConfigSilently();
       });
     });
-    
+
     document.querySelectorAll('.rule-url').forEach(el => {
       el.addEventListener('change', (e) => {
         const idx = e.target.getAttribute('data-index');
@@ -99,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
   addRuleBtn.addEventListener('click', () => {
     const url = document.getElementById('new-url').value || '.*';
     const ct = document.getElementById('new-ct').value || '.*';
-    
+
     currentConfig.rules.push({
       id: Date.now(),
       enabled: true,
@@ -107,10 +115,10 @@ document.addEventListener('DOMContentLoaded', () => {
       ct: ct,
       rtype: 0
     });
-    
+
     renderRules(currentConfig.rules);
     saveConfigSilently();
-    
+
     document.getElementById('new-url').value = '';
     document.getElementById('new-ct').value = '';
   });
@@ -119,14 +127,22 @@ document.addEventListener('DOMContentLoaded', () => {
     chrome.storage.local.set({ config: currentConfig });
   }
 
+  function toggleSizeRangeVisibility() {
+    sizeRangeConfig.style.display = noSmallFilesInput.checked ? 'block' : 'none';
+  }
+
+  noSmallFilesInput.addEventListener('change', toggleSizeRangeVisibility);
+
   // Save main settings automatically on change
-  [enabledInput, autoDownloadInput, noSmallFilesInput, noZeroFilesInput, deduplicateInput].forEach(el => {
+  [enabledInput, autoDownloadInput, noSmallFilesInput, noZeroFilesInput, deduplicateInput, minSizeInput, maxSizeInput].forEach(el => {
     el.addEventListener('change', () => {
       currentConfig.enabled = enabledInput.checked;
       currentConfig.automaticdownload = autoDownloadInput.checked;
       currentConfig.nosmallfiles = noSmallFilesInput.checked;
       currentConfig.nozerofiles = noZeroFilesInput.checked;
       currentConfig.deduplicate = deduplicateInput.checked;
+      currentConfig.minSize = parseInt(minSizeInput.value, 10) || 0;
+      currentConfig.maxSize = parseInt(maxSizeInput.value, 10) || 0;
       saveConfigSilently();
     });
   });

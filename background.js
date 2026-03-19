@@ -10,7 +10,9 @@ let config = {
   automaticdownload: false,
   nosmallfiles: true,
   nozerofiles: true,
-  deduplicate: true
+  deduplicate: true,
+  minSize: 800,
+  maxSize: 0
 };
 
 chrome.storage.local.get(["config"], (result) => {
@@ -79,7 +81,11 @@ chrome.webRequest.onHeadersReceived.addListener(
     // addLog(`Content-Type: ${contentType}, Content-Length: ${contentLength}`);
 
     if (config.nozerofiles && contentLength === 0) return;
-    if (config.nosmallfiles && contentLength > 0 && contentLength < 750000) return;
+    if (config.nosmallfiles && contentLength > 0) {
+      const sizeKB = contentLength / 1024;
+      if (sizeKB < config.minSize) return;
+      if (config.maxSize > 0 && sizeKB > config.maxSize) return;
+    }
 
     let matched = false;
     for (let rule of config.rules) {
@@ -173,7 +179,7 @@ chrome.webRequest.onHeadersReceived.addListener(
             }).then((downloadId) => {
               downloadHistory[mediaItem.url] = now;
               mediaItem.downloadId = downloadId;
-              
+
               // Clean up history (remove entries older than 24h)
               for (const [url, time] of Object.entries(downloadHistory)) {
                 if (now - time > ONE_DAY) delete downloadHistory[url];
