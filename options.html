@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="utf-8">
   <title>Fluxon Options</title>
@@ -13,29 +14,34 @@
       color: #333;
       background-color: #f9f9f9;
     }
+
     .card {
       background: white;
       border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
       padding: 20px;
       margin-bottom: 20px;
     }
+
     h2 {
       margin-top: 0;
       font-size: 18px;
       border-bottom: 1px solid #eee;
       padding-bottom: 10px;
     }
+
     .setting-row {
       display: flex;
       align-items: center;
       margin-bottom: 15px;
     }
+
     .setting-row input[type="checkbox"] {
       margin-right: 10px;
       width: 16px;
       height: 16px;
     }
+
     .setting-desc {
       color: #666;
       font-size: 13px;
@@ -43,6 +49,7 @@
       margin-top: -5px;
       margin-bottom: 15px;
     }
+
     button {
       background-color: #0078d7;
       color: white;
@@ -52,48 +59,60 @@
       font-size: 14px;
       cursor: pointer;
     }
+
     button:hover {
       background-color: #0063b1;
     }
+
     button:disabled {
       background-color: #ccc;
     }
+
     .danger {
       background-color: #d83b01;
     }
+
     .danger:hover {
       background-color: #a80000;
     }
+
     /* Rules Table */
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 10px;
     }
-    th, td {
+
+    th,
+    td {
       border: 1px solid #ddd;
       padding: 8px;
       text-align: left;
     }
+
     th {
       background-color: #f5f5f5;
     }
+
     .actions button {
       padding: 4px 8px;
       font-size: 12px;
       margin-right: 5px;
     }
+
     #add-rule-form {
       display: flex;
       gap: 10px;
       margin-top: 15px;
     }
+
     #add-rule-form input {
       flex: 1;
       padding: 6px;
       border: 1px solid #ccc;
       border-radius: 4px;
     }
+
     #save-msg {
       color: green;
       margin-left: 15px;
@@ -104,21 +123,23 @@
   </style>
   <script src="i18n-helper.js"></script>
 </head>
+
 <body>
 
   <div class="card">
     <h2 data-i18n="card_general">General Settings</h2>
-    
+
     <div class="setting-row">
       <input type="checkbox" id="enabled">
-      <label for="enabled"><strong data-i18n="opt_enable">Enable Media Stealer</strong></label>
+      <label for="enabled"><strong data-i18n="opt_enable">Enable Fluxon</strong></label>
     </div>
-    
+
     <div class="setting-row">
       <input type="checkbox" id="automaticdownload">
       <label for="automaticdownload"><strong data-i18n="opt_auto_download">Automatic Download</strong></label>
     </div>
-    <div class="setting-desc" data-i18n="opt_auto_download_desc">Automatically download intercepted media files. Be careful, this may download lots of files!</div>
+    <div class="setting-desc" data-i18n="opt_auto_download_desc">Automatically download intercepted media files. Be
+      careful, this may download lots of files!</div>
 
     <div class="setting-row">
       <input type="checkbox" id="nosmallfiles">
@@ -127,9 +148,11 @@
     <div id="size-range-config" style="margin-left: 26px; margin-bottom: 20px;">
       <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
         <label for="minSize" data-i18n="lbl_min_size">最小值:</label>
-        <input type="number" id="minSize" style="width: 80px; padding: 4px; border: 1px solid #ccc; border-radius: 4px;">
+        <input type="number" id="minSize"
+          style="width: 80px; padding: 4px; border: 1px solid #ccc; border-radius: 4px;">
         <label for="maxSize" style="margin-left: 10px;" data-i18n="lbl_max_size">最大值:</label>
-        <input type="number" id="maxSize" style="width: 80px; padding: 4px; border: 1px solid #ccc; border-radius: 4px;">
+        <input type="number" id="maxSize"
+          style="width: 80px; padding: 4px; border: 1px solid #ccc; border-radius: 4px;">
         <span style="font-size: 11px; color: #888;" data-i18n="size_no_limit">(0 表示不限制)</span>
       </div>
       <div class="setting-desc" style="margin: 0; line-height: 1.5; font-style: italic;" data-i18n="size_tips">
@@ -141,24 +164,27 @@
       <input type="checkbox" id="nozerofiles">
       <label for="nozerofiles"><strong data-i18n="opt_ignore_zero">Ignore Zero Byte Files</strong></label>
     </div>
-    
+
     <div class="setting-row">
       <input type="checkbox" id="deduplicate">
       <label for="deduplicate"><strong data-i18n="opt_deduplicate">Deduplicate Downloads</strong></label>
     </div>
-    <div class="setting-desc" data-i18n="opt_deduplicate_desc">Do not download the same file more than once within 24 hours.</div>
+    <div class="setting-desc" data-i18n="opt_deduplicate_desc">Do not download the same file more than once within 24
+      hours.</div>
 
     <div class="setting-row">
       <input type="checkbox" id="autoClean">
       <label for="autoClean"><strong data-i18n="opt_auto_clean">Auto-clean history and files (24h)</strong></label>
     </div>
-    <div class="setting-desc" data-i18n="opt_auto_clean_desc">Remove captured media records and their downloaded files after 24 hours.</div>
+    <div class="setting-desc" data-i18n="opt_auto_clean_desc">Remove captured media records and their downloaded files
+      after 24 hours.</div>
   </div>
 
   <div class="card">
     <h2 data-i18n="card_rules">Intercept Rules</h2>
-    <p class="setting-desc" data-i18n="opt_rules_desc">Configure which URLs and Content-Types should be intercepted. Uses regular expressions.</p>
-    
+    <p class="setting-desc" data-i18n="opt_rules_desc">Configure which URLs and Content-Types should be intercepted.
+      Uses regular expressions.</p>
+
     <table id="rules-table">
       <thead>
         <tr>
@@ -182,4 +208,5 @@
 
   <script src="options.js"></script>
 </body>
+
 </html>

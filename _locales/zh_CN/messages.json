@@ -1,52 +1,172 @@
 {
-  "appName": { "message": "流影" },
-  "appDesc": { "message": "轻松下载流媒体文件" },
-  "btn_download_all": { "message": "下载全部" },
-  "tt_download_all": { "message": "下载所有捕获的文件" },
-  "btn_popout": { "message": "独立窗口" },
-  "tt_popout": { "message": "在独立窗口中打开" },
-  "btn_clear_logs": { "message": "清除日志" },
-  "tt_clear_all": { "message": "清空列表" },
-  "tt_options": { "message": "选项设置" },
-  "title_captured_media": { "message": "已捕获媒体" },
-  "th_filename": { "message": "文件名" },
-  "th_type": { "message": "类型" },
-  "th_size": { "message": "大小" },
-  "th_action": { "message": "操作" },
-  "title_logs": { "message": "运行日志" },
-  "no_media": { "message": "尚未捕获到媒体文件。" },
-  "btn_download": { "message": "下载" },
-  "btn_open": { "message": "打开" },
-  "options_title": { "message": "流影选项设置" },
-  "card_general": { "message": "常规设置" },
-  "opt_enable": { "message": "启用媒体嗅探" },
-  "opt_auto_download": { "message": "自动下载" },
-  "opt_auto_download_desc": { "message": "自动下载所有拦截到的媒体文件。" },
-  "opt_filter_size": { "message": "筛选文件 size 的范围 (KB)" },
-  "lbl_min_size": { "message": "最小值:" },
-  "lbl_max_size": { "message": "最大值:" },
-  "size_no_limit": { "message": "(0 表示不限制)" },
-  "size_tips": { "message": "推荐配置：下载视频建议 800KB 左右；下载图片建议 200KB 左右。" },
-  "opt_ignore_zero": { "message": "忽略 0 字节文件" },
-  "opt_deduplicate": { "message": "下载去重" },
-  "opt_deduplicate_desc": { "message": "24小时内不对同一个文件重复触发下载。" },
-  "opt_auto_clean": { "message": "自动清理 24 小时后的记录及文件" },
-  "opt_auto_clean_desc": { "message": "24 小时后自动删除已捕获的记录及其下载的本地文件。" },
-  "card_rules": { "message": "媒体捕获规则 (Regex)" },
-  "opt_rules_desc": { "message": "配置需要拦截的 URL 和 Content-Type。支持正则表达式。" },
-  "th_rule_enabled": { "message": "启用" },
-  "th_url_pattern": { "message": "URL 正则" },
-  "th_content_type": { "message": "Content-Type 正则" },
-  "btn_delete": { "message": "删除" },
-  "title_add_rule": { "message": "添加新规则" },
-  "ph_url": { "message": "URL 正则 (例如 .*\\.mp4)" },
-  "ph_ct": { "message": "Content-Type 正则 (例如 video/.*)" },
-  "btn_add_rule": { "message": "添加规则" },
-  "log_enabled": { "message": "媒体助手已启用" },
-  "log_disabled": { "message": "媒体助手已禁用" },
-  "log_intercepted": { "message": "已拦截: $FILENAME$", "placeholders": { "FILENAME": { "content": "$1" } } },
-  "log_auto_download": { "message": "触发自动下载: $FILENAME$", "placeholders": { "FILENAME": { "content": "$1" } } },
-  "log_skipping": { "message": "跳过下载：24小时内已下载过此文件。" },
-  "log_failed": { "message": "下载失败: $ERROR$", "placeholders": { "ERROR": { "content": "$1" } } },
-  "log_ignored_duplicate": { "message": "忽略重复资源: $URL$", "placeholders": { "URL": { "content": "$1" } } }
+  "appName": {
+    "message": "流影"
+  },
+  "appDesc": {
+    "message": "轻松下载流媒体文件"
+  },
+  "btn_download_all": {
+    "message": "下载全部"
+  },
+  "tt_download_all": {
+    "message": "下载所有捕获的文件"
+  },
+  "btn_popout": {
+    "message": "独立窗口"
+  },
+  "tt_popout": {
+    "message": "在独立窗口中打开"
+  },
+  "btn_clear_logs": {
+    "message": "清除日志"
+  },
+  "tt_clear_all": {
+    "message": "清空列表"
+  },
+  "tt_options": {
+    "message": "选项设置"
+  },
+  "title_captured_media": {
+    "message": "已捕获媒体"
+  },
+  "th_filename": {
+    "message": "文件名"
+  },
+  "th_type": {
+    "message": "类型"
+  },
+  "th_size": {
+    "message": "大小"
+  },
+  "th_action": {
+    "message": "操作"
+  },
+  "title_logs": {
+    "message": "运行日志"
+  },
+  "no_media": {
+    "message": "尚未捕获到媒体文件。"
+  },
+  "btn_download": {
+    "message": "下载"
+  },
+  "btn_open": {
+    "message": "打开"
+  },
+  "options_title": {
+    "message": "流影选项设置"
+  },
+  "card_general": {
+    "message": "常规设置"
+  },
+  "opt_enable": {
+    "message": "启用流影"
+  },
+  "opt_auto_download": {
+    "message": "自动下载"
+  },
+  "opt_auto_download_desc": {
+    "message": "自动下载所有拦截到的媒体文件。"
+  },
+  "opt_filter_size": {
+    "message": "筛选文件 size 的范围 (KB)"
+  },
+  "lbl_min_size": {
+    "message": "最小值:"
+  },
+  "lbl_max_size": {
+    "message": "最大值:"
+  },
+  "size_no_limit": {
+    "message": "(0 表示不限制)"
+  },
+  "size_tips": {
+    "message": "推荐配置：下载视频建议 800KB 左右；下载图片建议 200KB 左右。"
+  },
+  "opt_ignore_zero": {
+    "message": "忽略 0 字节文件"
+  },
+  "opt_deduplicate": {
+    "message": "下载去重"
+  },
+  "opt_deduplicate_desc": {
+    "message": "24小时内不对同一个文件重复触发下载。"
+  },
+  "opt_auto_clean": {
+    "message": "自动清理 24 小时后的记录及文件"
+  },
+  "opt_auto_clean_desc": {
+    "message": "24 小时后自动删除已捕获的记录及其下载的本地文件。"
+  },
+  "card_rules": {
+    "message": "媒体捕获规则 (Regex)"
+  },
+  "opt_rules_desc": {
+    "message": "配置需要拦截的 URL 和 Content-Type。支持正则表达式。"
+  },
+  "th_rule_enabled": {
+    "message": "启用"
+  },
+  "th_url_pattern": {
+    "message": "URL 正则"
+  },
+  "th_content_type": {
+    "message": "Content-Type 正则"
+  },
+  "btn_delete": {
+    "message": "删除"
+  },
+  "title_add_rule": {
+    "message": "添加新规则"
+  },
+  "ph_url": {
+    "message": "URL 正则 (例如 .*\\.mp4)"
+  },
+  "ph_ct": {
+    "message": "Content-Type 正则 (例如 video/.*)"
+  },
+  "btn_add_rule": {
+    "message": "添加规则"
+  },
+  "log_enabled": {
+    "message": "流影已启用"
+  },
+  "log_disabled": {
+    "message": "流影已禁用"
+  },
+  "log_intercepted": {
+    "message": "已拦截: $FILENAME$",
+    "placeholders": {
+      "FILENAME": {
+        "content": "$1"
+      }
+    }
+  },
+  "log_auto_download": {
+    "message": "触发自动下载: $FILENAME$",
+    "placeholders": {
+      "FILENAME": {
+        "content": "$1"
+      }
+    }
+  },
+  "log_skipping": {
+    "message": "跳过下载：24小时内已下载过此文件。"
+  },
+  "log_failed": {
+    "message": "下载失败: $ERROR$",
+    "placeholders": {
+      "ERROR": {
+        "content": "$1"
+      }
+    }
+  },
+  "log_ignored_duplicate": {
+    "message": "忽略重复资源: $URL$",
+    "placeholders": {
+      "URL": {
+        "content": "$1"
+      }
+    }
+  }
 }
