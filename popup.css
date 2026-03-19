@@ -1,5 +1,5 @@
 body {
-  width: 500px;
+  width: 600px;
   height: 600px;
   display: flex;
   flex-direction: column;
@@ -86,7 +86,7 @@ th, td {
 th:nth-child(1), td:nth-child(1) { width: auto; }
 th:nth-child(2), td:nth-child(2) { width: 80px; }
 th:nth-child(3), td:nth-child(3) { width: 80px; }
-th:nth-child(4), td:nth-child(4) { width: 100px; }
+th:nth-child(4), td:nth-child(4) { width: 120px; }
 
 th {
   background-color: #f5f5f5;
@@ -102,7 +102,7 @@ tr:last-child td {
 }
 
 .filename {
-  max-width: 250px;
+  max-width: 300px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

@@ -17,7 +17,7 @@
   "no_media": { "message": "尚未捕获到媒体文件。" },
   "btn_download": { "message": "下载" },
   "btn_open": { "message": "打开" },
-  "options_title": { "message": "Fluxon 选项设置" },
+  "options_title": { "message": "流影选项设置" },
   "card_general": { "message": "常规设置" },
   "opt_enable": { "message": "启用媒体嗅探" },
   "opt_auto_download": { "message": "自动下载" },
