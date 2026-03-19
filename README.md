@@ -1,6 +1,6 @@
 # Fluxon
 
-Fluxon is a browser extension that helps you save any resources on a webpage easily. In most cases, it is used to download HTTP-based stream media especially online videos from youtube or other sites.
+Fluxon is a browser extension that helps you save any resources on a webpage easily. It can be used to download video and image. **Note: YouTube is not supported.**
 
 ## Installation
 
