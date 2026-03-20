@@ -20,6 +20,9 @@
   "btn_clear_logs": {
     "message": "Clear Logs"
   },
+  "btn_clear_downloads": {
+    "message": "Clear Records"
+  },
   "tt_clear_all": {
     "message": "Clear list"
   },
@@ -52,6 +55,9 @@
   },
   "btn_open": {
     "message": "Open"
+  },
+  "btn_downloading": {
+    "message": "Downloading"
   },
   "options_title": {
     "message": "Fluxon Options"

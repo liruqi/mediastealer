@@ -31,12 +31,20 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
     if (changes.config) {
       config = { ...config, ...changes.config.newValue };
     }
+    // Keep in-memory capturedMedia in sync with storage.
+    // Without this, background.js would overwrite statuses set by the popup
+    // (e.g. 'Complete') with stale in-memory values on the next capture event.
+    if (changes.capturedMedia && changes.capturedMedia.newValue) {
+      capturedMedia = changes.capturedMedia.newValue;
+      capturedUrls = new Set(capturedMedia.map(m => m.url));
+    }
   }
 });
 
 let capturedMedia = [];
 let capturedLogs = [];
 let downloadHistory = {}; // { url: timestamp }
+let capturedUrls = new Set(); // For faster deduplication lookups
 
 // ... other code ...
 
@@ -52,7 +60,10 @@ function addLog(message) {
 
 // Initialize captured media and history from storage on service worker start
 chrome.storage.local.get(["capturedMedia", "capturedLogs", "downloadHistory"], (result) => {
-  if (result.capturedMedia) capturedMedia = result.capturedMedia;
+  if (result.capturedMedia) {
+    capturedMedia = result.capturedMedia;
+    capturedUrls = new Set(capturedMedia.map(m => m.url));
+  }
   if (result.capturedLogs) capturedLogs = result.capturedLogs;
   if (result.downloadHistory) downloadHistory = result.downloadHistory;
   
@@ -90,6 +101,7 @@ function performCleanup() {
       });
       
       capturedMedia = capturedMedia.filter(item => (now - item.timestamp) <= ONE_DAY);
+      capturedUrls = new Set(capturedMedia.map(m => m.url));
       changed = true;
     }
   }
@@ -107,6 +119,7 @@ chrome.alarms.onAlarm.addListener((alarm) => {
     performCleanup();
   }
 });
+
 
 chrome.webRequest.onHeadersReceived.addListener(
   function (details) {
@@ -162,9 +175,8 @@ chrome.webRequest.onHeadersReceived.addListener(
 
     if (matched) {
       addLog(`Capturing Media: ${contentType} ${contentLength} bytes -> ${details.url}`);
-      // Check for duplicates
-      let isDuplicate = capturedMedia.some(m => m.url === details.url);
-      if (!isDuplicate) {
+      // Check for duplicates — now using a Set for performance
+      if (!capturedUrls.has(details.url)) {
         let originalName = details.url.split('?')[0].split('/').pop() || "media_file";
         let baseName = originalName;
 
@@ -211,14 +223,17 @@ chrome.webRequest.onHeadersReceived.addListener(
           status: config.automaticdownload ? "Downloading" : "Ready"
         };
 
-        capturedMedia.unshift(mediaItem);
-        // Keep max 100 items
-        if (capturedMedia.length > 100) {
-          capturedMedia.pop();
-        }
-
         addLog(chrome.i18n.getMessage("log_intercepted", [mediaItem.filename]));
-        chrome.storage.local.set({ capturedMedia });
+
+        // Always read from storage before writing to avoid overwriting concurrent
+        // changes (e.g. user clicking "Clear Records" while browsing).
+        chrome.storage.local.get(['capturedMedia'], (stored) => {
+          const freshMedia = stored.capturedMedia || [];
+          freshMedia.unshift(mediaItem);
+          if (freshMedia.length > 100) freshMedia.pop();
+          capturedMedia = freshMedia; // keep in-memory in sync
+          chrome.storage.local.set({ capturedMedia: freshMedia });
+        });
 
 
         if (config.automaticdownload) {
@@ -245,6 +260,16 @@ chrome.webRequest.onHeadersReceived.addListener(
             }).then((downloadId) => {
               downloadHistory[mediaItem.url] = now;
               mediaItem.downloadId = downloadId;
+              
+              // Persist the downloadId to storage so the popup can track it
+              chrome.storage.local.get(['capturedMedia'], (result) => {
+                const media = result.capturedMedia || [];
+                const item = media.find(m => m.id === mediaItem.id);
+                if (item) {
+                  item.downloadId = downloadId;
+                  chrome.storage.local.set({ capturedMedia: media });
+                }
+              });
 
               // Trigger cleanup check
               performCleanup();

@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="utf-8">
   <title>Fluxon</title>
   <link rel="stylesheet" href="popup.css">
   <script src="i18n-helper.js"></script>
 </head>
+
 <body>
   <div class="header">
     <div class="logo-title">
@@ -13,13 +15,14 @@
       <h1 data-i18n="appName">Fluxon</h1>
     </div>
     <div class="actions">
-      <button id="download-all-btn" data-i18n-title="tt_download_all" data-i18n="btn_download_all" style="background-color: #0078d7; color: white;">Download All</button>
-      <button id="popout-btn" data-i18n-title="tt_popout" data-i18n="btn_popout">Popout</button>
-      <button id="clear-btn" data-i18n-title="tt_clear_all" data-i18n="btn_clear_logs">Clear</button>
+      <button id="download-all-btn" data-i18n-title="tt_download_all" data-i18n="btn_download_all"
+        style="background-color: #0078d7; color: white;">Download All</button>
+      <button id="clear-btn" data-i18n-title="tt_clear_all" data-i18n="btn_clear_downloads">Clear</button>
       <button id="options-btn" data-i18n-title="tt_options">⚙️</button>
+      <button id="popout-btn" data-i18n-title="tt_popout" title="Popout">⧉</button>
     </div>
   </div>
-  
+
   <div class="list-container">
     <table id="media-list" class="hidden">
       <thead>
@@ -40,7 +43,11 @@
   </div>
 
   <div class="logs-section">
-    <h4 data-i18n="title_logs">Extension Logs <button id="clear-logs-btn" data-i18n="btn_clear_logs" style="float: right; font-size: 10px; padding: 2px 4px;">Clear Logs</button></h4>
+    <div class="logs-header">
+      <h4 data-i18n="title_logs">Extension Logs</h4>
+      <button id="clear-logs-btn" data-i18n="btn_clear_logs" style="font-size: 10px; padding: 2px 6px;">Clear
+        Logs</button>
+    </div>
     <div id="logs-container" class="logs-container">
       <!-- Logs populate here -->
     </div>
@@ -48,4 +55,5 @@
 
   <script src="popup.js"></script>
 </body>
+
 </html>
