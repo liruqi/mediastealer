@@ -103,11 +103,25 @@ const M3U8_PLUGIN = {
         // Pick best variant (highest bandwidth)
         variants.sort((a, b) => b.bandwidth - a.bandwidth);
         const bestVariant = variants[0];
-        console.log(`M3U8 Plugin: Master playlist detected. Picking variant: ${bestVariant.url} (${bestVariant.bandwidth} bps)`);
+        
+        const resolution = bestVariant.width ? `${bestVariant.width}x${bestVariant.height}` : 'unknown';
+        chrome.runtime.sendMessage({ 
+          type: 'MERGE_PROGRESS', 
+          data: { filename: item.filename, status: `Master Playlist: Selecting best variant: ${resolution} (${bestVariant.bandwidth} bps)` } 
+        });
         
         // Recursive call with same item but variant URL
         return this.triggerMerge({ ...item, url: bestVariant.url }, depth + 1);
       }
+
+      // Identify if this is likely an audio track
+      const isAudio = item.url.includes('/aud/') || item.url.includes('mp4a') || 
+                      (!m3u8Content.includes('RESOLUTION=') && !m3u8Content.includes('avc1'));
+      const streamLabel = isAudio ? 'Audio' : 'Video';
+      chrome.runtime.sendMessage({ 
+        type: 'MERGE_PROGRESS', 
+        data: { filename: item.filename, status: `Merging ${streamLabel} HLS stream...` } 
+      });
 
       // 2. Parse segments/keys (Media Playlist logic)
       const segments = [];
@@ -168,8 +182,8 @@ const M3U8_PLUGIN = {
         folderName = pathPart + folderName;
       }
       
-      const ext = isFMP4 ? 'mp4' : 'ts';
-      const finalFilename = `${folderName}/merged_video.${ext}`;
+      const ext = isFMP4 ? (isAudio ? 'm4a' : 'mp4') : 'ts';
+      const finalFilename = `${folderName}/merged_${isAudio ? 'audio' : 'video'}.${ext}`;
 
       chrome.runtime.sendMessage({
         target: 'offscreen',

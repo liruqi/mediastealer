@@ -159,10 +159,15 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         });
 
         // 3. Assemble and Download
-        const contentType = (filename && filename.endsWith('.mp4')) ? 'video/mp4' : 'video/mp2t';
+        let contentType = 'video/mp2t';
+        if (filename) {
+          if (filename.endsWith('.mp4')) contentType = 'video/mp4';
+          else if (filename.endsWith('.m4a')) contentType = 'audio/mp4';
+        }
+        
         chrome.runtime.sendMessage({
           type: 'MERGE_PROGRESS',
-          data: { filename, status: `DEBUG: Assembling final Blob...` }
+          data: { filename, status: `DEBUG: Assembling final Blob (type: ${contentType})...` }
         });
 
         const blob = new Blob(segmentBuffers, { type: contentType });
