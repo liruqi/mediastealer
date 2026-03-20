@@ -215,214 +215,145 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   } else if (message.type === 'MUX_MEDIA') {
     const { videoKey, audioKey, filename, itemId } = message.data;
-    console.log(`Offscreen: Starting MUX for ${filename}`);
+    console.log(`Offscreen: [MUX] Starting for ${filename} [mediabunny Input→Output]`);
 
     (async () => {
-      let videoSamplesAdded = 0;
-      let audioSamplesAdded = 0;
-      let videoExpected = 0;
-      let audioExpected = 0;
-      let isFinalized = false;
-
       try {
         const videoBlob = await MediaDB.getBlob(videoKey);
         const audioBlob = audioKey ? await MediaDB.getBlob(audioKey) : null;
-        if (!videoBlob) throw new Error("Video source blob not found");
+        if (!videoBlob) throw new Error('Video source blob not found');
 
         const videoArrayBuffer = await videoBlob.arrayBuffer();
         const audioArrayBuffer = audioBlob ? await audioBlob.arrayBuffer() : null;
 
-        const videoMp4 = MP4Box.createFile();
-        const audioMp4 = MP4Box.createFile();
-        
-        let muxer = null;
+        const {
+          Input, Mp4InputFormat, BufferSource,
+          Output, Mp4OutputFormat, BufferTarget,
+          EncodedVideoPacketSource, EncodedAudioPacketSource,
+          EncodedPacketSink
+        } = Mediabunny;
 
-        const checkFinished = async () => {
-          if (isFinalized) return;
-          const vDone = videoExpected === 0 || videoSamplesAdded >= videoExpected;
-          const aDone = audioExpected === 0 || audioSamplesAdded >= audioExpected;
+        // ── Open source files with mediabunny Input ────────────────────────
+        const videoInput = new Input({
+          formats: [new Mp4InputFormat()],
+          source: new BufferSource(videoArrayBuffer)
+        });
+        const audioInput = audioArrayBuffer ? new Input({
+          formats: [new Mp4InputFormat()],
+          source: new BufferSource(audioArrayBuffer)
+        }) : null;
 
-          if (vDone && aDone) {
-            isFinalized = true;
-            console.log(`Offscreen: [DEBUG] MUX Conditions met. V:${videoSamplesAdded}/${videoExpected}, A:${audioSamplesAdded}/${audioExpected}`);
-            chrome.runtime.sendMessage({ type: 'MERGE_PROGRESS', data: { filename, status: `[MUXING] Finalizing...` } });
-            
-            try {
-              console.log(`Offscreen: [DEBUG] Calling muxer.finalize()...`);
-              muxer.finalize();
-              const { buffer } = muxer.target;
-              
-              const finalBlob = new Blob([buffer], { type: 'video/mp4' });
-              const blobUrl = URL.createObjectURL(finalBlob);
-              const finalMB = (finalBlob.size / 1024 / 1024).toFixed(2);
-              console.log(`MUX Complete. Final size: ${finalBlob.size} bytes (${finalMB} MB).`);
+        const videoTracks = await videoInput.getVideoTracks();
+        if (!videoTracks.length) throw new Error('No video track found in source');
+        const vTrack = videoTracks[0];
 
-              if (itemId) {
-                chrome.runtime.sendMessage({ type: 'UPDATE_ITEM_STATUS', data: { itemId, status: 'Muxing...' } });
-              }
+        const audioTracks = audioInput ? await audioInput.getAudioTracks() : [];
+        const aTrack = audioTracks[0] ?? null;
 
-              chrome.runtime.sendMessage({
-                type: 'DOWNLOAD_INTERNAL',
-                data: { url: blobUrl, filename: filename, showFile: true }
-              }, (resp) => {
-                const err = resp?.error || (chrome.runtime.lastError ? chrome.runtime.lastError.message : null);
-                if (err) {
-                   chrome.runtime.sendMessage({ type: 'MERGE_PROGRESS', data: { filename, status: `[ERROR] MUX download failed: ${err}` } });
-                   if (itemId) chrome.runtime.sendMessage({ type: 'UPDATE_ITEM_STATUS', data: { itemId, status: 'Error' } });
-                } else {
-                   chrome.runtime.sendMessage({ type: 'MERGE_PROGRESS', data: { filename, status: `[COMPLETE] MUX file saved (${finalMB} MB)` } });
-                   if (itemId && resp?.downloadId) {
-                      chrome.runtime.sendMessage({ type: 'UPDATE_ITEM_STATUS', data: { itemId, status: 'Complete', downloadId: resp.downloadId } });
-                   }
-                }
-                setTimeout(() => {
-                  URL.revokeObjectURL(blobUrl);
-                  MediaDB.deleteBlob(videoKey);
-                  if (audioKey) MediaDB.deleteBlob(audioKey);
-                }, 15000);
-              });
-            } catch (finalizeErr) {
-              console.error(`Offscreen: [DEBUG] MUX Finalization error:`, finalizeErr);
-              chrome.runtime.sendMessage({ type: 'MERGE_PROGRESS', data: { filename, status: `[ERROR] MUX Finalization: ${finalizeErr.message}` } });
-            }
-          }
-        };
-
-        // Video Extraction
-        videoMp4.onReady = (info) => {
-          const vTrack = info.videoTracks[0];
-          if (!vTrack) { videoExpected = 0; checkFinished(); return; }
-          videoExpected = vTrack.nb_samples;
-          let avccData = null;
-          
-          if (!muxer) {
-            console.log(`Offscreen: [DEBUG] Initializing Muxer. vTrack:`, vTrack);
-            const vTrackBox = videoMp4.getTrackById(vTrack.id);
-            const entry = vTrackBox.mdia.minf.stbl.stsd.entries[0];
-            const box = entry.avcC || entry.hvcC || entry.vpcC;
-            
-            if (box && typeof box.write === 'function') {
-               try {
-                 const ds = new DataStream(undefined, 0, DataStream.BIG_ENDIAN);
-                 box.write(ds);
-                 avccData = new Uint8Array(ds.buffer, 8); // Skip 8-byte header (size + type)
-                 console.log(`Offscreen: [DEBUG] Serialized avcC, size: ${avccData.length}`);
-               } catch (e) {
-                 console.error(`Offscreen: [DEBUG] Failed to serialize avcC:`, e);
-               }
-            }
-
-            muxer = new Mp4Muxer.Muxer({
-              target: new Mp4Muxer.ArrayBufferTarget(),
-              video: {
-                codec: 'avc',
-                width: vTrack.video.width || 1920,
-                height: vTrack.video.height || 1080,
-                avcc: avccData,
-                colorSpace: { primaries: 'bt709', transfer: 'bt709', matrix: 'bt709', fullRange: false }
-              },
-              audio: audioArrayBuffer ? {
-                codec: 'aac',
-                sampleRate: (info.audioTracks && info.audioTracks[0]) ? info.audioTracks[0].audio.sample_rate : 44100,
-                numberOfChannels: (info.audioTracks && info.audioTracks[0]) ? info.audioTracks[0].audio.channel_count : 2
-              } : undefined,
-              fastStart: 'in-memory'
-            });
-
-            // SAFETY PATCH: Force colorSpace availability even if Muxer fails to set it
-            if (muxer.videoTrack && !muxer.videoTrack.info.decoderConfig) {
-               console.warn(`Offscreen: [DEBUG] Muxer failed to create decoderConfig. Patching...`);
-               muxer.videoTrack.info.decoderConfig = {
-                  colorSpace: { primaries: 'bt709', transfer: 'bt709', matrix: 'bt709', fullRange: false }
-               };
-            }
-            console.log(`Offscreen: [DEBUG] Muxer initialized:`, muxer);
-          }
-
-          videoMp4.setExtractionOptions(vTrack.id, null, { nbSamples: vTrack.nb_samples });
-          videoMp4.onSamples = (id, user, samples) => {
-            if (isFinalized) return;
-            for (let s of samples) { 
-              // MP4-Muxer expects CTS OFFSET, not Absolute CTS
-              const ctsOffset = (s.cts - s.dts) / vTrack.timescale * 1e6;
-              const chunkMeta = { cts: ctsOffset };
-              
-              if (videoSamplesAdded === 0) {
-                chunkMeta.decoderConfig = {
-                  codec: 'avc1.42E01E', // Default if serializing fails
-                  width: vTrack.video.width || 1920,
-                  height: vTrack.video.height || 1080,
-                  description: avccData,
-                  colorSpace: { primaries: 'bt709', transfer: 'bt709', matrix: 'bt709', fullRange: false }
-                };
-                console.log(`Offscreen: [DEBUG] First Video Chunk Meta:`, chunkMeta);
-              }
-
-              if (!isFinalized) {
-                muxer.addVideoChunkRaw(
-                  new Uint8Array(s.data),
-                  s.is_sync ? 'key' : 'delta',
-                  (s.dts / vTrack.timescale) * 1e6,
-                  (s.duration / vTrack.timescale) * 1e6,
-                  chunkMeta
-                );
-              }
-              videoSamplesAdded++; 
-            }
-            if (videoSamplesAdded % 100 === 0 || videoSamplesAdded === videoExpected) {
-              chrome.runtime.sendMessage({ type: 'MERGE_PROGRESS', data: { filename, status: `[MUXING] Video: ${videoSamplesAdded}/${videoExpected}` } });
-            }
-            checkFinished();
-          };
-          videoMp4.start();
-        };
-
-        // Audio Extraction
-        audioMp4.onReady = (info) => {
-          const aTrack = info.audioTracks[0];
-          if (!aTrack) { audioExpected = 0; checkFinished(); return; }
-          audioExpected = aTrack.nb_samples;
-          
-          audioMp4.setExtractionOptions(aTrack.id, null, { nbSamples: aTrack.nb_samples });
-          audioMp4.onSamples = (id, user, samples) => {
-            if (isFinalized) return;
-            for (let s of samples) { 
-              if (!isFinalized) {
-                muxer.addAudioChunkRaw(
-                  new Uint8Array(s.data),
-                  'key',
-                  (s.dts / aTrack.timescale) * 1e6,
-                  (s.duration / aTrack.timescale) * 1e6
-                );
-              }
-              audioSamplesAdded++; 
-            }
-            if (audioSamplesAdded % 100 === 0 || audioSamplesAdded === audioExpected) {
-              chrome.runtime.sendMessage({ type: 'MERGE_PROGRESS', data: { filename, status: `[MUXING] Audio: ${audioSamplesAdded}/${audioExpected}` } });
-            }
-            checkFinished();
-          };
-          audioMp4.start();
-        };
-
-        // Safety Timeout (60s)
-        setTimeout(() => {
-          if (!isFinalized) {
-            chrome.runtime.sendMessage({ type: 'MERGE_PROGRESS', data: { filename, status: `[ERROR] MUX Timed out. V:${videoSamplesAdded}/${videoExpected} A:${audioSamplesAdded}/${audioExpected}` } });
-            if (itemId) chrome.runtime.sendMessage({ type: 'UPDATE_ITEM_STATUS', data: { itemId, status: 'Error' } });
-          }
-        }, 60000);
-
-        videoArrayBuffer.fileStart = 0;
-        videoMp4.appendBuffer(videoArrayBuffer);
-        if (audioArrayBuffer) {
-          audioArrayBuffer.fileStart = 0;
-          audioMp4.appendBuffer(audioArrayBuffer);
+        const vDecoderConfig = await vTrack.getDecoderConfig();
+        console.log(`Offscreen: [MUX] Video codec: ${vTrack.codec} decoderConfig:`, vDecoderConfig);
+        if (aTrack) {
+          const aDecoderConfig = await aTrack.getDecoderConfig();
+          console.log(`Offscreen: [MUX] Audio codec: ${aTrack.codec} decoderConfig:`, aDecoderConfig);
         }
 
+        // ── Create mediabunny Output ───────────────────────────────────────
+        const mbVideoSource = new EncodedVideoPacketSource(vTrack.codec);
+        const mbAudioSource = aTrack ? new EncodedAudioPacketSource(aTrack.codec) : null;
+
+        const mbOutput = new Output({
+          format: new Mp4OutputFormat({ fastStart: 'in-memory' }),
+          target: new BufferTarget()
+        });
+        mbOutput.addVideoTrack(mbVideoSource);
+        if (mbAudioSource) mbOutput.addAudioTrack(mbAudioSource);
+        await mbOutput.start();
+        console.log('Offscreen: [MUX] Output started');
+
+        // ── Stream packets from input to output ────────────────────────────
+        // Run video and audio pipelines concurrently
+        const vSink = new EncodedPacketSink(vTrack);
+        const aSink = aTrack ? new EncodedPacketSink(aTrack) : null;
+
+        let videoCount = 0;
+        let audioCount = 0;
+
+        const pumpVideo = async () => {
+          let firstPacket = true;
+          for await (const packet of vSink.packets()) {
+            let meta;
+            if (firstPacket) {
+              meta = { decoderConfig: vDecoderConfig };
+              console.log(`Offscreen: [MUX] First video packet pts=${packet.timestamp.toFixed(4)}s type=${packet.type}`);
+              firstPacket = false;
+            }
+            await mbVideoSource.add(packet, meta);
+            videoCount++;
+            if (videoCount % 100 === 0) {
+              chrome.runtime.sendMessage({ type: 'MERGE_PROGRESS', data: { filename, status: `[MUXING] Video: ${videoCount} packets` } });
+            }
+          }
+          console.log(`Offscreen: [MUX] Video pump done. ${videoCount} packets`);
+        };
+
+        const pumpAudio = async () => {
+          if (!aSink || !mbAudioSource) return;
+          let firstPacket = true;
+          const aDecoderConfig = await aTrack.getDecoderConfig();
+          for await (const packet of aSink.packets()) {
+            let meta;
+            if (firstPacket) {
+              meta = { decoderConfig: aDecoderConfig };
+              console.log(`Offscreen: [MUX] First audio packet pts=${packet.timestamp.toFixed(4)}s`);
+              firstPacket = false;
+            }
+            await mbAudioSource.add(packet, meta);
+            audioCount++;
+            if (audioCount % 100 === 0) {
+              chrome.runtime.sendMessage({ type: 'MERGE_PROGRESS', data: { filename, status: `[MUXING] Audio: ${audioCount} packets` } });
+            }
+          }
+          console.log(`Offscreen: [MUX] Audio pump done. ${audioCount} packets`);
+        };
+
+        chrome.runtime.sendMessage({ type: 'MERGE_PROGRESS', data: { filename, status: '[MUXING] Pumping packets…' } });
+        await Promise.all([pumpVideo(), pumpAudio()]);
+
+        // ── Finalize ───────────────────────────────────────────────────────
+        console.log(`Offscreen: [MUX] Finalizing. V:${videoCount} A:${audioCount}`);
+        chrome.runtime.sendMessage({ type: 'MERGE_PROGRESS', data: { filename, status: '[MUXING] Finalizing…' } });
+        await mbOutput.finalize();
+
+        const buffer = mbOutput.target.buffer;
+        const finalBlob = new Blob([buffer], { type: 'video/mp4' });
+        const blobUrl = URL.createObjectURL(finalBlob);
+        const finalMB = (finalBlob.size / 1024 / 1024).toFixed(2);
+        console.log(`Offscreen: [MUX] Complete — ${finalMB} MB`);
+
+        if (itemId) chrome.runtime.sendMessage({ type: 'UPDATE_ITEM_STATUS', data: { itemId, status: 'Muxing…' } });
+
+        chrome.runtime.sendMessage({
+          type: 'DOWNLOAD_INTERNAL',
+          data: { url: blobUrl, filename, showFile: true }
+        }, (resp) => {
+          const err = resp?.error || chrome.runtime.lastError?.message;
+          if (err) {
+            chrome.runtime.sendMessage({ type: 'MERGE_PROGRESS', data: { filename, status: `[ERROR] MUX download failed: ${err}` } });
+            if (itemId) chrome.runtime.sendMessage({ type: 'UPDATE_ITEM_STATUS', data: { itemId, status: 'Error' } });
+          } else {
+            chrome.runtime.sendMessage({ type: 'MERGE_PROGRESS', data: { filename, status: `[COMPLETE] MUX saved (${finalMB} MB)` } });
+            if (itemId && resp?.downloadId) chrome.runtime.sendMessage({ type: 'UPDATE_ITEM_STATUS', data: { itemId, status: 'Complete', downloadId: resp.downloadId } });
+          }
+          setTimeout(() => {
+            URL.revokeObjectURL(blobUrl);
+            MediaDB.deleteBlob(videoKey);
+            if (audioKey) MediaDB.deleteBlob(audioKey);
+          }, 15000);
+        });
+
       } catch (e) {
-        console.error('Offscreen MUX critical error:', e);
-        chrome.runtime.sendMessage({ type: 'MERGE_PROGRESS', data: { filename, status: `[ERROR] MUX Exception: ${e.message}` } });
+        console.error('Offscreen: [MUX] Critical error:', e);
+        chrome.runtime.sendMessage({ type: 'MERGE_PROGRESS', data: { filename, status: `[ERROR] MUX: ${e.message}` } });
         if (itemId) chrome.runtime.sendMessage({ type: 'UPDATE_ITEM_STATUS', data: { itemId, status: 'Error' } });
       }
     })();
