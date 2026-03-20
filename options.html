@@ -176,12 +176,8 @@
       <input type="checkbox" id="autoClean">
       <label for="autoClean"><strong data-i18n="opt_auto_clean">Auto-clean history and files (24h)</strong></label>
     </div>
-    <div class="setting-desc" data-i18n="opt_auto_clean_desc">Remove captured media records and their downloaded files
-      after 24 hours.</div>
-  </div>
-
   <div class="card">
-    <h2 data-i18n="card_rules">Intercept Rules</h2>
+    <h2 data-i18n="card_rules">Capture Rules</h2>
     <p class="setting-desc" data-i18n="opt_rules_desc">Configure which URLs and Content-Types should be intercepted.
       Uses regular expressions.</p>
 
@@ -203,6 +199,28 @@
       <input type="text" id="new-url" data-i18n-placeholder="ph_url" placeholder="URL Pattern (e.g. .*)">
       <input type="text" id="new-ct" data-i18n-placeholder="ph_ct" placeholder="Content-Type Pattern (e.g. video/.*)">
       <button id="add-rule-btn" data-i18n="btn_add_rule">Add Rule</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 data-i18n="title_ignored_extensions">Ignored Extensions</h2>
+    <p class="setting-desc" data-i18n="opt_ignored_extensions_desc">List of file extensions to skip during capture.</p>
+
+    <table id="extensions-table">
+      <thead>
+        <tr>
+          <th width="80%" data-i18n="th_extension">Extension</th>
+          <th width="20%" data-i18n="th_action">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- JS will populate extensions -->
+      </tbody>
+    </table>
+
+    <div id="add-extension-form" style="display: flex; gap: 10px; margin-top: 15px;">
+      <input type="text" id="new-extension" data-i18n-placeholder="ph_extension" placeholder=".gif, .svg, .ico" style="flex: 1; padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+      <button id="add-extension-btn" data-i18n="btn_add_extension">Add Extension</button>
     </div>
   </div>
 

@@ -105,10 +105,25 @@
     "message": "Remove captured media records and their downloaded files after 24 hours."
   },
   "card_rules": {
-    "message": "Media Capture Rules (Regex)"
+    "message": "Capture Rules (Regex)"
   },
   "opt_rules_desc": {
-    "message": "Configure which URLs and Content-Types should be intercepted. Uses regular expressions."
+    "message": "Configure which URLs and Content-Type patterns should be intercepted."
+  },
+  "title_ignored_extensions": {
+    "message": "Ignored Extensions"
+  },
+  "opt_ignored_extensions_desc": {
+    "message": "List of file extensions to skip during capture."
+  },
+  "th_extension": {
+    "message": "Extension"
+  },
+  "ph_extension": {
+    "message": ".gif, .svg, .ico"
+  },
+  "btn_add_extension": {
+    "message": "Add Extension"
   },
   "th_rule_enabled": {
     "message": "Enabled"

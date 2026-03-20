@@ -13,7 +13,8 @@ let config = {
   deduplicate: true,
   autoClean: true,
   minSize: 800,
-  maxSize: 0
+  maxSize: 0,
+  ignoredExtensions: [".gif", ".svg", ".ico"]
 };
 
 chrome.storage.local.get(["config"], (result) => {
@@ -66,7 +67,7 @@ chrome.storage.local.get(["capturedMedia", "capturedLogs", "downloadHistory"], (
   }
   if (result.capturedLogs) capturedLogs = result.capturedLogs;
   if (result.downloadHistory) downloadHistory = result.downloadHistory;
-  
+
   // Perform initial cleanup on startup
   setTimeout(performCleanup, 5000);
 });
@@ -87,19 +88,19 @@ function performCleanup() {
   // 2. Clean capturedMedia (Popup List) and files
   if (config.autoClean !== false) {
     const originalCount = capturedMedia.length;
-    
+
     // We process items to be removed
     const itemsToRemove = capturedMedia.filter(item => (now - item.timestamp) > ONE_DAY);
-    
+
     if (itemsToRemove.length > 0) {
       itemsToRemove.forEach(item => {
         if (item.downloadId) {
           // Attempt to delete physical file and record from browser history
-          chrome.downloads.removeFile(item.downloadId).catch(() => {});
-          chrome.downloads.erase({ id: item.downloadId }).catch(() => {});
+          chrome.downloads.removeFile(item.downloadId).catch(() => { });
+          chrome.downloads.erase({ id: item.downloadId }).catch(() => { });
         }
       });
-      
+
       capturedMedia = capturedMedia.filter(item => (now - item.timestamp) <= ONE_DAY);
       capturedUrls = new Set(capturedMedia.map(m => m.url));
       changed = true;
@@ -183,20 +184,18 @@ chrome.webRequest.onHeadersReceived.addListener(
         // Generate date string for folder
         const d = new Date();
         const dateStr = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0');
-        
+
         // Extract domain
         let domain = "unknown";
         try {
           const originUrl = details.initiator || details.documentUrl || details.url;
           domain = new URL(originUrl).hostname;
-        } catch (e) {}
+        } catch (e) { }
 
         // Find existing extension or generate one
         let ext = "";
-        let finalFilename = "";
         if (baseName.includes('.')) {
-          ext = baseName.substring(baseName.lastIndexOf('.'));
-          baseName = baseName.substring(0, baseName.lastIndexOf('.'));
+          ext = baseName.substring(baseName.lastIndexOf('.')).toLowerCase();
         } else {
           if (contentType.includes("video/mp4")) ext = ".mp4";
           else if (contentType.includes("video/webm")) ext = ".webm";
@@ -206,10 +205,22 @@ chrome.webRequest.onHeadersReceived.addListener(
           else if (contentType.includes("image/png")) ext = ".png";
           else if (contentType.includes("image/gif")) ext = ".gif";
           else if (contentType.includes("image/webp")) ext = ".webp";
-          else if (contentType.split('/')[1]) ext = "." + contentType.split('/')[1].split(';')[0];
+          else if (contentType.split('/')[1]) ext = "." + contentType.split('/')[1].split(';')[0].toLowerCase();
         }
 
-        finalFilename = `${baseName}${ext}`;
+        // Check against ignored extensions
+        if (config.ignoredExtensions && config.ignoredExtensions.includes(ext)) {
+          addLog(`Ignoring extension: ${ext} for ${details.url}`);
+          return;
+        }
+
+        let finalFilename = "";
+        if (baseName.includes('.')) {
+          finalFilename = baseName; // already contains extension
+          baseName = baseName.substring(0, baseName.lastIndexOf('.'));
+        } else {
+          finalFilename = `${baseName}${ext}`;
+        }
 
         let mediaItem = {
           id: Date.now() + "_" + Math.floor(Math.random() * 1000),
@@ -260,7 +271,7 @@ chrome.webRequest.onHeadersReceived.addListener(
             }).then((downloadId) => {
               downloadHistory[mediaItem.url] = now;
               mediaItem.downloadId = downloadId;
-              
+
               // Persist the downloadId to storage so the popup can track it
               chrome.storage.local.get(['capturedMedia'], (result) => {
                 const media = result.capturedMedia || [];

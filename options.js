@@ -10,6 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const sizeRangeConfig = document.getElementById('size-range-config');
   const rulesTableBody = document.querySelector('#rules-table tbody');
   const addRuleBtn = document.getElementById('add-rule-btn');
+  const extensionsTableBody = document.querySelector('#extensions-table tbody');
+  const addExtensionBtn = document.getElementById('add-extension-btn');
+  const newExtensionInput = document.getElementById('new-extension');
 
   let currentConfig = {};
 
@@ -22,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Load configuration from storage
   function loadConfig() {
     chrome.storage.local.get(['config'], (result) => {
-      currentConfig = result.config || {
+      const defaults = {
         enabled: true,
         rules: defaultRules,
         automaticdownload: false,
@@ -31,8 +34,10 @@ document.addEventListener('DOMContentLoaded', () => {
         deduplicate: true,
         autoClean: true,
         minSize: 800,
-        maxSize: 0
+        maxSize: 0,
+        ignoredExtensions: [".gif", ".svg", ".ico"]
       };
+      currentConfig = result.config ? { ...defaults, ...result.config } : defaults;
 
       enabledInput.checked = currentConfig.enabled;
       autoDownloadInput.checked = currentConfig.automaticdownload;
@@ -45,6 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       toggleSizeRangeVisibility();
       renderRules(currentConfig.rules);
+      renderExtensions(currentConfig.ignoredExtensions || []);
     });
   }
 
@@ -106,6 +112,40 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Render extensions table
+  function renderExtensions(extensions) {
+    extensionsTableBody.innerHTML = '';
+    extensions.forEach((ext, index) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>
+          <input type="text" value="${ext}" style="width: 100%; box-sizing: border-box;" class="ext-value" data-index="${index}">
+        </td>
+        <td>
+          <button class="delete-ext danger" data-index="${index}" data-i18n="btn_delete">${chrome.i18n.getMessage('btn_delete')}</button>
+        </td>
+      `;
+      extensionsTableBody.appendChild(tr);
+    });
+
+    document.querySelectorAll('.ext-value').forEach(el => {
+      el.addEventListener('change', (e) => {
+        const idx = e.target.getAttribute('data-index');
+        currentConfig.ignoredExtensions[idx] = e.target.value.trim().toLowerCase();
+        saveConfigSilently();
+      });
+    });
+
+    document.querySelectorAll('.delete-ext').forEach(el => {
+      el.addEventListener('click', (e) => {
+        const idx = e.target.getAttribute('data-index');
+        currentConfig.ignoredExtensions.splice(idx, 1);
+        renderExtensions(currentConfig.ignoredExtensions);
+        saveConfigSilently();
+      });
+    });
+  }
+
   // Add rule
   addRuleBtn.addEventListener('click', () => {
     const url = document.getElementById('new-url').value || '.*';
@@ -124,6 +164,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('new-url').value = '';
     document.getElementById('new-ct').value = '';
+  });
+
+  // Add extension
+  addExtensionBtn.addEventListener('click', () => {
+    const val = newExtensionInput.value.trim().toLowerCase();
+    if (val) {
+      if (!currentConfig.ignoredExtensions) currentConfig.ignoredExtensions = [];
+      const parts = val.split(',').map(p => p.trim()).filter(p => p.length > 0);
+      parts.forEach(p => {
+        if (!currentConfig.ignoredExtensions.includes(p)) {
+          currentConfig.ignoredExtensions.push(p);
+        }
+      });
+      renderExtensions(currentConfig.ignoredExtensions);
+      saveConfigSilently();
+      newExtensionInput.value = '';
+    }
   });
 
   function saveConfigSilently() {
