@@ -351,13 +351,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       addLog(`Merging ${filename}: ${current}/${total} fragments...`);
     }
   } else if (message.type === "DOWNLOAD_INTERNAL") {
-    const { url, filename } = message.data;
+    const { url, filename, showFile } = message.data;
     chrome.downloads.download({
       url: url,
       filename: filename,
       saveAs: false
     }, (downloadId) => {
       const err = chrome.runtime.lastError ? chrome.runtime.lastError.message : null;
+      if (downloadId && !err && showFile) {
+        chrome.downloads.show(downloadId);
+      }
       sendResponse({ success: !err, downloadId, error: err });
     });
     return true; // Keep channel open for async callback

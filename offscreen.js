@@ -116,11 +116,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         });
 
         // Helper: Download via Background
-        async function downloadViaBackground(url, filename) {
+        async function downloadViaBackground(url, filename, showFile = false) {
           return new Promise((resolve) => {
             chrome.runtime.sendMessage({
               type: 'DOWNLOAD_INTERNAL',
-              data: { url, filename }
+              data: { url, filename, showFile }
             }, (response) => {
               if (response && response.success && response.downloadId) {
                 const dlId = response.downloadId;
@@ -178,7 +178,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           if (message.data.m3u8Content) {
             const m3u8Blob = new Blob([message.data.m3u8Content], { type: 'application/vnd.apple.mpegurl' });
             const m3u8BlobUrl = URL.createObjectURL(m3u8Blob);
-            await downloadViaBackground(m3u8BlobUrl, `${folderName}/playlist.m3u8`);
+            await downloadViaBackground(m3u8BlobUrl, `${folderName}/playlist.m3u8`, false);
             setTimeout(() => URL.revokeObjectURL(m3u8BlobUrl), 10000);
           }
           
@@ -194,7 +194,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
               data: { filename, status: `[SAVING] ${fCount}/${downloadQueue.length}: ${itemToDownload.filename}` }
             });
 
-            await downloadViaBackground(fragUrl, itemToDownload.filename);
+            await downloadViaBackground(fragUrl, itemToDownload.filename, false);
             setTimeout(() => URL.revokeObjectURL(fragUrl), 2000);
           }
         }
@@ -204,12 +204,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           data: { filename, status: `Finalizing merged video: ${filename}` }
         });
 
-        const result = await downloadViaBackground(blobUrl, filename);
+        const result = await downloadViaBackground(blobUrl, filename, true);
         setTimeout(() => URL.revokeObjectURL(blobUrl), 15000);
         
-        if (result.success && result.downloadId) {
-          chrome.downloads.show(result.downloadId);
-        }
         sendResponse({ success: result.success, downloadId: result.downloadId, error: result.error });
 
       } catch (e) {
