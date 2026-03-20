@@ -11,7 +11,8 @@
     "notifications",
     "alarms",
     "tabs",
-    "windows"
+    "windows",
+    "offscreen"
   ],
   "host_permissions": [
     "<all_urls>"

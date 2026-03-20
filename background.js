@@ -1,3 +1,5 @@
+importScripts('plugin-engine.js', 'plugins/m3u8-plugin.js');
+
 const defaultRules = [
   { id: 1, enabled: true, url: ".*", ct: "video/.*", rtype: 1 },
   { id: 2, enabled: true, url: ".*", ct: "audio/.*", rtype: 2 },
@@ -123,7 +125,7 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 
 
 chrome.webRequest.onHeadersReceived.addListener(
-  function (details) {
+  async function (details) {
     if (!config.enabled) return;
 
     if (!details.responseHeaders) return;
@@ -148,29 +150,39 @@ chrome.webRequest.onHeadersReceived.addListener(
     // addLog(`Inspecting HTTP response: ${details.url}`);
     // addLog(`Content-Type: ${contentType}, Content-Length: ${contentLength}`);
 
-    if (config.nozerofiles && contentLength === 0) return;
-    if (config.nosmallfiles && contentLength > 0) {
-      const sizeKB = contentLength / 1024;
-      if (sizeKB < config.minSize) return;
-      if (config.maxSize > 0 && sizeKB > config.maxSize) return;
+    // Plugin Interception Hook
+    const pluginResult = await self.pluginEngine.executeHook('onIntercept', { details, contentType, config });
+    if (pluginResult.skip) return;
+
+    if (!pluginResult.ignoreSize) {
+      if (config.nozerofiles && contentLength === 0) return;
+      if (config.nosmallfiles && contentLength > 0) {
+        const sizeKB = contentLength / 1024;
+        if (sizeKB < config.minSize) return;
+        if (config.maxSize > 0 && sizeKB > config.maxSize) return;
+      }
     }
 
     let matched = false;
-    for (let rule of config.rules) {
-      if (!rule.enabled) continue;
+    if (pluginResult.isPluginHandled) {
+      matched = true;
+    } else {
+      for (let rule of config.rules) {
+        if (!rule.enabled) continue;
 
-      try {
-        let urlRegex = new RegExp(rule.url, "i");
-        let ctRegex = new RegExp(rule.ct, "i");
+        try {
+          let urlRegex = new RegExp(rule.url, "i");
+          let ctRegex = new RegExp(rule.ct, "i");
 
-        if (urlRegex.test(details.url) && ctRegex.test(contentType)) {
-          addLog(`MATCHED RULE (url=${rule.url}, ct=${rule.ct}): ${details.url}`);
-          matched = true;
-          break;
+          if (urlRegex.test(details.url) && ctRegex.test(contentType)) {
+            addLog(`MATCHED RULE (url=${rule.url}, ct=${rule.ct}): ${details.url}`);
+            matched = true;
+            break;
+          }
+        } catch (e) {
+          // Ignore invalid regex
+          console.error("Invalid rule regex", e);
         }
-      } catch (e) {
-        // Ignore invalid regex
-        console.error("Invalid rule regex", e);
       }
     }
 
@@ -231,64 +243,36 @@ chrome.webRequest.onHeadersReceived.addListener(
           type: contentType,
           size: contentLength,
           timestamp: Date.now(),
-          status: config.automaticdownload ? "Downloading" : "Ready"
+          status: 'Ready',
+          pluginType: pluginResult.type || 'generic'
         };
+
+        if (config.automaticdownload) {
+           mediaItem.status = 'Downloading';
+        }
 
         addLog(chrome.i18n.getMessage("log_intercepted", [mediaItem.filename]));
 
-        // Always read from storage before writing to avoid overwriting concurrent
-        // changes (e.g. user clicking "Clear Records" while browsing).
-        chrome.storage.local.get(['capturedMedia'], (stored) => {
+        // 4. Update storage and trigger auto-download (or plugin download)
+        chrome.storage.local.get(['capturedMedia'], async (stored) => {
           const freshMedia = stored.capturedMedia || [];
           freshMedia.unshift(mediaItem);
           if (freshMedia.length > 100) freshMedia.pop();
-          capturedMedia = freshMedia; // keep in-memory in sync
+          capturedMedia = freshMedia;
           chrome.storage.local.set({ capturedMedia: freshMedia });
-        });
 
+          // Plugin Download Hook
+          const preDownloadResult = await self.pluginEngine.executeHook('onPreDownload', { item: mediaItem, config });
 
-        if (config.automaticdownload) {
-          addLog(`Auto-download triggered: ${mediaItem.filename}`);
-
-          // Deduplication check
-          const now = Date.now();
-          const lastDownload = downloadHistory[mediaItem.url];
-          const ONE_DAY = 24 * 60 * 60 * 1000;
-
-          if (config.deduplicate && lastDownload && (now - lastDownload < ONE_DAY)) {
-            addLog(chrome.i18n.getMessage("log_skipping"));
-          } else {
-            let safeFilename = mediaItem.filename.replace(/[^a-zA-Z0-9.\-_]/g, '_');
-            if (!safeFilename || safeFilename === "_") safeFilename = "downloaded_media";
-
-            // Use the new path structure: FLX{YYYY-MM-DD}/{domain}/{filename}
-            const downloadPath = `${mediaItem.dateFolder}/${mediaItem.domain}/${safeFilename}`;
-
-            chrome.downloads.download({
-              url: mediaItem.url,
-              filename: downloadPath,
-              saveAs: false
-            }).then((downloadId) => {
-              downloadHistory[mediaItem.url] = now;
-              mediaItem.downloadId = downloadId;
-
-              // Persist the downloadId to storage so the popup can track it
-              chrome.storage.local.get(['capturedMedia'], (result) => {
-                const media = result.capturedMedia || [];
-                const item = media.find(m => m.id === mediaItem.id);
-                if (item) {
-                  item.downloadId = downloadId;
-                  chrome.storage.local.set({ capturedMedia: media });
-                }
-              });
-
-              // Trigger cleanup check
-              performCleanup();
-            }).catch(err => addLog(chrome.i18n.getMessage("log_failed", [err.message || err])));
+          if (preDownloadResult.handled) {
+            addLog(`Download handled by plugin: ${mediaItem.filename}`);
+            if (preDownloadResult.downloadId) {
+              updateItemStatus(mediaItem.id, 'Complete', preDownloadResult.downloadId);
+            }
+          } else if (config.automaticdownload) {
+             triggerStandardDownload(mediaItem);
           }
-        }
-      } else {
-        addLog(chrome.i18n.getMessage("log_ignored_duplicate", [details.url]));
+        });
       }
     }
   },
@@ -296,9 +280,49 @@ chrome.webRequest.onHeadersReceived.addListener(
   ["responseHeaders", "extraHeaders"]
 );
 
-// Allow popup to request logs
+function triggerStandardDownload(mediaItem) {
+  const now = Date.now();
+  const lastDownload = downloadHistory[mediaItem.url];
+  const ONE_DAY = 24 * 60 * 60 * 1000;
+
+  if (config.deduplicate && lastDownload && (now - lastDownload < ONE_DAY)) {
+    addLog(chrome.i18n.getMessage("log_skipping"));
+    return;
+  }
+
+  let safeFilename = mediaItem.filename.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+  if (!safeFilename || safeFilename === "_") safeFilename = "downloaded_media";
+  const downloadPath = `${mediaItem.dateFolder}/${mediaItem.domain}/${safeFilename}`;
+
+  chrome.downloads.download({
+    url: mediaItem.url,
+    filename: downloadPath,
+    saveAs: false
+  }).then((downloadId) => {
+    downloadHistory[mediaItem.url] = now;
+    updateItemStatus(mediaItem.id, 'Downloading', downloadId);
+    performCleanup();
+  }).catch(err => addLog(chrome.i18n.getMessage("log_failed", [err.message || err])));
+}
+
+function updateItemStatus(itemId, status, downloadId) {
+  chrome.storage.local.get(['capturedMedia'], (result) => {
+    const media = result.capturedMedia || [];
+    const item = media.find(m => m.id === itemId);
+    if (item) {
+      item.status = status;
+      if (downloadId) item.downloadId = downloadId;
+      chrome.storage.local.set({ capturedMedia: media });
+    }
+  });
+}
+
+// Message Listeners
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "GET_LOGS") {
     sendResponse({ logs: capturedLogs });
+  } else if (message.type === "MERGE_PROGRESS") {
+    const { filename, current, total } = message.data;
+    addLog(`Merging ${filename}: ${current}/${total} fragments...`);
   }
 });
