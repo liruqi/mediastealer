@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const mediaList = document.getElementById('media-list');
   const logsContainer = document.getElementById('logs-container');
 
+  // ── Logging ──────────────────────────────────────────────────────────────
   function addLogToUI(logStr) {
     const div = document.createElement('div');
     div.className = 'log-entry';
@@ -21,46 +22,116 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // ── Helpers ───────────────────────────────────────────────────────────────
   function formatBytes(bytes, decimals = 2) {
     if (!+bytes) return '0 Bytes';
     const k = 1024;
     const dm = decimals < 0 ? 0 : decimals;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
   }
 
+  /** Applies the correct class + label + disabled state to an action button based on item status */
+  function applyBtnState(btn, status) {
+    btn.classList.remove('open-btn', 'downloading-btn', 'deleted-btn');
+    btn.disabled = false;
+
+    switch (status) {
+      case 'Complete':
+        btn.textContent = chrome.i18n.getMessage('btn_open') || 'Open';
+        btn.classList.add('open-btn');
+        break;
+      case 'Downloading':
+        btn.textContent = chrome.i18n.getMessage('btn_downloading') || 'Downloading';
+        btn.classList.add('downloading-btn');
+        btn.disabled = true;
+        break;
+      case 'Deleted':
+        btn.textContent = chrome.i18n.getMessage('btn_deleted') || 'Deleted';
+        btn.classList.add('deleted-btn');
+        btn.disabled = true;
+        break;
+      default: // 'Ready' or anything else
+        btn.textContent = chrome.i18n.getMessage('btn_download') || 'Download';
+        break;
+    }
+  }
+
+  /** Checks actual download state via chrome.downloads API and corrects stored status / button */
+  function checkDownloadStatus(downloadId, itemId) {
+    chrome.downloads.search({ id: downloadId }, (results) => {
+      if (!results || !results[0]) return;
+      const download = results[0];
+      const btn = document.getElementById(`btn-${itemId}`);
+
+      let newStatus = null;
+      if (download.state === 'complete') {
+        // exists may be undefined on some Chrome versions — only mark Deleted when explicitly false
+        newStatus = (download.exists === false) ? 'Deleted' : 'Complete';
+      } else if (download.state === 'in_progress') {
+        newStatus = 'Downloading';
+      } else if (download.state === 'interrupted') {
+        newStatus = 'Ready';
+      }
+
+      if (!newStatus) return;
+
+      if (btn) applyBtnState(btn, newStatus);
+
+      // Persist if changed
+      chrome.storage.local.get(['capturedMedia'], (result) => {
+        const media = result.capturedMedia || [];
+        const item = media.find(m => m.id === itemId);
+        if (item && item.status !== newStatus) {
+          item.status = newStatus;
+          chrome.storage.local.set({ capturedMedia: media });
+        }
+      });
+    });
+  }
+
+  // ── List Rendering ────────────────────────────────────────────────────────
   function renderList(items) {
     tbody.innerHTML = '';
-    
+
     if (items && items.length > 0) {
       emptyState.classList.add('hidden');
       mediaList.classList.remove('hidden');
-      
+
       items.forEach(item => {
         const tr = document.createElement('tr');
-        
         tr.innerHTML = `
           <td>
             <span class="filename" title="${item.url}">${item.filename}</span>
           </td>
-          <td class="type">${item.type.split(';')[0]}</td>
+          <td class="type">${(item.type || '').split(';')[0]}</td>
           <td>${formatBytes(item.size)}</td>
           <td>
-            <button class="action-btn" id="btn-${item.id}" data-id="${item.id}" data-url="${item.url}" data-filename="${item.filename}" data-i18n="btn_download">${chrome.i18n.getMessage('btn_download')}</button>
+            <button class="action-btn" id="btn-${item.id}"
+              data-id="${item.id}"
+              data-url="${item.url}"
+              data-filename="${item.filename}">
+              ${chrome.i18n.getMessage('btn_download') || 'Download'}
+            </button>
           </td>
         `;
-        
         tbody.appendChild(tr);
 
-        // If it has a downloadId, check status
+        // Set button to correct state from stored status
+        const btn = document.getElementById(`btn-${item.id}`);
+        if (btn) {
+          applyBtnState(btn, item.status || 'Ready');
+        }
+
+        // If we have a downloadId, verify current state via API
         if (item.downloadId) {
           checkDownloadStatus(item.downloadId, item.id);
         }
       });
 
-      // Add click listeners to action buttons
-      document.querySelectorAll('.action-btn').forEach(btn => {
+      // Attach event listeners
+      tbody.querySelectorAll('.action-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           const id = e.target.getAttribute('data-id');
           const url = e.target.getAttribute('data-url');
@@ -71,19 +142,23 @@ document.addEventListener('DOMContentLoaded', () => {
             const item = media.find(m => m.id === id);
             if (!item) return;
 
-            const isDownload = e.target.classList.contains('download-btn') || 
-                             e.target.textContent === chrome.i18n.getMessage('btn_download') || 
-                             e.target.textContent === 'Download';
-            
-            const isOpen = e.target.classList.contains('open-btn') || 
-                          e.target.textContent === chrome.i18n.getMessage('btn_open') || 
-                          e.target.textContent === 'Open';
+            const currentStatus = item.status || 'Ready';
 
-            if (isDownload) {
+            if (currentStatus === 'Complete') {
+              // Open / reveal file
+              if (item.downloadId) {
+                chrome.downloads.show(item.downloadId);
+              }
+            } else if (currentStatus === 'Ready' || currentStatus === 'interrupted') {
+              // Start download
               let downloadPath = filename;
               if (item.dateFolder && item.domain) {
                 downloadPath = `${item.dateFolder}/${item.domain}/${filename}`;
               }
+
+              item.status = 'Downloading';
+              chrome.storage.local.set({ capturedMedia: media });
+              applyBtnState(e.target, 'Downloading');
 
               chrome.downloads.download({
                 url: url,
@@ -92,10 +167,12 @@ document.addEventListener('DOMContentLoaded', () => {
               }).then(downloadId => {
                 item.downloadId = downloadId;
                 chrome.storage.local.set({ capturedMedia: media });
-                checkDownloadStatus(downloadId, id);
+                // Background.js onChanged listener will update status to Complete/Ready
+              }).catch(() => {
+                item.status = 'Ready';
+                chrome.storage.local.set({ capturedMedia: media });
+                applyBtnState(e.target, 'Ready');
               });
-            } else if (isOpen && item.downloadId) {
-              chrome.downloads.show(item.downloadId);
             }
           });
         });
@@ -106,56 +183,42 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Load initial data
+  // ── Initial Data Load ─────────────────────────────────────────────────────
   chrome.storage.local.get(['capturedMedia'], (result) => {
     renderList(result.capturedMedia || []);
   });
 
-  // Load initial logs
+  // Logs
   chrome.runtime.sendMessage({ type: "GET_LOGS" }, (response) => {
-    if (chrome.runtime.lastError) {
-      console.log("Background script not ready or asleep:", chrome.runtime.lastError);
-      return;
-    }
-    if (response && response.logs) {
-      renderLogs(response.logs);
-    }
+    if (chrome.runtime.lastError) { return; }
+    if (response && response.logs) { renderLogs(response.logs); }
   });
 
-  // Listen for real-time logs from background
   chrome.runtime.onMessage.addListener((message) => {
-    if (message.type === "NEW_LOG") {
-      addLogToUI(message.output);
-    }
+    if (message.type === "NEW_LOG") { addLogToUI(message.output); }
   });
 
-  // Listen for changes
   chrome.storage.onChanged.addListener((changes, namespace) => {
     if (namespace === 'local' && changes.capturedMedia) {
       renderList(changes.capturedMedia.newValue);
     }
   });
 
-  // Buttons
+  // ── Toolbar Buttons ───────────────────────────────────────────────────────
   document.getElementById('clear-btn').addEventListener('click', () => {
-    chrome.storage.local.set({ capturedMedia: [] }, () => {
-      renderList([]);
-    });
+    chrome.storage.local.set({ capturedMedia: [] }, () => renderList([]));
   });
 
   document.getElementById('download-all-btn').addEventListener('click', () => {
     chrome.storage.local.get(['capturedMedia'], (result) => {
       const items = result.capturedMedia || [];
       items.forEach(item => {
+        if (item.status === 'Complete' || item.status === 'Downloading') return;
         let downloadPath = item.filename;
         if (item.dateFolder && item.domain) {
           downloadPath = `${item.dateFolder}/${item.domain}/${item.filename}`;
         }
-        chrome.downloads.download({
-          url: item.url,
-          filename: downloadPath,
-          saveAs: false
-        });
+        chrome.downloads.download({ url: item.url, filename: downloadPath, saveAs: false });
       });
     });
   });
@@ -165,40 +228,26 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('clear-logs-btn').addEventListener('click', () => {
-    chrome.storage.local.set({ capturedLogs: [] }, () => {
-      renderLogs([]);
-    });
+    chrome.storage.local.set({ capturedLogs: [] }, () => renderLogs([]));
   });
 
-  // Detect if we are in a popout window
-  chrome.windows.getCurrent((win) => {
-    if (win.type === 'popup') {
-      document.body.classList.add('is-popout');
-      document.getElementById('popout-btn').style.display = 'none';
-    }
-  });
+  // ── Popout ────────────────────────────────────────────────────────────────
+  // Detect popout mode via query parameter
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('mode') === 'popout') {
+    document.body.classList.add('is-popout');
+    const popoutBtn = document.getElementById('popout-btn');
+    if (popoutBtn) popoutBtn.style.display = 'none';
+  }
 
   document.getElementById('popout-btn').addEventListener('click', () => {
     chrome.windows.create({
-      url: chrome.runtime.getURL("popup.html"),
-      type: "popup",
-      width: 600,
-      height: 600
-    }, () => {
-      window.close();
+      url: chrome.runtime.getURL('popup.html?mode=popout'),
+      type: 'popup',
+      width: 800,
+      height: 650
     });
+    // Close the toolbar popup
+    window.close();
   });
-
-  function checkDownloadStatus(downloadId, itemId) {
-    chrome.downloads.search({ id: downloadId }, (results) => {
-      if (results && results[0]) {
-        const download = results[0];
-        const btn = document.getElementById(`btn-${itemId}`);
-        if (btn && download.state === 'complete' && download.exists) {
-          btn.textContent = chrome.i18n.getMessage('btn_open');
-          btn.classList.add('open-btn');
-        }
-      }
-    });
-  }
 });

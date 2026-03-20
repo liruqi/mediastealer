@@ -20,6 +20,9 @@
   "btn_clear_logs": {
     "message": "清除日志"
   },
+  "btn_clear_downloads": {
+    "message": "清除列表"
+  },
   "tt_clear_all": {
     "message": "清空列表"
   },
@@ -52,6 +55,12 @@
   },
   "btn_open": {
     "message": "打开"
+  },
+  "btn_downloading": {
+    "message": "下载中"
+  },
+  "btn_deleted": {
+    "message": "已删除"
   },
   "options_title": {
     "message": "流影选项设置"

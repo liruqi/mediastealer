@@ -9,7 +9,9 @@
     "downloads",
     "storage",
     "notifications",
-    "alarms"
+    "alarms",
+    "tabs",
+    "windows"
   ],
   "host_permissions": [
     "<all_urls>"
