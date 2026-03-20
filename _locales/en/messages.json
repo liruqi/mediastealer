@@ -20,6 +20,9 @@
   "btn_clear_logs": {
     "message": "Clear Logs"
   },
+  "label_debug": {
+    "message": "Debug"
+  },
   "btn_clear_downloads": {
     "message": "Clear Records"
   },

@@ -219,22 +219,46 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ── 1-second polling for active downloads ─────────────────────────────────
-  // Only checks items with status 'Downloading'. Stops automatically when none remain.
   const POLL_INTERVAL_MS = 1000;
+  let debugPolling = false;
+  const debugChk = document.getElementById('debug-polling-chk');
+
+  chrome.storage.local.get(['debugPolling'], (result) => {
+    debugPolling = !!result.debugPolling;
+    if (debugChk) debugChk.checked = debugPolling;
+  });
+
+  if (debugChk) {
+    debugChk.addEventListener('change', () => {
+      debugPolling = debugChk.checked;
+      chrome.storage.local.set({ debugPolling });
+      addLogToUI(`Debug polling: ${debugPolling ? 'ON' : 'OFF'}`);
+    });
+  }
 
   function pollDownloadStatus() {
     chrome.storage.local.get(['capturedMedia'], (result) => {
       const media = result.capturedMedia || [];
-      const downloading = media.filter(m => m.status === 'Downloading' && m.downloadId);
+      const downloading = media.filter(m => m.status === 'Downloading');
 
       if (downloading.length === 0) return;
 
-      let updates = [];
-      let pending = downloading.length;
+      if (debugPolling) {
+        addLogToUI(`Polling ${downloading.length} downloading items...`);
+      }
 
       downloading.forEach(item => {
+        if (!item.downloadId) {
+          if (debugPolling) addLogToUI(`Item ${item.filename} has no downloadId yet.`);
+          return;
+        }
+
         chrome.downloads.search({ id: item.downloadId }, (results) => {
-          pending--;
+          if (debugPolling) {
+            const found = (results && results[0]) ? `found (state=${results[0].state})` : 'NOT found';
+            addLogToUI(`Search ID ${item.downloadId} (${item.filename}): ${found}`);
+          }
+
           if (results && results[0]) {
             const dl = results[0];
             let newStatus = null;
@@ -248,40 +272,31 @@ document.addEventListener('DOMContentLoaded', () => {
               const currentOrder = STATUS_ORDER[item.status] ?? 0;
               const newOrder = STATUS_ORDER[newStatus] ?? 0;
               if (newOrder > currentOrder) {
-                updates.push({ id: item.id, status: newStatus });
+                if (debugPolling) addLogToUI(`Status change: ${item.filename} -> ${newStatus}`);
+                updateItemStatusAtomically(item.id, newStatus);
               }
             }
-          }
-
-          if (pending === 0 && updates.length > 0) {
-            // Apply updates atomically to current storage
-            chrome.storage.local.get(['capturedMedia'], (freshResult) => {
-              const freshMedia = freshResult.capturedMedia || [];
-              let changed = false;
-              updates.forEach(upd => {
-                const item = freshMedia.find(m => m.id === upd.id);
-                if (item && item.status !== upd.status) {
-                  item.status = upd.status;
-                  changed = true;
-                  // Update UI immediately if button exists
-                  const btn = document.getElementById(`btn-${upd.id}`);
-                  if (btn) applyBtnState(btn, upd.status);
-                }
-              });
-              if (changed) {
-                chrome.storage.local.set({ capturedMedia: freshMedia });
-              }
-            });
           }
         });
       });
     });
   }
 
+  function updateItemStatusAtomically(itemId, newStatus) {
+    chrome.storage.local.get(['capturedMedia'], (freshResult) => {
+      const freshMedia = freshResult.capturedMedia || [];
+      const target = freshMedia.find(m => m.id === itemId);
+      if (target && target.status !== newStatus) {
+        target.status = newStatus;
+        chrome.storage.local.set({ capturedMedia: freshMedia });
+      }
+    });
+  }
+
   // Start poll — runs every 1s while popup is open
-  pollDownloadStatus(); // Call once immediately
+  pollDownloadStatus(); 
   const pollTimer = setInterval(pollDownloadStatus, POLL_INTERVAL_MS);
-  // Clean up on unload
+  
   window.addEventListener('unload', () => clearInterval(pollTimer));
 
   // ── Toolbar Buttons ───────────────────────────────────────────────────────

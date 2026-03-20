@@ -7,6 +7,7 @@
   "tt_popout": { "message": "เปิดในหน้าต่างแยกส่วนตัว" },
   "btn_clear_logs": { "message": "ล้างบันทึก" },
   "btn_clear_downloads": { "message": "ล้างรายการดาวน์โหลด" },
+  "label_debug": { "message": "แก้ไขจุดบกพร่อง" },
   "tt_clear_all": { "message": "ล้างรายการทั้งหมด" },
   "tt_options": { "message": "การตั้งค่า" },
   "title_captured_media": { "message": "สื่อที่ตรวจพบ" },

@@ -20,6 +20,9 @@
   "btn_clear_logs": {
     "message": "清除日志"
   },
+  "label_debug": {
+    "message": "调试"
+  },
   "btn_clear_downloads": {
     "message": "清除列表"
   },

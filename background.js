@@ -251,28 +251,43 @@ chrome.webRequest.onHeadersReceived.addListener(
            mediaItem.status = 'Downloading';
         }
 
-        addLog(chrome.i18n.getMessage("log_intercepted", [mediaItem.filename]));
-
-        // 4. Update storage and trigger auto-download (or plugin download)
-        chrome.storage.local.get(['capturedMedia'], async (stored) => {
-          const freshMedia = stored.capturedMedia || [];
-          freshMedia.unshift(mediaItem);
-          if (freshMedia.length > 100) freshMedia.pop();
-          capturedMedia = freshMedia;
-          chrome.storage.local.set({ capturedMedia: freshMedia });
-
-          // Plugin Download Hook
+        // Handle Auto-download OR Plugin Download OR just Manual Ready
+        const handleCapture = async () => {
+          // 4. Plugin Download Hook
           const preDownloadResult = await self.pluginEngine.executeHook('onPreDownload', { item: mediaItem, config });
-
+          
           if (preDownloadResult.handled) {
-            addLog(`Download handled by plugin: ${mediaItem.filename}`);
-            if (preDownloadResult.downloadId) {
-              updateItemStatus(mediaItem.id, 'Complete', preDownloadResult.downloadId);
-            }
+            mediaItem.status = 'Complete';
+            if (preDownloadResult.downloadId) mediaItem.downloadId = preDownloadResult.downloadId;
           } else if (config.automaticdownload) {
-             triggerStandardDownload(mediaItem);
+            // Initiate download BEFORE saving to storage to ensure we have the ID
+            const downloadResult = await startDownload(mediaItem);
+            if (downloadResult.success) {
+              mediaItem.status = 'Downloading';
+              mediaItem.downloadId = downloadResult.downloadId;
+              downloadHistory[mediaItem.url] = Date.now();
+            }
           }
-        });
+
+          // 5. Save to storage
+          chrome.storage.local.get(['capturedMedia'], (stored) => {
+            const freshMedia = stored.capturedMedia || [];
+            // Re-check for duplicates just in case
+            if (!freshMedia.find(m => m.url === mediaItem.url)) {
+              freshMedia.unshift(mediaItem);
+              if (freshMedia.length > 100) freshMedia.pop();
+              capturedMedia = freshMedia;
+              chrome.storage.local.set({ capturedMedia: freshMedia });
+              if (mediaItem.downloadId) {
+                addLog(`Media captured & download started: ${mediaItem.filename}`);
+              } else {
+                addLog(chrome.i18n.getMessage("log_intercepted", [mediaItem.filename]));
+              }
+            }
+          });
+        };
+
+        handleCapture();
       }
     }
   },
@@ -280,29 +295,31 @@ chrome.webRequest.onHeadersReceived.addListener(
   ["responseHeaders", "extraHeaders"]
 );
 
-function triggerStandardDownload(mediaItem) {
-  const now = Date.now();
-  const lastDownload = downloadHistory[mediaItem.url];
-  const ONE_DAY = 24 * 60 * 60 * 1000;
+async function startDownload(mediaItem) {
+  try {
+    const lastDownload = downloadHistory[mediaItem.url];
+    const ONE_DAY = 24 * 60 * 60 * 1000;
 
-  if (config.deduplicate && lastDownload && (now - lastDownload < ONE_DAY)) {
-    addLog(chrome.i18n.getMessage("log_skipping"));
-    return;
+    if (config.deduplicate && lastDownload && (Date.now() - lastDownload < ONE_DAY)) {
+      addLog(chrome.i18n.getMessage("log_skipping"));
+      return { success: false };
+    }
+
+    let safeFilename = mediaItem.filename.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+    if (!safeFilename || safeFilename === "_") safeFilename = "downloaded_media";
+    const downloadPath = `${mediaItem.dateFolder}/${mediaItem.domain}/${safeFilename}`;
+
+    const downloadId = await chrome.downloads.download({
+      url: mediaItem.url,
+      filename: downloadPath,
+      saveAs: false
+    });
+
+    return { success: true, downloadId };
+  } catch (err) {
+    addLog(chrome.i18n.getMessage("log_failed", [err.message || err]));
+    return { success: false };
   }
-
-  let safeFilename = mediaItem.filename.replace(/[^a-zA-Z0-9.\-_]/g, '_');
-  if (!safeFilename || safeFilename === "_") safeFilename = "downloaded_media";
-  const downloadPath = `${mediaItem.dateFolder}/${mediaItem.domain}/${safeFilename}`;
-
-  chrome.downloads.download({
-    url: mediaItem.url,
-    filename: downloadPath,
-    saveAs: false
-  }).then((downloadId) => {
-    downloadHistory[mediaItem.url] = now;
-    updateItemStatus(mediaItem.id, 'Downloading', downloadId);
-    performCleanup();
-  }).catch(err => addLog(chrome.i18n.getMessage("log_failed", [err.message || err])));
 }
 
 function updateItemStatus(itemId, status, downloadId) {
