@@ -31,6 +31,12 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
     if (changes.config) {
       config = { ...config, ...changes.config.newValue };
     }
+    // Keep in-memory capturedMedia in sync with storage.
+    // Without this, background.js would overwrite statuses set by the popup
+    // (e.g. 'Complete') with stale in-memory values on the next capture event.
+    if (changes.capturedMedia && changes.capturedMedia.newValue) {
+      capturedMedia = changes.capturedMedia.newValue;
+    }
   }
 });
 
@@ -108,42 +114,6 @@ chrome.alarms.onAlarm.addListener((alarm) => {
   }
 });
 
-// Track download completion in the background so popup doesn't need to poll.
-// We match by URL (always stored) to avoid race conditions where downloadId
-// might not yet be saved to storage when onChanged fires.
-chrome.downloads.onChanged.addListener((delta) => {
-  if (!delta.state) return; // only care about state changes
-
-  const newState = delta.state.current;
-  let newStatus = null;
-
-  if (newState === 'complete') {
-    newStatus = 'Complete';
-  } else if (newState === 'interrupted') {
-    newStatus = 'Ready'; // allow retry
-  }
-
-  if (!newStatus) return;
-
-  // Look up the download to get its URL, then match capturedMedia by URL
-  chrome.downloads.search({ id: delta.id }, (results) => {
-    if (!results || !results[0]) return;
-    const dlUrl = results[0].url;
-
-    chrome.storage.local.get(['capturedMedia'], (result) => {
-      const media = result.capturedMedia || [];
-      // Match by URL first (avoids race condition with downloadId storage)
-      // Fall back to downloadId for items triggered automatically
-      const item = media.find(m => m.url === dlUrl) ||
-                   media.find(m => m.downloadId === delta.id);
-      if (!item) return;
-
-      item.status = newStatus;
-      item.downloadId = delta.id; // ensure downloadId is always up to date
-      chrome.storage.local.set({ capturedMedia: media });
-    });
-  });
-});
 
 chrome.webRequest.onHeadersReceived.addListener(
   function (details) {

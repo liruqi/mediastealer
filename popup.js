@@ -58,12 +58,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // Status progression — must only move forward, never backward
+  const STATUS_ORDER = { 'Ready': 0, 'Downloading': 1, 'Complete': 2, 'Deleted': 3 };
+
   /** Checks actual download state via chrome.downloads API and corrects stored status / button */
   function checkDownloadStatus(downloadId, itemId) {
     chrome.downloads.search({ id: downloadId }, (results) => {
       if (!results || !results[0]) return;
       const download = results[0];
-      const btn = document.getElementById(`btn-${itemId}`);
 
       let newStatus = null;
       if (download.state === 'complete') {
@@ -77,16 +79,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (!newStatus) return;
 
-      if (btn) applyBtnState(btn, newStatus);
-
-      // Persist if changed
+      // Only update if it's a forward progression
       chrome.storage.local.get(['capturedMedia'], (result) => {
         const media = result.capturedMedia || [];
         const item = media.find(m => m.id === itemId);
-        if (item && item.status !== newStatus) {
-          item.status = newStatus;
-          chrome.storage.local.set({ capturedMedia: media });
-        }
+        if (!item) return;
+
+        const currentOrder = STATUS_ORDER[item.status] ?? 0;
+        const newOrder = STATUS_ORDER[newStatus] ?? 0;
+
+        // Allow 'Ready' (retry) only if truly interrupted; block all other regressions
+        if (newOrder < currentOrder) return;
+        if (newOrder === currentOrder) return; // no change needed
+
+        item.status = newStatus;
+        const btn = document.getElementById(`btn-${itemId}`);
+        if (btn) applyBtnState(btn, newStatus);
+        chrome.storage.local.set({ capturedMedia: media });
       });
     });
   }
@@ -124,10 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
           applyBtnState(btn, item.status || 'Ready');
         }
 
-        // If we have a downloadId, verify current state via API
-        if (item.downloadId) {
-          checkDownloadStatus(item.downloadId, item.id);
-        }
+        // NOTE: status polling handles updates — no per-render check needed
       });
 
       // Attach event listeners
@@ -203,6 +209,58 @@ document.addEventListener('DOMContentLoaded', () => {
       renderList(changes.capturedMedia.newValue);
     }
   });
+
+  // ── 3-second polling for active downloads ─────────────────────────────────
+  // Only checks items with status 'Downloading'. Stops automatically when none remain.
+  const POLL_INTERVAL_MS = 3000;
+
+  function pollDownloadStatus() {
+    chrome.storage.local.get(['capturedMedia'], (result) => {
+      const media = result.capturedMedia || [];
+      const downloading = media.filter(m => m.status === 'Downloading' && m.downloadId);
+
+      if (downloading.length === 0) return; // nothing to check
+
+      let changed = false;
+
+      let pending = downloading.length;
+      downloading.forEach(item => {
+        chrome.downloads.search({ id: item.downloadId }, (results) => {
+          pending--;
+          if (results && results[0]) {
+            const dl = results[0];
+            let newStatus = null;
+            if (dl.state === 'complete') {
+              newStatus = (dl.exists === false) ? 'Deleted' : 'Complete';
+            } else if (dl.state === 'interrupted') {
+              newStatus = 'Ready';
+            }
+
+            if (newStatus && newStatus !== item.status) {
+              const currentOrder = STATUS_ORDER[item.status] ?? 0;
+              const newOrder = STATUS_ORDER[newStatus] ?? 0;
+              if (newOrder > currentOrder) {
+                item.status = newStatus;
+                changed = true;
+                const btn = document.getElementById(`btn-${item.id}`);
+                if (btn) applyBtnState(btn, newStatus);
+              }
+            }
+          }
+
+          // After all checks, persist if anything changed
+          if (pending === 0 && changed) {
+            chrome.storage.local.set({ capturedMedia: media });
+          }
+        });
+      });
+    });
+  }
+
+  // Start poll — runs every 3s while popup is open
+  const pollTimer = setInterval(pollDownloadStatus, POLL_INTERVAL_MS);
+  // Clean up on unload
+  window.addEventListener('unload', () => clearInterval(pollTimer));
 
   // ── Toolbar Buttons ───────────────────────────────────────────────────────
   document.getElementById('clear-btn').addEventListener('click', () => {
