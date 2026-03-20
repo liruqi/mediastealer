@@ -1,4 +1,4 @@
-importScripts('plugin-engine.js', 'plugins/m3u8-plugin.js');
+importScripts('media-db.js', 'plugin-engine.js', 'plugins/m3u8-plugin.js');
 
 const defaultRules = [
   { id: 1, enabled: true, url: ".*", ct: "video/.*", rtype: 1 },
@@ -353,30 +353,61 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
   } else if (message.type === "DOWNLOAD_INTERNAL") {
     const { url, filename, showFile } = message.data;
-    chrome.downloads.download({
-      url: url,
-      filename: filename,
-      saveAs: false
-    }, (downloadId) => {
-      const err = chrome.runtime.lastError ? chrome.runtime.lastError.message : null;
-      if (downloadId && !err && showFile) {
-        chrome.downloads.show(downloadId);
+    const relativePath = filename.replace(/\\/g, '/');
+    chrome.downloads.search({ state: 'complete' }, (results) => {
+      const existing = results.find(item => {
+        const itemPath = item.filename.replace(/\\/g, '/');
+        // Check if path matches AND file still exists on disk
+        return itemPath.endsWith(relativePath) && item.exists !== false;
+      });
+
+      if (existing) {
+        addLog(`File already exists, skipping download: ${filename} (at ${existing.filename})`);
+        sendResponse({ success: true, downloadId: existing.id, wasSkipped: true });
+        return;
       }
-      sendResponse({ success: !err, downloadId, error: err });
+
+      chrome.downloads.download({
+        url: url,
+        filename: filename,
+        saveAs: false
+      }, (downloadId) => {
+        const err = chrome.runtime.lastError ? chrome.runtime.lastError.message : null;
+        if (err) {
+          addLog(`Download trigger failed for ${filename}: ${err}`);
+        }
+        if (downloadId && !err && showFile) {
+          chrome.downloads.show(downloadId);
+        }
+        sendResponse({ success: !err, downloadId, error: err });
+      });
     });
     return true; // Keep channel open for async callback
   } else if (message.type === "WAIT_FOR_DOWNLOAD") {
     const { downloadId } = message.data;
-    const checkStatus = (delta) => {
-      if (delta.id === downloadId && delta.state) {
-        if (delta.state.current === 'complete' || delta.state.current === 'interrupted') {
-          chrome.downloads.onChanged.removeListener(checkStatus);
-          sendResponse({ state: delta.state.current });
-        }
+    
+    // Check current state first (it might be already complete if skipped)
+    chrome.downloads.search({ id: downloadId }, (results) => {
+      const current = results && results[0];
+      if (current && (current.state === 'complete' || current.state === 'interrupted')) {
+        sendResponse({ state: current.state });
+        return;
       }
-    };
-    chrome.downloads.onChanged.addListener(checkStatus);
+
+      const checkStatus = (delta) => {
+        if (delta.id === downloadId && delta.state) {
+          if (delta.state.current === 'complete' || delta.state.current === 'interrupted') {
+            chrome.downloads.onChanged.removeListener(checkStatus);
+            sendResponse({ state: delta.state.current });
+          }
+        }
+      };
+      chrome.downloads.onChanged.addListener(checkStatus);
+    });
     return true;
+  } else if (message.type === "UPDATE_ITEM_STATUS") {
+    const { itemId, status, downloadId } = message.data;
+    updateItemStatus(itemId, status, downloadId);
   } else if (message.type === "TRIGGER_PLUGIN_ACTION") {
     const { pluginName, action, itemId } = message;
     chrome.storage.local.get(['config'], (result) => {
