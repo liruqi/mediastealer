@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Status progression — must only move forward, never backward
-  const STATUS_ORDER = { 'Ready': 0, 'Downloading': 1, 'Complete': 2, 'Deleted': 3 };
+  const STATUS_ORDER = { 'Ready': 0, 'Downloading': 1, 'Complete': 2 };
 
   /** Checks actual download state via chrome.downloads API and corrects stored status / button */
   function checkDownloadStatus(downloadId, itemId) {
@@ -69,8 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       let newStatus = null;
       if (download.state === 'complete') {
-        // exists may be undefined on some Chrome versions — only mark Deleted when explicitly false
-        newStatus = (download.exists === false) ? 'Deleted' : 'Complete';
+        newStatus = 'Complete';
       } else if (download.state === 'in_progress') {
         newStatus = 'Downloading';
       } else if (download.state === 'interrupted') {
@@ -101,7 +100,15 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ── List Rendering ────────────────────────────────────────────────────────
+  let lastRenderedJson = '';
   function renderList(items) {
+    if (!items) items = [];
+    
+    // Quick performance check: if data hasn't changed, don't rebuild DOM
+    const currentJson = JSON.stringify(items.map(m => ({id: m.id, url: m.url, status: m.status})));
+    if (currentJson === lastRenderedJson) return;
+    lastRenderedJson = currentJson;
+
     tbody.innerHTML = '';
 
     if (items && items.length > 0) {
@@ -136,12 +143,15 @@ document.addEventListener('DOMContentLoaded', () => {
         // NOTE: status polling handles updates — no per-render check needed
       });
 
-      // Attach event listeners
-      tbody.querySelectorAll('.action-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const id = e.target.getAttribute('data-id');
-          const url = e.target.getAttribute('data-url');
-          const filename = e.target.getAttribute('data-filename');
+      // Use event delegation for better performance
+      if (!tbody.dataset.listenerAttached) {
+        tbody.addEventListener('click', (e) => {
+          const btn = e.target.closest('.action-btn');
+          if (!btn) return;
+
+          const id = btn.getAttribute('data-id');
+          const url = btn.getAttribute('data-url');
+          const filename = btn.getAttribute('data-filename');
 
           chrome.storage.local.get(['capturedMedia'], (result) => {
             const media = result.capturedMedia || [];
@@ -151,12 +161,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const currentStatus = item.status || 'Ready';
 
             if (currentStatus === 'Complete') {
-              // Open / reveal file
               if (item.downloadId) {
                 chrome.downloads.show(item.downloadId);
               }
             } else if (currentStatus === 'Ready' || currentStatus === 'interrupted') {
-              // Start download
               let downloadPath = filename;
               if (item.dateFolder && item.domain) {
                 downloadPath = `${item.dateFolder}/${item.domain}/${filename}`;
@@ -164,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
               item.status = 'Downloading';
               chrome.storage.local.set({ capturedMedia: media });
-              applyBtnState(e.target, 'Downloading');
+              applyBtnState(btn, 'Downloading');
 
               chrome.downloads.download({
                 url: url,
@@ -173,16 +181,16 @@ document.addEventListener('DOMContentLoaded', () => {
               }).then(downloadId => {
                 item.downloadId = downloadId;
                 chrome.storage.local.set({ capturedMedia: media });
-                // Background.js onChanged listener will update status to Complete/Ready
               }).catch(() => {
                 item.status = 'Ready';
                 chrome.storage.local.set({ capturedMedia: media });
-                applyBtnState(e.target, 'Ready');
+                applyBtnState(btn, 'Ready');
               });
             }
           });
         });
-      });
+        tbody.dataset.listenerAttached = 'true';
+      }
     } else {
       emptyState.classList.remove('hidden');
       mediaList.classList.add('hidden');
@@ -219,11 +227,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const media = result.capturedMedia || [];
       const downloading = media.filter(m => m.status === 'Downloading' && m.downloadId);
 
-      if (downloading.length === 0) return; // nothing to check
+      if (downloading.length === 0) return;
 
-      let changed = false;
-
+      let updates = [];
       let pending = downloading.length;
+
       downloading.forEach(item => {
         chrome.downloads.search({ id: item.downloadId }, (results) => {
           pending--;
@@ -231,7 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const dl = results[0];
             let newStatus = null;
             if (dl.state === 'complete') {
-              newStatus = (dl.exists === false) ? 'Deleted' : 'Complete';
+              newStatus = 'Complete';
             } else if (dl.state === 'interrupted') {
               newStatus = 'Ready';
             }
@@ -240,17 +248,30 @@ document.addEventListener('DOMContentLoaded', () => {
               const currentOrder = STATUS_ORDER[item.status] ?? 0;
               const newOrder = STATUS_ORDER[newStatus] ?? 0;
               if (newOrder > currentOrder) {
-                item.status = newStatus;
-                changed = true;
-                const btn = document.getElementById(`btn-${item.id}`);
-                if (btn) applyBtnState(btn, newStatus);
+                updates.push({ id: item.id, status: newStatus });
               }
             }
           }
 
-          // After all checks, persist if anything changed
-          if (pending === 0 && changed) {
-            chrome.storage.local.set({ capturedMedia: media });
+          if (pending === 0 && updates.length > 0) {
+            // Apply updates atomically to current storage
+            chrome.storage.local.get(['capturedMedia'], (freshResult) => {
+              const freshMedia = freshResult.capturedMedia || [];
+              let changed = false;
+              updates.forEach(upd => {
+                const item = freshMedia.find(m => m.id === upd.id);
+                if (item && item.status !== upd.status) {
+                  item.status = upd.status;
+                  changed = true;
+                  // Update UI immediately if button exists
+                  const btn = document.getElementById(`btn-${upd.id}`);
+                  if (btn) applyBtnState(btn, upd.status);
+                }
+              });
+              if (changed) {
+                chrome.storage.local.set({ capturedMedia: freshMedia });
+              }
+            });
           }
         });
       });
