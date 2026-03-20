@@ -128,6 +128,11 @@ chrome.webRequest.onHeadersReceived.addListener(
   async function (details) {
     if (!config.enabled) return;
 
+    // Skip requests initiated by the extension itself (background/offscreen/popup)
+    if (details.initiator && details.initiator.startsWith('chrome-extension://')) {
+      return;
+    }
+
     if (!details.responseHeaders) return;
 
     let contentLength = -1; // -1 means unknown (e.g., chunked transfer)
@@ -339,8 +344,35 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "GET_LOGS") {
     sendResponse({ logs: capturedLogs });
   } else if (message.type === "MERGE_PROGRESS") {
-    const { filename, current, total } = message.data;
-    addLog(`Merging ${filename}: ${current}/${total} fragments...`);
+    const { filename, current, total, status } = message.data;
+    if (status) {
+      addLog(status);
+    } else {
+      addLog(`Merging ${filename}: ${current}/${total} fragments...`);
+    }
+  } else if (message.type === "DOWNLOAD_INTERNAL") {
+    const { url, filename } = message.data;
+    chrome.downloads.download({
+      url: url,
+      filename: filename,
+      saveAs: false
+    }, (downloadId) => {
+      const err = chrome.runtime.lastError ? chrome.runtime.lastError.message : null;
+      sendResponse({ success: !err, downloadId, error: err });
+    });
+    return true; // Keep channel open for async callback
+  } else if (message.type === "WAIT_FOR_DOWNLOAD") {
+    const { downloadId } = message.data;
+    const checkStatus = (delta) => {
+      if (delta.id === downloadId && delta.state) {
+        if (delta.state.current === 'complete' || delta.state.current === 'interrupted') {
+          chrome.downloads.onChanged.removeListener(checkStatus);
+          sendResponse({ state: delta.state.current });
+        }
+      }
+    };
+    chrome.downloads.onChanged.addListener(checkStatus);
+    return true;
   } else if (message.type === "TRIGGER_PLUGIN_ACTION") {
     const { pluginName, action, itemId } = message;
     chrome.storage.local.get(['config'], (result) => {
