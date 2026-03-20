@@ -103,9 +103,9 @@ document.addEventListener('DOMContentLoaded', () => {
   let lastRenderedJson = '';
   function renderList(items) {
     if (!items) items = [];
-    
+
     // Quick performance check: if data hasn't changed, don't rebuild DOM
-    const currentJson = JSON.stringify(items.map(m => ({id: m.id, url: m.url, status: m.status})));
+    const currentJson = JSON.stringify(items.map(m => ({ id: m.id, url: m.url, status: m.status })));
     if (currentJson === lastRenderedJson) return;
     lastRenderedJson = currentJson;
 
@@ -218,9 +218,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // ── 3-second polling for active downloads ─────────────────────────────────
+  // ── 1-second polling for active downloads ─────────────────────────────────
   // Only checks items with status 'Downloading'. Stops automatically when none remain.
-  const POLL_INTERVAL_MS = 3000;
+  const POLL_INTERVAL_MS = 1000;
 
   function pollDownloadStatus() {
     chrome.storage.local.get(['capturedMedia'], (result) => {
@@ -278,7 +278,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Start poll — runs every 3s while popup is open
+  // Start poll — runs every 1s while popup is open
+  pollDownloadStatus(); // Call once immediately
   const pollTimer = setInterval(pollDownloadStatus, POLL_INTERVAL_MS);
   // Clean up on unload
   window.addEventListener('unload', () => clearInterval(pollTimer));
