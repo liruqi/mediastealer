@@ -37,6 +37,11 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.classList.remove('open-btn', 'downloading-btn', 'deleted-btn');
     btn.disabled = false;
 
+    // Also handle sister merge-btn if present
+    const row = btn.closest('tr');
+    const mergeBtn = row ? row.querySelector('.merge-btn') : null;
+    if (mergeBtn) mergeBtn.disabled = false;
+
     switch (status) {
       case 'Complete':
         btn.textContent = chrome.i18n.getMessage('btn_open') || 'Open';
@@ -46,11 +51,13 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.textContent = chrome.i18n.getMessage('btn_downloading') || 'Downloading';
         btn.classList.add('downloading-btn');
         btn.disabled = true;
+        if (mergeBtn) mergeBtn.disabled = true;
         break;
       case 'Deleted':
         btn.textContent = chrome.i18n.getMessage('btn_deleted') || 'Deleted';
         btn.classList.add('deleted-btn');
         btn.disabled = true;
+        if (mergeBtn) mergeBtn.disabled = true;
         break;
       default: // 'Ready' or anything else
         btn.textContent = chrome.i18n.getMessage('btn_download') || 'Download';
@@ -124,12 +131,21 @@ document.addEventListener('DOMContentLoaded', () => {
           <td class="type">${(item.type || '').split(';')[0]}</td>
           <td>${formatBytes(item.size)}</td>
           <td>
-            <button class="action-btn" id="btn-${item.id}"
-              data-id="${item.id}"
-              data-url="${item.url}"
-              data-filename="${item.filename}">
-              ${chrome.i18n.getMessage('btn_download') || 'Download'}
-            </button>
+            <div class="btn-group">
+              <button class="action-btn" id="btn-${item.id}"
+                data-id="${item.id}"
+                data-url="${item.url}"
+                data-filename="${item.filename}">
+                ${chrome.i18n.getMessage('btn_download') || 'Download'}
+              </button>
+              ${item.pluginType === 'm3u8' ? `
+                <button class="action-btn merge-btn" 
+                  data-id="${item.id}" 
+                  title="${chrome.i18n.getMessage('btn_merge') || 'Merge'}">
+                  ${chrome.i18n.getMessage('btn_merge') || 'Merge'}
+                </button>
+              ` : ''}
+            </div>
           </td>
         `;
         tbody.appendChild(tr);
@@ -150,8 +166,16 @@ document.addEventListener('DOMContentLoaded', () => {
           if (!btn) return;
 
           const id = btn.getAttribute('data-id');
-          const url = btn.getAttribute('data-url');
-          const filename = btn.getAttribute('data-filename');
+
+          if (btn.classList.contains('merge-btn')) {
+            chrome.runtime.sendMessage({
+              type: 'TRIGGER_PLUGIN_ACTION',
+              pluginName: 'M3U8 Downloader',
+              action: 'merge',
+              itemId: id
+            });
+            return;
+          }
 
           chrome.storage.local.get(['capturedMedia'], (result) => {
             const media = result.capturedMedia || [];

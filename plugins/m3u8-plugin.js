@@ -10,7 +10,8 @@ const M3U8_PLUGIN = {
    * Intercept hook: Detect .m3u8 and ignore size rules.
    */
   async onIntercept({ details, contentType, config }) {
-    const isM3u8 = details.url.toLowerCase().includes('.m3u8') || 
+    const url = details.url.toLowerCase();
+    const isM3u8 = url.includes('.m3u8') || 
                    contentType.toLowerCase().includes('application/vnd.apple.mpegurl') ||
                    contentType.toLowerCase().includes('application/x-mpegurl');
     
@@ -23,10 +24,10 @@ const M3U8_PLUGIN = {
       };
     }
     
-    // Check if this is a fragment of an already handled M3U8 (to skip it)
-    // This is a bit tricky, but we can check if the URL matches common fragment patterns
-    if (details.url.toLowerCase().includes('.ts') || details.url.toLowerCase().includes('.m4s')) {
-       // We'll let background.js check if it's already "known" via capturedUrls
+    // Block individual fragments (TS, M4S, etc.)
+    if (url.includes('.ts') || url.includes('.m4s') || url.includes('.m4v') || url.includes('.m4a')) {
+       // Returning skip:true prevents background.js from capturing these at all
+       return { skip: true };
     }
 
     return null;
@@ -37,23 +38,59 @@ const M3U8_PLUGIN = {
    */
   async onPreDownload({ item, config }) {
     if (item.type !== 'm3u8') return null;
-
-    console.log(`M3U8 Plugin: Starting download for ${item.url}`);
     
+    // Only auto-trigger if automatic download is enabled
+    if (config.automaticdownload) {
+      this.triggerMerge(item);
+      return { handled: true };
+    }
+    return null;
+  },
+
+  /**
+   * Action hook: Handle manual triggers from the UI.
+   */
+  async onAction({ action, itemId, config }) {
+    if (action === 'merge') {
+      chrome.storage.local.get(['capturedMedia'], (result) => {
+        const media = result.capturedMedia || [];
+        const item = media.find(m => m.id === itemId);
+        if (item) {
+          this.triggerMerge(item);
+        }
+      });
+    }
+  },
+
+  async triggerMerge(item) {
+    console.log(`M3U8 Plugin: Starting merge for ${item.url}`);
+    
+    // Use the global updateItemStatus from background.js
+    if (typeof updateItemStatus === 'function') {
+      updateItemStatus(item.id, 'Downloading');
+    }
+
     try {
       // 1. Fetch the playlist
       const resp = await fetch(item.url);
       const m3u8Content = await resp.text();
       
-      // 2. Parse segment URLs (simple regex for now)
+      // 2. Parse segment URLs and EXT-X-MAP
       const lines = m3u8Content.split('\n');
       const segmentUrls = [];
+      let mapUrl = null;
       const baseUrl = item.url.substring(0, item.url.lastIndexOf('/') + 1);
 
       for (let line of lines) {
         line = line.trim();
-        if (line && !line.startsWith('#')) {
-          // Resolve relative URLs
+        if (!line) continue;
+
+        if (line.startsWith('#EXT-X-MAP')) {
+          const match = line.match(/URI="([^"]+)"/);
+          if (match) {
+            mapUrl = new URL(match[1], baseUrl).href;
+          }
+        } else if (!line.startsWith('#')) {
           try {
             const url = new URL(line, baseUrl).href;
             segmentUrls.push(url);
@@ -68,27 +105,23 @@ const M3U8_PLUGIN = {
       // 3. Request offscreen merge
       await this.ensureOffscreen();
       
-      const filename = item.filename.replace('.m3u8', '.ts'); // Convert to .ts for merged file
+      let folderName = item.filename.replace('.m3u8', '') + '.m3u8';
+      const finalFilename = `${folderName}/merged_video.ts`;
       
-      const result = await chrome.runtime.sendMessage({
+      chrome.runtime.sendMessage({
         target: 'offscreen',
         type: 'MERGE_M3U8',
         data: {
           playlistUrl: item.url,
           segmentUrls: segmentUrls,
-          filename: filename
+          mapUrl: mapUrl,
+          filename: finalFilename,
+          folderName: folderName
         }
       });
 
-      if (result && result.success) {
-        return { handled: true, downloadId: result.downloadId };
-      } else {
-        throw new Error(result ? result.error : 'Unknown offscreen error');
-      }
-
     } catch (e) {
-      console.error('M3U8 Plugin error:', e);
-      return { error: e.message };
+      console.error('M3U8 Plugin triggerMerge error:', e);
     }
   },
 

@@ -20,6 +20,7 @@
   "btn_download": { "message": "ดาวน์โหลด" },
   "btn_open": { "message": "เปิด" },
   "btn_downloading": { "message": "กำลังดาวน์โหลด" },
+  "btn_merge": { "message": "ผสาน" },
   "options_title": { "message": "การตั้งค่า ธารเงา" },
   "card_general": { "message": "การตั้งค่าทั่วไป" },
   "opt_enable": { "message": "เปิดใช้งาน ธารเงา" },

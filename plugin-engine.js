@@ -23,6 +23,9 @@ function registerPlugin(plugin) {
 async function executeHook(hookName, arg) {
   let result = {};
   for (const plugin of plugins) {
+    // If a specific plugin is targeted, skip others
+    if (arg && arg.pluginName && plugin.name !== arg.pluginName) continue;
+
     if (plugin[hookName] && typeof plugin[hookName] === 'function') {
       try {
         const hookResult = await plugin[hookName](arg);

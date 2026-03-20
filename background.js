@@ -341,5 +341,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   } else if (message.type === "MERGE_PROGRESS") {
     const { filename, current, total } = message.data;
     addLog(`Merging ${filename}: ${current}/${total} fragments...`);
+  } else if (message.type === "TRIGGER_PLUGIN_ACTION") {
+    const { pluginName, action, itemId } = message;
+    chrome.storage.local.get(['config'], (result) => {
+      const config = result.config || {};
+      self.pluginEngine.executeHook('onAction', { pluginName, action, itemId, config });
+    });
   }
 });

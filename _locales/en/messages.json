@@ -62,6 +62,9 @@
   "btn_downloading": {
     "message": "Downloading"
   },
+  "btn_merge": {
+    "message": "Merge"
+  },
   "options_title": {
     "message": "Fluxon Options"
   },
