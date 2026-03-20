@@ -11,6 +11,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     (async () => {
       try {
         const keyCache = new Map(); // url -> CryptoKey
+        const downloadQueue = [];
         const segmentBuffers = new Array(segments.length + (mapUrl ? 1 : 0));
         const CONCURRENCY = 5;
         let completed = 0;
@@ -78,12 +79,24 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
         // 1. Process Map (Initialization)
         if (mapUrl) {
+          chrome.runtime.sendMessage({
+            type: 'MERGE_PROGRESS',
+            data: { filename, status: `Fetching Initialization Map: ${mapUrl}` }
+          });
           const mapBuf = await fetchWithRetry(mapUrl);
           segmentBuffers[0] = mapBuf;
+          
+          if (folderName) {
+            const mapExt = mapUrl.split('?')[0].split('.').pop() || 'mp4';
+            downloadQueue.push({
+              sourceUrl: mapUrl,
+              data: mapBuf,
+              filename: `${folderName}/init.${mapExt}`
+            });
+          }
         }
 
         // 2. Process Segments with Concurrency
-        const downloadQueue = [];
         const queue = [...segments.entries()];
         const workers = Array(CONCURRENCY).fill(null).map(async () => {
           while (queue.length > 0) {

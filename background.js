@@ -249,7 +249,8 @@ chrome.webRequest.onHeadersReceived.addListener(
           size: contentLength,
           timestamp: Date.now(),
           status: 'Ready',
-          pluginType: pluginResult.type || 'generic'
+          pluginType: pluginResult.type || 'generic',
+          streamType: pluginResult.streamType || null
         };
 
         if (config.automaticdownload) {

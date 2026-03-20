@@ -126,7 +126,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>
-            <span class="filename" title="${item.url}">${item.filename}</span>
+            <div class="filename-container">
+              <span class="filename" title="${item.url}">${item.filename}</span>
+              ${item.streamType ? `<span class="badge badge-${item.streamType}">${item.streamType.toUpperCase()}</span>` : ''}
+            </div>
           </td>
           <td class="type">${(item.type || '').split(';')[0]}</td>
           <td>${formatBytes(item.size)}</td>

@@ -5,6 +5,7 @@
 
 const M3U8_PLUGIN = {
   name: "M3U8 Downloader",
+  handledUrls: new Set(),
 
   /**
    * Intercept hook: Detect .m3u8 and ignore size rules.
@@ -16,11 +17,17 @@ const M3U8_PLUGIN = {
       contentType.toLowerCase().includes('application/x-mpegurl');
 
     if (isM3u8) {
+      let streamType = 'hls';
+      if (url.includes('master')) streamType = 'master';
+      else if (url.includes('/vid/') || url.includes('avc1')) streamType = 'video';
+      else if (url.includes('/aud/') || url.includes('mp4a')) streamType = 'audio';
+
       return {
         ignoreSize: true,
         isPluginHandled: true,
         pluginName: this.name,
-        type: 'm3u8'
+        type: 'm3u8',
+        streamType: streamType
       };
     }
 
@@ -38,10 +45,16 @@ const M3U8_PLUGIN = {
    */
   async onPreDownload({ item, config }) {
     if (item.type !== 'm3u8') return null;
+    if (this.handledUrls.has(item.url)) return { handled: true };
 
     // Only auto-trigger if automatic download is enabled
     if (config.automaticdownload) {
-      this.triggerMerge(item);
+      // Delay slightly to allow Master playlist to be captured/prioritized
+      setTimeout(() => {
+        if (!this.handledUrls.has(item.url)) {
+          this.triggerMerge(item);
+        }
+      }, 500);
       return { handled: true };
     }
     return null;
@@ -62,8 +75,8 @@ const M3U8_PLUGIN = {
     }
   },
 
-  async triggerMerge(item, depth = 0) {
-    if (depth > 2) {
+  async triggerMerge(item, depth = 0, parentFolder = null) {
+    if (depth > 3) {
       console.error('M3U8 Plugin: Max playlist depth reached');
       return;
     }
@@ -74,12 +87,25 @@ const M3U8_PLUGIN = {
       updateItemStatus(item.id, 'Downloading');
     }
 
+    this.handledUrls.add(item.url);
+
     try {
       const resp = await fetch(item.url);
       const m3u8Content = await resp.text();
       const baseUrl = item.url.substring(0, item.url.lastIndexOf('/') + 1);
-      const lines = m3u8Content.split('\n');
-
+      const lines = m3u8Content.split(/\r?\n/);
+      
+      // Determine Folder Name for this stage
+      const urlBase = item.url.split('/').pop().split('?')[0].replace(/\.m3u8$/i, '').replace(/\./g, '_');
+      let folderName;
+      if (parentFolder) {
+        folderName = `${parentFolder}/${urlBase}_hls`;
+      } else {
+        const datePart = item.dateFolder || 'FLX-Unknown';
+        const domainPart = item.domain || 'unknown';
+        folderName = `${datePart}/${domainPart}/${urlBase}_hls`;
+      }
+      
       // 1. Detect Master Playlist
       const variants = [];
       let isMaster = false;
@@ -89,11 +115,16 @@ const M3U8_PLUGIN = {
           isMaster = true;
           const bandwidthMatch = line.match(/BANDWIDTH=(\d+)/);
           const bandwidth = bandwidthMatch ? parseInt(bandwidthMatch[1], 10) : 0;
+          const resMatch = line.match(/RESOLUTION=(\d+x\d+)/);
           const nextLine = lines[i + 1] ? lines[i + 1].trim() : '';
           if (nextLine && !nextLine.startsWith('#')) {
+            const vUrl = new URL(nextLine, baseUrl).href;
+            this.handledUrls.add(vUrl);
             variants.push({
-              url: new URL(nextLine, baseUrl).href,
-              bandwidth: bandwidth
+              url: vUrl,
+              bandwidth: bandwidth,
+              resolution: resMatch ? resMatch[1] : 'unknown',
+              info: line
             });
           }
         }
@@ -104,20 +135,56 @@ const M3U8_PLUGIN = {
         variants.sort((a, b) => b.bandwidth - a.bandwidth);
         const bestVariant = variants[0];
         
-        const resolution = bestVariant.width ? `${bestVariant.width}x${bestVariant.height}` : 'unknown';
         chrome.runtime.sendMessage({ 
           type: 'MERGE_PROGRESS', 
-          data: { filename: item.filename, status: `Master Playlist: Selecting best variant: ${resolution} (${bestVariant.bandwidth} bps)` } 
+          data: { filename: item.filename, status: `Master Playlist: Selecting best variant: ${bestVariant.resolution} (${bestVariant.bandwidth} bps)` } 
         });
+
+        // Search for associated audio track
+        console.log('M3U8 Plugin: Checking for audio groups in variant:', bestVariant.info);
+        const audioGroupIdMatch = bestVariant.info.match(/AUDIO="([^"]+)"/);
+        if (audioGroupIdMatch) {
+          const groupId = audioGroupIdMatch[1];
+          chrome.runtime.sendMessage({ 
+            type: 'MERGE_PROGRESS', 
+            data: { filename: item.filename, status: `Found Audio Group: ${groupId}. Searching for track...` } 
+          });
+          const audioMediaLine = lines.find(l => l.includes('#EXT-X-MEDIA') && l.includes('TYPE=AUDIO') && l.includes(`GROUP-ID="${groupId}"`));
+          if (audioMediaLine) {
+            const audioUriMatch = audioMediaLine.match(/URI="([^"]+)"/);
+            if (audioUriMatch) {
+              const audioUrl = new URL(audioUriMatch[1], baseUrl).href;
+              chrome.runtime.sendMessage({ 
+                type: 'MERGE_PROGRESS', 
+                data: { filename: item.filename, status: `Auto-merging associated Audio track: ${audioUrl}` } 
+              });
+              // Trigger audio merge in parallel (nested)
+              this.triggerMerge({ ...item, url: audioUrl }, depth + 1, folderName);
+            } else {
+              chrome.runtime.sendMessage({ 
+                type: 'MERGE_PROGRESS', 
+                data: { filename: item.filename, status: `[NOTE] Audio group ${groupId} has no URI (often embedded in video TS)` } 
+              });
+            }
+          }
+        }
         
-        // Recursive call with same item but variant URL
-        return this.triggerMerge({ ...item, url: bestVariant.url }, depth + 1);
+        // Finalize Video merge (nested)
+        return this.triggerMerge({ ...item, url: bestVariant.url }, depth + 1, folderName);
       }
 
       // Identify if this is likely an audio track
       const isAudio = item.url.includes('/aud/') || item.url.includes('mp4a') || 
                       (!m3u8Content.includes('RESOLUTION=') && !m3u8Content.includes('avc1'));
       const streamLabel = isAudio ? 'Audio' : 'Video';
+      
+      if (depth === 0) {
+        chrome.runtime.sendMessage({ 
+          type: 'MERGE_PROGRESS', 
+          data: { filename: item.filename, status: `[PRO TIP] This is a standalone ${streamLabel} track. For full video + sound, click Merge on a [MASTER] item if available.` } 
+        });
+      }
+      
       chrome.runtime.sendMessage({ 
         type: 'MERGE_PROGRESS', 
         data: { filename: item.filename, status: `Merging ${streamLabel} HLS stream...` } 
@@ -172,16 +239,6 @@ const M3U8_PLUGIN = {
       await this.ensureOffscreen();
 
       const isFMP4 = !!mapUrl || segments.some(s => s.url.includes('.m4s'));
-      // Sanitize: remove .m3u8 and any dots from the base name for the folder
-      let baseName = item.filename.split('/').pop().replace(/\.m3u8$/i, '').replace(/\./g, '_');
-      let folderName = baseName + '_hls';
-      
-      // If original filename had a path, preserve it (e.g. x.com/foo.m3u8 -> x.com/foo_hls/)
-      if (item.filename.includes('/')) {
-        const pathPart = item.filename.substring(0, item.filename.lastIndexOf('/') + 1);
-        folderName = pathPart + folderName;
-      }
-      
       const ext = isFMP4 ? (isAudio ? 'm4a' : 'mp4') : 'ts';
       const finalFilename = `${folderName}/merged_${isAudio ? 'audio' : 'video'}.${ext}`;
 

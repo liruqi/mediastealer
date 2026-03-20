@@ -101,13 +101,34 @@ tr:last-child td {
   border-bottom: none;
 }
 
+.filename-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+}
+
 .filename {
   max-width: 300px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  display: inline-block;
 }
+
+.badge {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 4px;
+  border-radius: 3px;
+  color: white;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.badge-master { background-color: #ff5722; } /* Deep Orange */
+.badge-video { background-color: #2196f3; } /* Blue */
+.badge-audio { background-color: #9c27b0; } /* Purple */
+.badge-hls { background-color: #607d8b; }   /* Blue Grey */
 
 body.is-popout .filename {
   max-width: 50vw;
