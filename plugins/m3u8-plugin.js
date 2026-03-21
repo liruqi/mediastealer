@@ -150,7 +150,7 @@ const M3U8_PLUGIN = {
         
         let audioMergePromise = Promise.resolve({ success: true, muxKey: null });
         console.log(`M3U8 Plugin: Coordinating Master Merge. Video: ${bestVariant.url}, Audio: ${bestAudioUrl || 'none'}`);
-        chrome.runtime.sendMessage({
+        dispatchToBackground({
           type: 'MERGE_PROGRESS',
           data: { filename: item.url, status: `[MASTER] Coordinating Video & Audio tracks...` }
         });
@@ -168,11 +168,11 @@ const M3U8_PLUGIN = {
         
         if (vRes?.success && vRes.muxKey) {
            console.log(`M3U8 Plugin: Video track ready for MUX.`);
-           chrome.runtime.sendMessage({ type: 'MERGE_PROGRESS', data: { filename: item.url, status: `[MASTER] Video track ready.` } });
+           dispatchToBackground({ type: 'MERGE_PROGRESS', data: { filename: item.url, status: `[MASTER] Video track ready.` } });
         }
         if (bestAudioUrl && aRes?.success && aRes.muxKey) {
            console.log(`M3U8 Plugin: Audio track ready for MUX.`);
-           chrome.runtime.sendMessage({ type: 'MERGE_PROGRESS', data: { filename: item.url, status: `[MASTER] Audio track ready.` } });
+           dispatchToBackground({ type: 'MERGE_PROGRESS', data: { filename: item.url, status: `[MASTER] Audio track ready.` } });
         }
         
         if (vRes?.success && vRes.muxKey && (!bestAudioUrl || (aRes?.success && aRes.muxKey))) {
@@ -180,7 +180,7 @@ const M3U8_PLUGIN = {
           console.log(`M3U8 Plugin: Coordination complete, triggering MUX: ${finalFilename}`);
           
           await this.ensureOffscreen();
-          chrome.runtime.sendMessage({
+          const muxMsg = {
             type: 'MUX_MEDIA',
             data: {
               videoKey: vRes.muxKey,
@@ -188,12 +188,13 @@ const M3U8_PLUGIN = {
               filename: finalFilename,
               itemId: item.id
             }
-          });
+          };
+          dispatchToOffscreen(muxMsg);
         } else {
           const vErr = vRes?.error ? `Video: ${vRes.error}` : '';
           const aErr = aRes?.error ? `Audio: ${aRes.error}` : '';
           console.error(`M3U8 Plugin: Coordination failed. ${vErr} ${aErr}`);
-          chrome.runtime.sendMessage({
+          dispatchToBackground({
             type: 'MERGE_PROGRESS',
             data: { filename: item.url, status: `[ERROR] Coordination failed. ${vErr} ${aErr}` }
           });
@@ -241,7 +242,7 @@ const M3U8_PLUGIN = {
       const finalFilename = `${folderName}/merged_${isAudio ? 'audio' : 'video'}.${ext}`;
 
       return new Promise((resolve) => {
-        chrome.runtime.sendMessage({
+        const msg = {
           target: 'offscreen',
           type: 'MERGE_M3U8',
           data: {
@@ -254,13 +255,17 @@ const M3U8_PLUGIN = {
             folderName: folderName,
             ...options
           }
-        }, (response) => {
+        };
+
+        const callback = (response) => {
           if (response && response.success) {
              resolve({ success: true, muxKey: response.muxKey });
           } else {
              resolve({ success: false, error: response?.error });
           }
-        });
+        };
+
+        dispatchToOffscreen(msg, callback);
       });
 
     } catch (e) {
@@ -270,9 +275,13 @@ const M3U8_PLUGIN = {
   },
 
   async ensureOffscreen() {
-    // chrome.offscreen is Chrome-only; skip gracefully on Firefox
+    // chrome.offscreen is Chrome-only
     if (!chrome.offscreen) {
-      console.warn('M3U8 Plugin: chrome.offscreen not available (Firefox?). HLS merging requires Chrome.');
+      if (typeof self.handleOffscreenMessage === 'function') {
+        // We are successfully running in a context where offscreen logic is directly available (Firefox background)
+        return;
+      }
+      console.warn('M3U8 Plugin: chrome.offscreen not available. HLS merging requires Chrome.');
       throw new Error('Offscreen API not available in this browser.');
     }
 
@@ -296,6 +305,27 @@ const M3U8_PLUGIN = {
     return this._offscreenPromise;
   }
 };
+
+// plugins/m3u8-plugin.js
+// Intercepts m3u8 and ts requests, generates download links for master list
+
+function dispatchToBackground(msg, cb) {
+  if (!chrome.offscreen && typeof self.handleBackgroundMessage === 'function') {
+    self.handleBackgroundMessage(msg, {}, cb || (() => {}));
+  } else {
+    if (cb) chrome.runtime.sendMessage(msg, cb);
+    else chrome.runtime.sendMessage(msg).catch(() => {});
+  }
+}
+
+function dispatchToOffscreen(msg, cb) {
+  if (!chrome.offscreen && typeof self.handleOffscreenMessage === 'function') {
+    self.handleOffscreenMessage(msg, {}, cb || (() => {}));
+  } else {
+    if (cb) chrome.runtime.sendMessage(msg, cb);
+    else chrome.runtime.sendMessage(msg).catch(() => {});
+  }
+}
 
 // Register the plugin
 if (typeof self !== 'undefined' && self.pluginEngine) {

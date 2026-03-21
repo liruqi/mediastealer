@@ -1,9 +1,21 @@
 /**
  * Fluxon Offscreen Script
  * Handles fetching segments and merging them into a single Blob.
+ * In Chrome, this runs in a dedicated offscreen document.
+ * In Firefox, this runs directly in the background Event Page.
  */
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+function dispatchToBackground(msg, callback) {
+  // If we're inside the background context (Firefox) and handleBackgroundMessage is available
+  if (typeof self.handleBackgroundMessage === 'function' && !chrome.offscreen) {
+    self.handleBackgroundMessage(msg, {}, callback || (() => {}));
+  } else {
+    if (callback) chrome.runtime.sendMessage(msg, callback);
+    else chrome.runtime.sendMessage(msg).catch(() => {});
+  }
+}
+
+self.handleOffscreenMessage = (message, sender, sendResponse) => {
   if (message.type === 'MERGE_M3U8') {
     const { segments, sequenceStart, mapUrl, filename, folderName } = message.data;
     console.log(`Offscreen: Starting Pro merge for ${filename} (${segments.length} segments)`);
@@ -79,17 +91,17 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         // Helper: Download via Background
         async function downloadViaBackground(url, filename, showFile = false) {
           return new Promise((resolve) => {
-            chrome.runtime.sendMessage({
+            dispatchToBackground({
               type: 'DOWNLOAD_INTERNAL',
               data: { url, filename, showFile }
             }, (response) => {
               if (response && response.success && response.downloadId) {
                 const dlId = response.downloadId;
-                chrome.runtime.sendMessage({
+                dispatchToBackground({
                   type: 'WAIT_FOR_DOWNLOAD',
                   data: { downloadId: dlId }
                 }, (waitResponse) => {
-                  chrome.runtime.sendMessage({
+                  dispatchToBackground({
                     type: 'MERGE_PROGRESS',
                     data: { filename: message.data.filename, status: `[${(waitResponse?.state || 'UNKNOWN').toUpperCase()}] ${filename}` }
                   });
@@ -97,7 +109,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 });
               } else {
                 const err = response?.error || 'Unknown error';
-                chrome.runtime.sendMessage({
+                dispatchToBackground({
                   type: 'MERGE_PROGRESS',
                   data: { filename: message.data.filename, status: `[ERR] ${filename}: ${err}` }
                 });
@@ -109,7 +121,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
         // 1. Process Map
         if (mapUrl) {
-          chrome.runtime.sendMessage({
+          dispatchToBackground({
             type: 'MERGE_PROGRESS',
             data: { filename, status: `Fetching Initialization Map: ${mapUrl}` }
           });
@@ -149,7 +161,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
               }
 
               completed++;
-              chrome.runtime.sendMessage({
+              dispatchToBackground({
                 type: 'MERGE_PROGRESS',
                 data: { filename, current: completed, total: segments.length, status: `Fetched ${completed}/${segments.length}` }
               });
@@ -191,12 +203,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         }
 
         if (message.data.shouldSaveToDB && message.data.muxKey) {
-          chrome.runtime.sendMessage({ type: 'MERGE_PROGRESS', data: { filename, status: `[CACHED] Saving to Disk & MediaDB: ${filename}` } });
+          dispatchToBackground({ type: 'MERGE_PROGRESS', data: { filename, status: `[CACHED] Saving to Disk & MediaDB: ${filename}` } });
           await MediaDB.saveBlob(message.data.muxKey, blob);
           await downloadViaBackground(blobUrl, filename, false);
           sendResponse({ success: true, muxKey: message.data.muxKey });
         } else {
-          chrome.runtime.sendMessage({ type: 'MERGE_PROGRESS', data: { filename, status: `Finalizing merge & saving: ${filename}` } });
+          dispatchToBackground({ type: 'MERGE_PROGRESS', data: { filename, status: `Finalizing merge & saving: ${filename}` } });
           const result = await downloadViaBackground(blobUrl, filename, true);
           sendResponse({ success: result.success, downloadId: result.downloadId, error: result.error });
         }
@@ -204,7 +216,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
       } catch (e) {
         console.error('Offscreen PRO: Merge failed:', e);
-        chrome.runtime.sendMessage({
+        dispatchToBackground({
           type: 'MERGE_PROGRESS',
           data: { filename: message.data.filename, status: `CRITICAL ERROR: ${e.message}` }
         });
@@ -231,7 +243,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           Output, Mp4OutputFormat, BufferTarget,
           EncodedVideoPacketSource, EncodedAudioPacketSource,
           EncodedPacketSink
-        } = Mediabunny;
+        } = self.Mediabunny;
 
         // ── Open source files with mediabunny Input ────────────────────────
         const videoInput = new Input({
@@ -290,7 +302,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             await mbVideoSource.add(packet, meta);
             videoCount++;
             if (videoCount % 100 === 0) {
-              chrome.runtime.sendMessage({ type: 'MERGE_PROGRESS', data: { filename, status: `[MUXING] Video: ${videoCount} packets` } });
+              dispatchToBackground({ type: 'MERGE_PROGRESS', data: { filename, status: `[MUXING] Video: ${videoCount} packets` } });
             }
           }
           console.log(`Offscreen: [MUX] Video pump done. ${videoCount} packets`);
@@ -310,18 +322,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             await mbAudioSource.add(packet, meta);
             audioCount++;
             if (audioCount % 100 === 0) {
-              chrome.runtime.sendMessage({ type: 'MERGE_PROGRESS', data: { filename, status: `[MUXING] Audio: ${audioCount} packets` } });
+              dispatchToBackground({ type: 'MERGE_PROGRESS', data: { filename, status: `[MUXING] Audio: ${audioCount} packets` } });
             }
           }
           console.log(`Offscreen: [MUX] Audio pump done. ${audioCount} packets`);
         };
 
-        chrome.runtime.sendMessage({ type: 'MERGE_PROGRESS', data: { filename, status: '[MUXING] Pumping packets…' } });
+        dispatchToBackground({ type: 'MERGE_PROGRESS', data: { filename, status: '[MUXING] Pumping packets…' } });
         await Promise.all([pumpVideo(), pumpAudio()]);
 
         // ── Finalize ───────────────────────────────────────────────────────
         console.log(`Offscreen: [MUX] Finalizing. V:${videoCount} A:${audioCount}`);
-        chrome.runtime.sendMessage({ type: 'MERGE_PROGRESS', data: { filename, status: '[MUXING] Finalizing…' } });
+        dispatchToBackground({ type: 'MERGE_PROGRESS', data: { filename, status: '[MUXING] Finalizing…' } });
         await mbOutput.finalize();
 
         const buffer = mbOutput.target.buffer;
@@ -330,19 +342,19 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         const finalMB = (finalBlob.size / 1024 / 1024).toFixed(2);
         console.log(`Offscreen: [MUX] Complete — ${finalMB} MB`);
 
-        if (itemId) chrome.runtime.sendMessage({ type: 'UPDATE_ITEM_STATUS', data: { itemId, status: 'Muxing…' } });
+        if (itemId) dispatchToBackground({ type: 'UPDATE_ITEM_STATUS', data: { itemId, status: 'Muxing…' } });
 
-        chrome.runtime.sendMessage({
+        dispatchToBackground({
           type: 'DOWNLOAD_INTERNAL',
           data: { url: blobUrl, filename, showFile: true }
         }, (resp) => {
           const err = resp?.error || chrome.runtime.lastError?.message;
           if (err) {
-            chrome.runtime.sendMessage({ type: 'MERGE_PROGRESS', data: { filename, status: `[ERROR] MUX download failed: ${err}` } });
-            if (itemId) chrome.runtime.sendMessage({ type: 'UPDATE_ITEM_STATUS', data: { itemId, status: 'Error' } });
+            dispatchToBackground({ type: 'MERGE_PROGRESS', data: { filename, status: `[ERROR] MUX download failed: ${err}` } });
+            if (itemId) dispatchToBackground({ type: 'UPDATE_ITEM_STATUS', data: { itemId, status: 'Error' } });
           } else {
-            chrome.runtime.sendMessage({ type: 'MERGE_PROGRESS', data: { filename, status: `[COMPLETE] MUX saved (${finalMB} MB)` } });
-            if (itemId && resp?.downloadId) chrome.runtime.sendMessage({ type: 'UPDATE_ITEM_STATUS', data: { itemId, status: 'Complete', muxedDownloadId: resp.downloadId } });
+            dispatchToBackground({ type: 'MERGE_PROGRESS', data: { filename, status: `[COMPLETE] MUX saved (${finalMB} MB)` } });
+            if (itemId && resp?.downloadId) dispatchToBackground({ type: 'UPDATE_ITEM_STATUS', data: { itemId, status: 'Complete', muxedDownloadId: resp.downloadId } });
           }
           setTimeout(() => {
             URL.revokeObjectURL(blobUrl);
@@ -353,11 +365,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
       } catch (e) {
         console.error('Offscreen: [MUX] Critical error:', e);
-        chrome.runtime.sendMessage({ type: 'MERGE_PROGRESS', data: { filename, status: `[ERROR] MUX: ${e.message}` } });
-        if (itemId) chrome.runtime.sendMessage({ type: 'UPDATE_ITEM_STATUS', data: { itemId, status: 'Error' } });
+        dispatchToBackground({ type: 'MERGE_PROGRESS', data: { filename, status: `[ERROR] MUX: ${e.message}` } });
+        if (itemId) dispatchToBackground({ type: 'UPDATE_ITEM_STATUS', data: { itemId, status: 'Error' } });
       }
     })();
     sendResponse({ success: true });
     return true;
   }
-});
+};
+
+chrome.runtime.onMessage.addListener(self.handleOffscreenMessage);

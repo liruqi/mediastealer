@@ -22,6 +22,8 @@
     "scripts": [
       "media-db.js",
       "plugin-engine.js",
+      "mediabunny.js",
+      "offscreen.js",
       "plugins/m3u8-plugin.js",
       "background.js"
     ]
