@@ -20,13 +20,18 @@ The Fluxon icon will appear in your toolbar. Pin it for easy access.
 
 ### Firefox
 
+**From the Firefox Add-ons (AMO)** *(recommended)*: 
+[Download Fluxon on AMO](https://addons.mozilla.org/en-US/firefox/addon/fluxon/)
+
+**Manual (temporary) install:**
+
 1. Download the latest `fluxon-*.zip` from [GitHub Releases](https://github.com/liruqi/fluxon/releases) and extract it.
 2. Open Firefox and navigate to `about:debugging`.
 3. Click **This Firefox**.
 4. Click **Load Temporary Add-on…**.
 5. Select the `manifest.json` file from the extracted folder.
 
-> **Note:** Temporary add-ons are removed when Firefox restarts. For persistent installation, the extension must be signed by Mozilla.
+> **Note:** Temporary add-ons are removed when Firefox restarts. For persistent installation, use the official **Firefox Add-ons** link above.
 
 ## Usage
 
