@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "__MSG_appName__",
-  "version": "1.5.3",
+  "version": "1.5.4",
   "description": "__MSG_appDesc__",
   "default_locale": "en",
   "permissions": [
@@ -10,8 +10,6 @@
     "storage",
     "notifications",
     "alarms",
-    "tabs",
-    "windows",
     "offscreen"
   ],
   "host_permissions": [
