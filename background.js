@@ -1,9 +1,10 @@
 importScripts('media-db.js', 'plugin-engine.js', 'plugins/m3u8-plugin.js');
 
 const defaultRules = [
-  { id: 1, enabled: true, url: ".*", ct: "video/.*", rtype: 1 },
-  { id: 2, enabled: true, url: ".*", ct: "audio/.*", rtype: 2 },
-  { id: 3, enabled: true, url: ".*", ct: "application/x-shockwave-flash", rtype: 3 }
+  { id: 1, enabled: true, url: ".*", ct: "video/.*", tag: "video", rtype: 1 },
+  { id: 2, enabled: true, url: ".*", ct: "audio/.*", tag: "audio", rtype: 2 },
+  { id: 3, enabled: true, url: ".*", ct: "application/x-shockwave-flash", tag: "video", rtype: 3 },
+  { id: 4, enabled: true, url: ".*", ct: "image/.*", tag: "image", rtype: 4 }
 ];
 
 let config = {
@@ -182,6 +183,7 @@ chrome.webRequest.onHeadersReceived.addListener(
           if (urlRegex.test(details.url) && ctRegex.test(contentType)) {
             addLog(`MATCHED RULE (url=${rule.url}, ct=${rule.ct}): ${details.url}`);
             matched = true;
+            var matchedTag = rule.tag || '';
             break;
           }
         } catch (e) {
@@ -249,6 +251,7 @@ chrome.webRequest.onHeadersReceived.addListener(
           size: contentLength,
           timestamp: Date.now(),
           status: 'Ready',
+          tag: typeof matchedTag !== 'undefined' ? matchedTag : '',
           pluginType: pluginResult.type || 'generic',
           streamType: pluginResult.streamType || null
         };

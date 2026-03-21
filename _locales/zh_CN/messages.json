@@ -153,7 +153,7 @@
     "message": "Content-Type 正则 (例如 video/.*)"
   },
   "btn_add_rule": {
-    "message": "添加规则"
+    "message": "添加"
   },
   "log_enabled": {
     "message": "流影已启用"
@@ -195,5 +195,20 @@
         "content": "$1"
       }
     }
+  },
+  "th_tag": {
+    "message": "标签"
+  },
+  "opt_tag_empty": {
+    "message": "(无)"
+  },
+  "opt_tag_video": {
+    "message": "视频"
+  },
+  "opt_tag_audio": {
+    "message": "音频"
+  },
+  "opt_tag_image": {
+    "message": "图像"
   }
 }

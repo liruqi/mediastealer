@@ -132,6 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
           </td>
           <td class="type">${(item.type || '').split(';')[0]}</td>
+          <td>${item.tag ? `<span class="badge badge-${item.tag}">${item.tag}</span>` : ''}</td>
           <td>${formatBytes(item.size)}</td>
           <td>
             <div class="btn-group">

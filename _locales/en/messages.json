@@ -153,7 +153,7 @@
     "message": "Content-Type Regex (e.g. video/.*)"
   },
   "btn_add_rule": {
-    "message": "Add Rule"
+    "message": "Add"
   },
   "log_enabled": {
     "message": "Fluxon enabled"
@@ -195,5 +195,20 @@
         "content": "$1"
       }
     }
+  },
+  "th_tag": {
+    "message": "Tag"
+  },
+  "opt_tag_empty": {
+    "message": "(Empty)"
+  },
+  "opt_tag_video": {
+    "message": "Video"
+  },
+  "opt_tag_audio": {
+    "message": "Audio"
+  },
+  "opt_tag_image": {
+    "message": "Image"
   }
 }

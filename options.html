@@ -187,9 +187,10 @@
       <thead>
         <tr>
           <th width="5%" data-i18n="th_rule_enabled">Enabled</th>
-          <th width="40%" data-i18n="th_url_pattern">URL Regex</th>
-          <th width="35%" data-i18n="th_content_type">Content-Type Regex</th>
-          <th width="20%" data-i18n="th_action">Actions</th>
+          <th width="35%" data-i18n="th_url_pattern">URL Regex</th>
+          <th width="30%" data-i18n="th_content_type">Content-Type Regex</th>
+          <th width="15%" data-i18n="th_tag">Tag</th>
+          <th width="15%" data-i18n="th_action">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -200,7 +201,13 @@
     <div id="add-rule-form">
       <input type="text" id="new-url" data-i18n-placeholder="ph_url" placeholder="URL Pattern (e.g. .*)">
       <input type="text" id="new-ct" data-i18n-placeholder="ph_ct" placeholder="Content-Type Pattern (e.g. video/.*)">
-      <button id="add-rule-btn" data-i18n="btn_add_rule">Add Rule</button>
+      <select id="new-tag" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+        <option value="" data-i18n="opt_tag_empty">(Empty)</option>
+        <option value="video" data-i18n="opt_tag_video">Video</option>
+        <option value="audio" data-i18n="opt_tag_audio">Audio</option>
+        <option value="image" data-i18n="opt_tag_image">Image</option>
+      </select>
+      <button id="add-rule-btn" data-i18n="btn_add_rule">Add</button>
     </div>
   </div>
 

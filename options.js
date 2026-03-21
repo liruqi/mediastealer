@@ -17,9 +17,10 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentConfig = {};
 
   const defaultRules = [
-    { id: 1, enabled: true, url: ".*", ct: "video/.*", rtype: 1 },
-    { id: 2, enabled: true, url: ".*", ct: "audio/.*", rtype: 2 },
-    { id: 3, enabled: true, url: ".*", ct: "application/x-shockwave-flash", rtype: 3 }
+    { id: 1, enabled: true, url: ".*", ct: "video/.*", tag: "video", rtype: 1 },
+    { id: 2, enabled: true, url: ".*", ct: "audio/.*", tag: "audio", rtype: 2 },
+    { id: 3, enabled: true, url: ".*", ct: "application/x-shockwave-flash", tag: "video", rtype: 3 },
+    { id: 4, enabled: true, url: ".*", ct: "image/.*", tag: "image", rtype: 4 }
   ];
 
   // Load configuration from storage
@@ -71,6 +72,14 @@ document.addEventListener('DOMContentLoaded', () => {
           <input type="text" value="${rule.ct}" style="width: 100%; box-sizing: border-box;" class="rule-ct" data-index="${index}">
         </td>
         <td>
+          <select class="rule-tag" data-index="${index}" style="width: 100%; box-sizing: border-box;">
+            <option value="" ${rule.tag === '' || !rule.tag ? 'selected' : ''}>${chrome.i18n.getMessage('opt_tag_empty') || '(Empty)'}</option>
+            <option value="video" ${rule.tag === 'video' ? 'selected' : ''}>${chrome.i18n.getMessage('opt_tag_video') || 'Video'}</option>
+            <option value="audio" ${rule.tag === 'audio' ? 'selected' : ''}>${chrome.i18n.getMessage('opt_tag_audio') || 'Audio'}</option>
+            <option value="image" ${rule.tag === 'image' ? 'selected' : ''}>${chrome.i18n.getMessage('opt_tag_image') || 'Image'}</option>
+          </select>
+        </td>
+        <td>
           <button class="delete-rule danger" data-index="${index}" data-i18n="btn_delete">${chrome.i18n.getMessage('btn_delete')}</button>
         </td>
       `;
@@ -98,6 +107,14 @@ document.addEventListener('DOMContentLoaded', () => {
       el.addEventListener('change', (e) => {
         const idx = e.target.getAttribute('data-index');
         currentConfig.rules[idx].ct = e.target.value;
+        saveConfigSilently();
+      });
+    });
+
+    document.querySelectorAll('.rule-tag').forEach(el => {
+      el.addEventListener('change', (e) => {
+        const idx = e.target.getAttribute('data-index');
+        currentConfig.rules[idx].tag = e.target.value;
         saveConfigSilently();
       });
     });
@@ -150,12 +167,14 @@ document.addEventListener('DOMContentLoaded', () => {
   addRuleBtn.addEventListener('click', () => {
     const url = document.getElementById('new-url').value || '.*';
     const ct = document.getElementById('new-ct').value || '.*';
+    const tag = document.getElementById('new-tag').value || '';
 
     currentConfig.rules.push({
       id: Date.now(),
       enabled: true,
       url: url,
       ct: ct,
+      tag: tag,
       rtype: 0
     });
 
@@ -164,6 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('new-url').value = '';
     document.getElementById('new-ct').value = '';
+    document.getElementById('new-tag').value = '';
   });
 
   // Add extension
