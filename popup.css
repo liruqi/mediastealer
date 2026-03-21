@@ -185,6 +185,22 @@ body.is-popout .filename {
   background-color: #e0a800;
 }
 
+.action-btn.merged-btn {
+  background-color: #28a745;
+  color: white;
+}
+
+.action-btn.merged-btn:hover {
+  background-color: #218838;
+}
+
+.action-btn.merging-btn {
+  background-color: #6c757d;
+  color: white;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
 .empty-state {
   text-align: center;
   padding: 40px 20px;

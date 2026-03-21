@@ -65,8 +65,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  /** Updates the Merge button label/state for m3u8 items based on item status. */
+  function applyMergeBtnState(btn, item) {
+    btn.classList.remove('merged-btn', 'merging-btn');
+    btn.disabled = false;
+    const status = item.status || 'Ready';
+    if (status === 'Complete' && item.downloadId) {
+      btn.textContent = chrome.i18n.getMessage('btn_merged') || 'Merged';
+      btn.classList.add('merged-btn');
+      btn.title = 'Click to reveal master.mp4';
+    } else if (['Muxing\u2026', 'Muxing...', 'Merging\u2026', 'Downloading'].includes(status)) {
+      btn.textContent = status === 'Downloading' ? 'Merging\u2026' : status;
+      btn.classList.add('merging-btn');
+      btn.disabled = true;
+    } else {
+      btn.textContent = chrome.i18n.getMessage('btn_merge') || 'Merge';
+    }
+  }
+
   // Status progression — must only move forward, never backward
   const STATUS_ORDER = { 'Ready': 0, 'Downloading': 1, 'Complete': 2 };
+
 
   /** Checks actual download state via chrome.downloads API and corrects stored status / button */
   function checkDownloadStatus(downloadId, itemId) {
@@ -112,7 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!items) items = [];
 
     // Quick performance check: if data hasn't changed, don't rebuild DOM
-    const currentJson = JSON.stringify(items.map(m => ({ id: m.id, url: m.url, status: m.status })));
+    const currentJson = JSON.stringify(items.map(m => ({ id: m.id, url: m.url, status: m.status, downloadId: m.downloadId })));
     if (currentJson === lastRenderedJson) return;
     lastRenderedJson = currentJson;
 
@@ -144,6 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
               </button>
               ${item.pluginType === 'm3u8' ? `
                 <button class="action-btn merge-btn" 
+                  id="merge-btn-${item.id}"
                   data-id="${item.id}" 
                   title="${chrome.i18n.getMessage('btn_merge') || 'Merge'}">
                   ${chrome.i18n.getMessage('btn_merge') || 'Merge'}
@@ -154,13 +174,11 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         tbody.appendChild(tr);
 
-        // Set button to correct state from stored status
+        // Set button states from stored status
         const btn = document.getElementById(`btn-${item.id}`);
-        if (btn) {
-          applyBtnState(btn, item.status || 'Ready');
-        }
-
-        // NOTE: status polling handles updates — no per-render check needed
+        if (btn) applyBtnState(btn, item.status || 'Ready');
+        const mergeBtn = document.getElementById(`merge-btn-${item.id}`);
+        if (mergeBtn) applyMergeBtnState(mergeBtn, item);
       });
 
       // Use event delegation for better performance
@@ -172,12 +190,24 @@ document.addEventListener('DOMContentLoaded', () => {
           const id = btn.getAttribute('data-id');
 
           if (btn.classList.contains('merge-btn')) {
+            // If already merged, show the file in Finder
+            if (btn.classList.contains('merged-btn')) {
+              chrome.storage.local.get(['capturedMedia'], (result) => {
+                const media = result.capturedMedia || [];
+                const item = media.find(m => m.id === id);
+                if (item && item.downloadId) chrome.downloads.show(item.downloadId);
+              });
+              return;
+            }
+            // Otherwise trigger the merge
             chrome.runtime.sendMessage({
               type: 'TRIGGER_PLUGIN_ACTION',
               pluginName: 'M3U8 Downloader',
               action: 'merge',
               itemId: id
             });
+            btn.disabled = true;
+            btn.textContent = 'Merging…';
             return;
           }
 
