@@ -26,7 +26,11 @@ jobs:
       - name: Build Firefox zip
         run: |
           VERSION="${{ steps.version.outputs.VERSION }}"
-          # Firefox uses the base manifest (no windows/offscreen)
+          # Firefox uses Event Pages (scripts) and handles background differently than Chrome
+          # Remove service_worker which is Chrome-specific
+          jq 'del(.background.service_worker)' manifest.json > manifest.firefox.json
+          mv manifest.firefox.json manifest.json
+
           zip -r "fluxon-${VERSION}-firefox.zip" \
             manifest.json \
             background.js \
@@ -40,11 +44,14 @@ jobs:
             plugin-engine.js \
             mux.js \
             media-db.js \
-            mediabunny.cjs \
+            mediabunny.js \
             i18n-helper.js \
             icons/ \
             _locales/ \
             plugins/
+          
+          # Restore manifest for next step
+          git checkout manifest.json
           echo "FIREFOX_ZIP=fluxon-${VERSION}-firefox.zip" >> "$GITHUB_ENV"
 
       - name: Build Chrome zip
@@ -67,7 +74,7 @@ jobs:
             plugin-engine.js \
             mux.js \
             media-db.js \
-            mediabunny.cjs \
+            mediabunny.js \
             i18n-helper.js \
             icons/ \
             _locales/ \
