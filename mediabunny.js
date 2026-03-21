@@ -13664,45 +13664,45 @@ var Mediabunny = (() => {
       let currentSegmentIndex = startSegmentIndex;
       const chunks = [];
       outer:
+      while (true) {
+        let pageSlice = this.reader.requestSlice(currentPage.dataStartPos, currentPage.dataSize);
+        if (pageSlice instanceof Promise) pageSlice = await pageSlice;
+        assert(pageSlice);
+        const pageData = readBytes(pageSlice, currentPage.dataSize);
         while (true) {
-          let pageSlice = this.reader.requestSlice(currentPage.dataStartPos, currentPage.dataSize);
-          if (pageSlice instanceof Promise) pageSlice = await pageSlice;
-          assert(pageSlice);
-          const pageData = readBytes(pageSlice, currentPage.dataSize);
-          while (true) {
-            if (currentSegmentIndex === currentPage.lacingValues.length) {
-              chunks.push(pageData.subarray(startDataOffset, currentDataOffset));
-              break;
-            }
-            const lacingValue = currentPage.lacingValues[currentSegmentIndex];
-            currentDataOffset += lacingValue;
-            if (lacingValue < 255) {
-              chunks.push(pageData.subarray(startDataOffset, currentDataOffset));
-              break outer;
-            }
-            currentSegmentIndex++;
+          if (currentSegmentIndex === currentPage.lacingValues.length) {
+            chunks.push(pageData.subarray(startDataOffset, currentDataOffset));
+            break;
           }
-          let currentPos = currentPage.headerStartPos + currentPage.totalSize;
-          while (true) {
-            let headerSlice = this.reader.requestSliceRange(currentPos, MIN_PAGE_HEADER_SIZE, MAX_PAGE_HEADER_SIZE);
-            if (headerSlice instanceof Promise) headerSlice = await headerSlice;
-            if (!headerSlice) {
-              return null;
-            }
-            const nextPage = readPageHeader(headerSlice);
-            if (!nextPage) {
-              return null;
-            }
-            currentPage = nextPage;
-            if (currentPage.serialNumber === startPage.serialNumber) {
-              break;
-            }
-            currentPos = currentPage.headerStartPos + currentPage.totalSize;
+          const lacingValue = currentPage.lacingValues[currentSegmentIndex];
+          currentDataOffset += lacingValue;
+          if (lacingValue < 255) {
+            chunks.push(pageData.subarray(startDataOffset, currentDataOffset));
+            break outer;
           }
-          startDataOffset = 0;
-          currentDataOffset = 0;
-          currentSegmentIndex = 0;
+          currentSegmentIndex++;
         }
+        let currentPos = currentPage.headerStartPos + currentPage.totalSize;
+        while (true) {
+          let headerSlice = this.reader.requestSliceRange(currentPos, MIN_PAGE_HEADER_SIZE, MAX_PAGE_HEADER_SIZE);
+          if (headerSlice instanceof Promise) headerSlice = await headerSlice;
+          if (!headerSlice) {
+            return null;
+          }
+          const nextPage = readPageHeader(headerSlice);
+          if (!nextPage) {
+            return null;
+          }
+          currentPage = nextPage;
+          if (currentPage.serialNumber === startPage.serialNumber) {
+            break;
+          }
+          currentPos = currentPage.headerStartPos + currentPage.totalSize;
+        }
+        startDataOffset = 0;
+        currentDataOffset = 0;
+        currentSegmentIndex = 0;
+      }
       const totalPacketSize = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
       if (totalPacketSize === 0) {
         return null;
@@ -13924,65 +13924,65 @@ var Mediabunny = (() => {
       let high = this.demuxer.reader.fileSize;
       const lowPages = [lowPage];
       outer:
-        while (lowPage.headerStartPos + lowPage.totalSize < high) {
-          const low = lowPage.headerStartPos;
-          const mid = Math.floor((low + high) / 2);
-          let searchStartPos = mid;
-          while (true) {
-            const until = Math.min(
-              searchStartPos + MAX_PAGE_SIZE,
-              high - MIN_PAGE_HEADER_SIZE
-            );
-            let searchSlice = this.demuxer.reader.requestSlice(searchStartPos, until - searchStartPos);
-            if (searchSlice instanceof Promise) searchSlice = await searchSlice;
-            assert(searchSlice);
-            const found = findNextPageHeader(searchSlice, until);
-            if (!found) {
-              high = mid + MIN_PAGE_HEADER_SIZE;
-              continue outer;
-            }
-            let headerSlice = this.demuxer.reader.requestSliceRange(
-              searchSlice.filePos,
-              MIN_PAGE_HEADER_SIZE,
-              MAX_PAGE_HEADER_SIZE
-            );
-            if (headerSlice instanceof Promise) headerSlice = await headerSlice;
-            assert(headerSlice);
-            const page = readPageHeader(headerSlice);
-            assert(page);
-            let pageValid = false;
-            if (page.serialNumber === this.bitstream.serialNumber) {
-              pageValid = true;
-            } else {
-              let pageSlice = this.demuxer.reader.requestSlice(page.headerStartPos, page.totalSize);
-              if (pageSlice instanceof Promise) pageSlice = await pageSlice;
-              assert(pageSlice);
-              const bytes2 = readBytes(pageSlice, page.totalSize);
-              const crc = computeOggPageCrc(bytes2);
-              pageValid = crc === page.checksum;
-            }
-            if (!pageValid) {
-              searchStartPos = page.headerStartPos + 4;
-              continue;
-            }
-            if (pageValid && page.serialNumber !== this.bitstream.serialNumber) {
-              searchStartPos = page.headerStartPos + page.totalSize;
-              continue;
-            }
-            const isContinuationPage = page.granulePosition === -1;
-            if (isContinuationPage) {
-              searchStartPos = page.headerStartPos + page.totalSize;
-              continue;
-            }
-            if (this.granulePositionToTimestampInSamples(page.granulePosition) > timestampInSamples) {
-              high = page.headerStartPos;
-            } else {
-              lowPage = page;
-              lowPages.push(page);
-            }
+      while (lowPage.headerStartPos + lowPage.totalSize < high) {
+        const low = lowPage.headerStartPos;
+        const mid = Math.floor((low + high) / 2);
+        let searchStartPos = mid;
+        while (true) {
+          const until = Math.min(
+            searchStartPos + MAX_PAGE_SIZE,
+            high - MIN_PAGE_HEADER_SIZE
+          );
+          let searchSlice = this.demuxer.reader.requestSlice(searchStartPos, until - searchStartPos);
+          if (searchSlice instanceof Promise) searchSlice = await searchSlice;
+          assert(searchSlice);
+          const found = findNextPageHeader(searchSlice, until);
+          if (!found) {
+            high = mid + MIN_PAGE_HEADER_SIZE;
             continue outer;
           }
+          let headerSlice = this.demuxer.reader.requestSliceRange(
+            searchSlice.filePos,
+            MIN_PAGE_HEADER_SIZE,
+            MAX_PAGE_HEADER_SIZE
+          );
+          if (headerSlice instanceof Promise) headerSlice = await headerSlice;
+          assert(headerSlice);
+          const page = readPageHeader(headerSlice);
+          assert(page);
+          let pageValid = false;
+          if (page.serialNumber === this.bitstream.serialNumber) {
+            pageValid = true;
+          } else {
+            let pageSlice = this.demuxer.reader.requestSlice(page.headerStartPos, page.totalSize);
+            if (pageSlice instanceof Promise) pageSlice = await pageSlice;
+            assert(pageSlice);
+            const bytes2 = readBytes(pageSlice, page.totalSize);
+            const crc = computeOggPageCrc(bytes2);
+            pageValid = crc === page.checksum;
+          }
+          if (!pageValid) {
+            searchStartPos = page.headerStartPos + 4;
+            continue;
+          }
+          if (pageValid && page.serialNumber !== this.bitstream.serialNumber) {
+            searchStartPos = page.headerStartPos + page.totalSize;
+            continue;
+          }
+          const isContinuationPage = page.granulePosition === -1;
+          if (isContinuationPage) {
+            searchStartPos = page.headerStartPos + page.totalSize;
+            continue;
+          }
+          if (this.granulePositionToTimestampInSamples(page.granulePosition) > timestampInSamples) {
+            high = page.headerStartPos;
+          } else {
+            lowPage = page;
+            lowPages.push(page);
+          }
+          continue outer;
         }
+      }
       let lowerPage = startPosition.startPage;
       for (const otherLowPage of lowPages) {
         if (otherLowPage.granulePosition === lowPage.granulePosition) {
@@ -14122,7 +14122,7 @@ var Mediabunny = (() => {
           lastEncodedPacket = encodedPacket;
           lastEncodedPacketMetadata = encodedPacketMetadata;
           if (currentTimestampIsCorrect && // Next timestamp will be too late
-          (Math.max(currentTimestampInSamples, 0) > timestampInSamples || Math.max(encodedPacketMetadata.timestampInSamples, 0) === timestampInSamples)) {
+            (Math.max(currentTimestampInSamples, 0) > timestampInSamples || Math.max(encodedPacketMetadata.timestampInSamples, 0) === timestampInSamples)) {
             break;
           }
         }
@@ -14194,31 +14194,31 @@ var Mediabunny = (() => {
     let page = endPage;
     let segmentIndex = endSegmentIndex;
     outer:
-      while (true) {
-        segmentIndex--;
-        for (segmentIndex; segmentIndex >= 0; segmentIndex--) {
-          const lacingValue = page.lacingValues[segmentIndex];
-          if (lacingValue < 255) {
-            segmentIndex++;
-            break outer;
-          }
+    while (true) {
+      segmentIndex--;
+      for (segmentIndex; segmentIndex >= 0; segmentIndex--) {
+        const lacingValue = page.lacingValues[segmentIndex];
+        if (lacingValue < 255) {
+          segmentIndex++;
+          break outer;
         }
-        assert(segmentIndex === -1);
-        const pageStartsWithFreshPacket = !(page.headerType & 1);
-        if (pageStartsWithFreshPacket) {
-          segmentIndex = 0;
-          break;
-        }
-        const previousPage = findLast(
-          pageList,
-          (x) => x.headerStartPos < page.headerStartPos
-        );
-        if (!previousPage) {
-          return null;
-        }
-        page = previousPage;
-        segmentIndex = page.lacingValues.length;
       }
+      assert(segmentIndex === -1);
+      const pageStartsWithFreshPacket = !(page.headerType & 1);
+      if (pageStartsWithFreshPacket) {
+        segmentIndex = 0;
+        break;
+      }
+      const previousPage = findLast(
+        pageList,
+        (x) => x.headerStartPos < page.headerStartPos
+      );
+      if (!previousPage) {
+        return null;
+      }
+      page = previousPage;
+      segmentIndex = page.lacingValues.length;
+    }
     assert(segmentIndex !== -1);
     if (segmentIndex === page.lacingValues.length) {
       const nextPage = pageList[pageList.indexOf(page) + 1];
@@ -16466,51 +16466,51 @@ var Mediabunny = (() => {
       };
       if (!keyframesOnly || this.allPacketsAreKeyPackets()) {
         outer:
+        while (true) {
+          let currentPos = currentPesHeader.sectionStartPos + demuxer.packetStride;
           while (true) {
-            let currentPos = currentPesHeader.sectionStartPos + demuxer.packetStride;
-            while (true) {
-              const packetHeader = await demuxer.readPacketHeader(currentPos);
-              if (!packetHeader) {
-                break outer;
-              }
-              if (packetHeader.pid === pid && packetHeader.payloadUnitStartIndicator === 1) {
-                const section = await demuxer.readSection(currentPos, false);
-                if (section) {
-                  const nextPesHeader = readPesPacketHeader(section);
-                  if (nextPesHeader) {
-                    if (nextPesHeader.pts > searchPts) {
-                      break outer;
-                    }
-                    currentPesHeader = nextPesHeader;
-                    maybeInsertReferencePacket(this.elementaryStream, nextPesHeader);
-                    break;
+            const packetHeader = await demuxer.readPacketHeader(currentPos);
+            if (!packetHeader) {
+              break outer;
+            }
+            if (packetHeader.pid === pid && packetHeader.payloadUnitStartIndicator === 1) {
+              const section = await demuxer.readSection(currentPos, false);
+              if (section) {
+                const nextPesHeader = readPesPacketHeader(section);
+                if (nextPesHeader) {
+                  if (nextPesHeader.pts > searchPts) {
+                    break outer;
                   }
+                  currentPesHeader = nextPesHeader;
+                  maybeInsertReferencePacket(this.elementaryStream, nextPesHeader);
+                  break;
                 }
               }
-              currentPos += demuxer.packetStride;
             }
+            currentPos += demuxer.packetStride;
           }
+        }
         outer:
-          for (let i = 0; i < reorderSize; i++) {
-            let pos = currentPesHeader.sectionStartPos - demuxer.packetStride;
-            while (pos >= demuxer.packetOffset) {
-              const packetHeader = await demuxer.readPacketHeader(pos);
-              if (!packetHeader) {
-                break outer;
-              }
-              if (packetHeader.pid === pid && packetHeader.payloadUnitStartIndicator === 1) {
-                const section = await demuxer.readSection(pos, false);
-                if (section) {
-                  const header = readPesPacketHeader(section);
-                  if (header) {
-                    currentPesHeader = header;
-                    break;
-                  }
+        for (let i = 0; i < reorderSize; i++) {
+          let pos = currentPesHeader.sectionStartPos - demuxer.packetStride;
+          while (pos >= demuxer.packetOffset) {
+            const packetHeader = await demuxer.readPacketHeader(pos);
+            if (!packetHeader) {
+              break outer;
+            }
+            if (packetHeader.pid === pid && packetHeader.payloadUnitStartIndicator === 1) {
+              const section = await demuxer.readSection(pos, false);
+              if (section) {
+                const header = readPesPacketHeader(section);
+                if (header) {
+                  currentPesHeader = header;
+                  break;
                 }
               }
-              pos -= demuxer.packetStride;
             }
+            pos -= demuxer.packetStride;
           }
+        }
         return retrieveEncodedPacket(currentPesHeader.sectionStartPos, (p) => p.pts <= searchPts);
       } else {
         let currentChunkStartPos = scanStartPos;
@@ -16531,66 +16531,66 @@ var Mediabunny = (() => {
           let passedSearchPts = false;
           let lookaheadCount = 0;
           outer:
-            while (pesHeader) {
-              if (nextChunkStartPos !== null && pesHeader.sectionStartPos >= nextChunkStartPos) {
+          while (pesHeader) {
+            if (nextChunkStartPos !== null && pesHeader.sectionStartPos >= nextChunkStartPos) {
+              break;
+            }
+            const isKeyCandidate = pesHeader.randomAccessIndicator === 1;
+            if (isKeyCandidate && pesHeader.pts <= searchPts) {
+              bestKeyPesHeader = pesHeader;
+            }
+            if (pesHeader.pts > searchPts) {
+              passedSearchPts = true;
+            }
+            if (passedSearchPts) {
+              lookaheadCount++;
+              if (lookaheadCount >= reorderSize) {
                 break;
               }
-              const isKeyCandidate = pesHeader.randomAccessIndicator === 1;
-              if (isKeyCandidate && pesHeader.pts <= searchPts) {
-                bestKeyPesHeader = pesHeader;
+            }
+            let currentPos = pesHeader.sectionStartPos + demuxer.packetStride;
+            while (true) {
+              const packetHeader = await demuxer.readPacketHeader(currentPos);
+              if (!packetHeader) {
+                break outer;
               }
-              if (pesHeader.pts > searchPts) {
-                passedSearchPts = true;
-              }
-              if (passedSearchPts) {
-                lookaheadCount++;
-                if (lookaheadCount >= reorderSize) {
-                  break;
-                }
-              }
-              let currentPos = pesHeader.sectionStartPos + demuxer.packetStride;
-              while (true) {
-                const packetHeader = await demuxer.readPacketHeader(currentPos);
-                if (!packetHeader) {
-                  break outer;
-                }
-                if (packetHeader.pid === pid && packetHeader.payloadUnitStartIndicator === 1) {
-                  const section = await demuxer.readSection(currentPos, false);
-                  if (section) {
-                    pesHeader = readPesPacketHeader(section);
-                    if (pesHeader) {
-                      maybeInsertReferencePacket(this.elementaryStream, pesHeader);
-                      break;
-                    }
+              if (packetHeader.pid === pid && packetHeader.payloadUnitStartIndicator === 1) {
+                const section = await demuxer.readSection(currentPos, false);
+                if (section) {
+                  pesHeader = readPesPacketHeader(section);
+                  if (pesHeader) {
+                    maybeInsertReferencePacket(this.elementaryStream, pesHeader);
+                    break;
                   }
                 }
-                currentPos += demuxer.packetStride;
               }
+              currentPos += demuxer.packetStride;
             }
+          }
           if (bestKeyPesHeader) {
             let startPesHeader = bestKeyPesHeader;
             if (lookaheadCount === 0) {
               outer:
-                for (let i = 0; i < reorderSize - 1; i++) {
-                  let pos = startPesHeader.sectionStartPos - demuxer.packetStride;
-                  while (pos >= demuxer.packetOffset) {
-                    const packetHeader = await demuxer.readPacketHeader(pos);
-                    if (!packetHeader) {
-                      break outer;
-                    }
-                    if (packetHeader.pid === pid && packetHeader.payloadUnitStartIndicator === 1) {
-                      const section = await demuxer.readSection(pos, false);
-                      if (section) {
-                        const header = readPesPacketHeader(section);
-                        if (header) {
-                          startPesHeader = header;
-                          break;
-                        }
+              for (let i = 0; i < reorderSize - 1; i++) {
+                let pos = startPesHeader.sectionStartPos - demuxer.packetStride;
+                while (pos >= demuxer.packetOffset) {
+                  const packetHeader = await demuxer.readPacketHeader(pos);
+                  if (!packetHeader) {
+                    break outer;
+                  }
+                  if (packetHeader.pid === pid && packetHeader.payloadUnitStartIndicator === 1) {
+                    const section = await demuxer.readSection(pos, false);
+                    if (section) {
+                      const header = readPesPacketHeader(section);
+                      if (header) {
+                        startPesHeader = header;
+                        break;
                       }
                     }
-                    pos -= demuxer.packetStride;
                   }
+                  pos -= demuxer.packetStride;
                 }
+              }
             }
             const encodedPacket = await retrieveEncodedPacket(
               startPesHeader.sectionStartPos,
@@ -21690,14 +21690,16 @@ var Mediabunny = (() => {
               if (image.kind !== "coverFront") {
                 continue;
               }
-              pairs.push({ key: "covr", value: box("data", [
-                u32(DATA_BOX_MIME_TYPE_MAP[image.mimeType] ?? 0),
-                // Type indicator
-                u32(0),
-                // Locale indicator
-                Array.from(image.data)
-                // Kinda slow, hopefully temp
-              ]) });
+              pairs.push({
+                key: "covr", value: box("data", [
+                  u32(DATA_BOX_MIME_TYPE_MAP[image.mimeType] ?? 0),
+                  // Type indicator
+                  u32(0),
+                  // Locale indicator
+                  Array.from(image.data)
+                  // Kinda slow, hopefully temp
+                ])
+              });
             }
           }
           ;
@@ -21708,17 +21710,19 @@ var Mediabunny = (() => {
               const string = tags.tracksTotal !== void 0 ? `${value}/${tags.tracksTotal}` : value.toString();
               pairs.push({ key: "track", value: dataStringBoxLong(string) });
             } else {
-              pairs.push({ key: "trkn", value: box("data", [
-                u32(0),
-                // 8 bytes empty
-                u32(0),
-                u16(0),
-                // Empty
-                u16(value),
-                u16(tags.tracksTotal ?? 0),
-                u16(0)
-                // Empty
-              ]) });
+              pairs.push({
+                key: "trkn", value: box("data", [
+                  u32(0),
+                  // 8 bytes empty
+                  u32(0),
+                  u16(0),
+                  // Empty
+                  u16(value),
+                  u16(tags.tracksTotal ?? 0),
+                  u16(0)
+                  // Empty
+                ])
+              });
             }
           }
           ;
@@ -21726,17 +21730,19 @@ var Mediabunny = (() => {
         case "discNumber":
           {
             if (!isMdta) {
-              pairs.push({ key: "disc", value: box("data", [
-                u32(0),
-                // 8 bytes empty
-                u32(0),
-                u16(0),
-                // Empty
-                u16(value),
-                u16(tags.discsTotal ?? 0),
-                u16(0)
-                // Empty
-              ]) });
+              pairs.push({
+                key: "disc", value: box("data", [
+                  u32(0),
+                  // 8 bytes empty
+                  u32(0),
+                  u16(0),
+                  // Empty
+                  u16(value),
+                  u16(tags.discsTotal ?? 0),
+                  u16(0)
+                  // Empty
+                ])
+              });
             }
           }
           ;
@@ -21765,22 +21771,26 @@ var Mediabunny = (() => {
         if (typeof value === "string") {
           pairs.push({ key, value: dataStringBoxLong(value) });
         } else if (value instanceof Uint8Array) {
-          pairs.push({ key, value: box("data", [
-            u32(0),
-            // Type indicator
-            u32(0),
-            // Locale indicator
-            Array.from(value)
-          ]) });
+          pairs.push({
+            key, value: box("data", [
+              u32(0),
+              // Type indicator
+              u32(0),
+              // Locale indicator
+              Array.from(value)
+            ])
+          });
         } else if (value instanceof RichImageData) {
-          pairs.push({ key, value: box("data", [
-            u32(DATA_BOX_MIME_TYPE_MAP[value.mimeType] ?? 0),
-            // Type indicator
-            u32(0),
-            // Locale indicator
-            Array.from(value.data)
-            // Kinda slow, hopefully temp
-          ]) });
+          pairs.push({
+            key, value: box("data", [
+              u32(DATA_BOX_MIME_TYPE_MAP[value.mimeType] ?? 0),
+              // Type indicator
+              u32(0),
+              // Locale indicator
+              Array.from(value.data)
+              // Kinda slow, hopefully temp
+            ])
+          });
         }
       }
     }
@@ -23100,24 +23110,24 @@ var Mediabunny = (() => {
         return;
       }
       outer:
-        while (true) {
-          let trackWithMinTimestamp = null;
-          let minTimestamp = Infinity;
-          for (const trackData of this.trackDatas) {
-            if (!isFinalCall && trackData.sampleQueue.length === 0 && !trackData.track.source._closed) {
-              break outer;
-            }
-            if (trackData.sampleQueue.length > 0 && trackData.sampleQueue[0].timestamp < minTimestamp) {
-              trackWithMinTimestamp = trackData;
-              minTimestamp = trackData.sampleQueue[0].timestamp;
-            }
+      while (true) {
+        let trackWithMinTimestamp = null;
+        let minTimestamp = Infinity;
+        for (const trackData of this.trackDatas) {
+          if (!isFinalCall && trackData.sampleQueue.length === 0 && !trackData.track.source._closed) {
+            break outer;
           }
-          if (!trackWithMinTimestamp) {
-            break;
+          if (trackData.sampleQueue.length > 0 && trackData.sampleQueue[0].timestamp < minTimestamp) {
+            trackWithMinTimestamp = trackData;
+            minTimestamp = trackData.sampleQueue[0].timestamp;
           }
-          const sample = trackWithMinTimestamp.sampleQueue.shift();
-          await this.addSampleToTrack(trackWithMinTimestamp, sample);
         }
+        if (!trackWithMinTimestamp) {
+          break;
+        }
+        const sample = trackWithMinTimestamp.sampleQueue.shift();
+        await this.addSampleToTrack(trackWithMinTimestamp, sample);
+      }
     }
     async finalizeFragment(flushWriter = true) {
       assert(this.isFragmented);
@@ -23402,15 +23412,17 @@ var Mediabunny = (() => {
       if (this.format._options.onEbmlHeader) {
         this.writer.startTrackingWrites();
       }
-      const ebmlHeader = { id: 440786851 /* EBML */, data: [
-        { id: 17030 /* EBMLVersion */, data: 1 },
-        { id: 17143 /* EBMLReadVersion */, data: 1 },
-        { id: 17138 /* EBMLMaxIDLength */, data: 4 },
-        { id: 17139 /* EBMLMaxSizeLength */, data: 8 },
-        { id: 17026 /* DocType */, data: this.format instanceof WebMOutputFormat ? "webm" : "matroska" },
-        { id: 17031 /* DocTypeVersion */, data: 2 },
-        { id: 17029 /* DocTypeReadVersion */, data: 2 }
-      ] };
+      const ebmlHeader = {
+        id: 440786851 /* EBML */, data: [
+          { id: 17030 /* EBMLVersion */, data: 1 },
+          { id: 17143 /* EBMLReadVersion */, data: 1 },
+          { id: 17138 /* EBMLMaxIDLength */, data: 4 },
+          { id: 17139 /* EBMLMaxSizeLength */, data: 8 },
+          { id: 17026 /* DocType */, data: this.format instanceof WebMOutputFormat ? "webm" : "matroska" },
+          { id: 17031 /* DocTypeVersion */, data: 2 },
+          { id: 17029 /* DocTypeReadVersion */, data: 2 }
+        ]
+      };
       this.ebmlWriter.writeEBML(ebmlHeader);
       if (this.format._options.onEbmlHeader) {
         const { data, start } = this.writer.stopTrackingWrites();
@@ -23430,59 +23442,73 @@ var Mediabunny = (() => {
       const kaxTracks = new Uint8Array([22, 84, 174, 107]);
       const kaxAttachments = new Uint8Array([25, 65, 164, 105]);
       const kaxTags = new Uint8Array([18, 84, 195, 103]);
-      const seekHead = { id: 290298740 /* SeekHead */, data: [
-        { id: 19899 /* Seek */, data: [
-          { id: 21419 /* SeekID */, data: kaxCues },
+      const seekHead = {
+        id: 290298740 /* SeekHead */, data: [
           {
-            id: 21420 /* SeekPosition */,
-            size: 5,
-            data: writeOffsets ? this.ebmlWriter.offsets.get(this.cues) - this.segmentDataOffset : 0
-          }
-        ] },
-        { id: 19899 /* Seek */, data: [
-          { id: 21419 /* SeekID */, data: kaxInfo },
+            id: 19899 /* Seek */, data: [
+              { id: 21419 /* SeekID */, data: kaxCues },
+              {
+                id: 21420 /* SeekPosition */,
+                size: 5,
+                data: writeOffsets ? this.ebmlWriter.offsets.get(this.cues) - this.segmentDataOffset : 0
+              }
+            ]
+          },
           {
-            id: 21420 /* SeekPosition */,
-            size: 5,
-            data: writeOffsets ? this.ebmlWriter.offsets.get(this.segmentInfo) - this.segmentDataOffset : 0
-          }
-        ] },
-        { id: 19899 /* Seek */, data: [
-          { id: 21419 /* SeekID */, data: kaxTracks },
+            id: 19899 /* Seek */, data: [
+              { id: 21419 /* SeekID */, data: kaxInfo },
+              {
+                id: 21420 /* SeekPosition */,
+                size: 5,
+                data: writeOffsets ? this.ebmlWriter.offsets.get(this.segmentInfo) - this.segmentDataOffset : 0
+              }
+            ]
+          },
           {
-            id: 21420 /* SeekPosition */,
-            size: 5,
-            data: writeOffsets ? this.ebmlWriter.offsets.get(this.tracksElement) - this.segmentDataOffset : 0
-          }
-        ] },
-        this.attachmentsElement ? { id: 19899 /* Seek */, data: [
-          { id: 21419 /* SeekID */, data: kaxAttachments },
-          {
-            id: 21420 /* SeekPosition */,
-            size: 5,
-            data: writeOffsets ? this.ebmlWriter.offsets.get(this.attachmentsElement) - this.segmentDataOffset : 0
-          }
-        ] } : null,
-        this.tagsElement ? { id: 19899 /* Seek */, data: [
-          { id: 21419 /* SeekID */, data: kaxTags },
-          {
-            id: 21420 /* SeekPosition */,
-            size: 5,
-            data: writeOffsets ? this.ebmlWriter.offsets.get(this.tagsElement) - this.segmentDataOffset : 0
-          }
-        ] } : null
-      ] };
+            id: 19899 /* Seek */, data: [
+              { id: 21419 /* SeekID */, data: kaxTracks },
+              {
+                id: 21420 /* SeekPosition */,
+                size: 5,
+                data: writeOffsets ? this.ebmlWriter.offsets.get(this.tracksElement) - this.segmentDataOffset : 0
+              }
+            ]
+          },
+          this.attachmentsElement ? {
+            id: 19899 /* Seek */, data: [
+              { id: 21419 /* SeekID */, data: kaxAttachments },
+              {
+                id: 21420 /* SeekPosition */,
+                size: 5,
+                data: writeOffsets ? this.ebmlWriter.offsets.get(this.attachmentsElement) - this.segmentDataOffset : 0
+              }
+            ]
+          } : null,
+          this.tagsElement ? {
+            id: 19899 /* Seek */, data: [
+              { id: 21419 /* SeekID */, data: kaxTags },
+              {
+                id: 21420 /* SeekPosition */,
+                size: 5,
+                data: writeOffsets ? this.ebmlWriter.offsets.get(this.tagsElement) - this.segmentDataOffset : 0
+              }
+            ]
+          } : null
+        ]
+      };
       this.seekHead = seekHead;
     }
     createSegmentInfo() {
       const segmentDuration = { id: 17545 /* Duration */, data: new EBMLFloat64(0) };
       this.segmentDuration = segmentDuration;
-      const segmentInfo = { id: 357149030 /* Info */, data: [
-        { id: 2807729 /* TimestampScale */, data: 1e6 },
-        { id: 19840 /* MuxingApp */, data: APP_NAME },
-        { id: 22337 /* WritingApp */, data: APP_NAME },
-        !this.format._options.appendOnly ? segmentDuration : null
-      ] };
+      const segmentInfo = {
+        id: 357149030 /* Info */, data: [
+          { id: 2807729 /* TimestampScale */, data: 1e6 },
+          { id: 19840 /* MuxingApp */, data: APP_NAME },
+          { id: 22337 /* WritingApp */, data: APP_NAME },
+          !this.format._options.appendOnly ? segmentDuration : null
+        ]
+      };
       this.segmentInfo = segmentInfo;
     }
     createTracks() {
@@ -23501,26 +23527,28 @@ var Mediabunny = (() => {
             seekPreRollNs = Math.round(1e9 * (header.preSkip / OPUS_SAMPLE_RATE));
           }
         }
-        tracksElement.data.push({ id: 174 /* TrackEntry */, data: [
-          { id: 215 /* TrackNumber */, data: trackData.track.id },
-          { id: 29637 /* TrackUID */, data: trackData.track.id },
-          { id: 131 /* TrackType */, data: TRACK_TYPE_MAP[trackData.type] },
-          trackData.track.metadata.disposition?.default === false ? { id: 136 /* FlagDefault */, data: 0 } : null,
-          trackData.track.metadata.disposition?.forced ? { id: 21930 /* FlagForced */, data: 1 } : null,
-          trackData.track.metadata.disposition?.hearingImpaired ? { id: 21931 /* FlagHearingImpaired */, data: 1 } : null,
-          trackData.track.metadata.disposition?.visuallyImpaired ? { id: 21932 /* FlagVisualImpaired */, data: 1 } : null,
-          trackData.track.metadata.disposition?.original ? { id: 21934 /* FlagOriginal */, data: 1 } : null,
-          trackData.track.metadata.disposition?.commentary ? { id: 21935 /* FlagCommentary */, data: 1 } : null,
-          { id: 156 /* FlagLacing */, data: 0 },
-          { id: 2274716 /* Language */, data: trackData.track.metadata.languageCode ?? UNDETERMINED_LANGUAGE },
-          { id: 134 /* CodecID */, data: codecId },
-          { id: 22186 /* CodecDelay */, data: 0 },
-          { id: 22203 /* SeekPreRoll */, data: seekPreRollNs },
-          trackData.track.metadata.name !== void 0 ? { id: 21358 /* Name */, data: new EBMLUnicodeString(trackData.track.metadata.name) } : null,
-          trackData.type === "video" ? this.videoSpecificTrackInfo(trackData) : null,
-          trackData.type === "audio" ? this.audioSpecificTrackInfo(trackData) : null,
-          trackData.type === "subtitle" ? this.subtitleSpecificTrackInfo(trackData) : null
-        ] });
+        tracksElement.data.push({
+          id: 174 /* TrackEntry */, data: [
+            { id: 215 /* TrackNumber */, data: trackData.track.id },
+            { id: 29637 /* TrackUID */, data: trackData.track.id },
+            { id: 131 /* TrackType */, data: TRACK_TYPE_MAP[trackData.type] },
+            trackData.track.metadata.disposition?.default === false ? { id: 136 /* FlagDefault */, data: 0 } : null,
+            trackData.track.metadata.disposition?.forced ? { id: 21930 /* FlagForced */, data: 1 } : null,
+            trackData.track.metadata.disposition?.hearingImpaired ? { id: 21931 /* FlagHearingImpaired */, data: 1 } : null,
+            trackData.track.metadata.disposition?.visuallyImpaired ? { id: 21932 /* FlagVisualImpaired */, data: 1 } : null,
+            trackData.track.metadata.disposition?.original ? { id: 21934 /* FlagOriginal */, data: 1 } : null,
+            trackData.track.metadata.disposition?.commentary ? { id: 21935 /* FlagCommentary */, data: 1 } : null,
+            { id: 156 /* FlagLacing */, data: 0 },
+            { id: 2274716 /* Language */, data: trackData.track.metadata.languageCode ?? UNDETERMINED_LANGUAGE },
+            { id: 134 /* CodecID */, data: codecId },
+            { id: 22186 /* CodecDelay */, data: 0 },
+            { id: 22203 /* SeekPreRoll */, data: seekPreRollNs },
+            trackData.track.metadata.name !== void 0 ? { id: 21358 /* Name */, data: new EBMLUnicodeString(trackData.track.metadata.name) } : null,
+            trackData.type === "video" ? this.videoSpecificTrackInfo(trackData) : null,
+            trackData.type === "audio" ? this.audioSpecificTrackInfo(trackData) : null,
+            trackData.type === "subtitle" ? this.subtitleSpecificTrackInfo(trackData) : null
+          ]
+        });
       }
     }
     videoSpecificTrackInfo(trackData) {
@@ -23538,51 +23566,53 @@ var Mediabunny = (() => {
       const flippedRotation = rotation ? normalizeRotation(-rotation) : 0;
       const hasNonSquarePixelAspectRatio = !!trackData.info.aspectRatio && trackData.info.aspectRatio.num * trackData.info.height !== trackData.info.aspectRatio.den * trackData.info.width;
       const colorSpace = trackData.info.decoderConfig.colorSpace;
-      const videoElement = { id: 224 /* Video */, data: [
-        { id: 176 /* PixelWidth */, data: trackData.info.width },
-        { id: 186 /* PixelHeight */, data: trackData.info.height },
-        hasNonSquarePixelAspectRatio ? { id: 21680 /* DisplayWidth */, data: trackData.info.aspectRatio.num } : null,
-        hasNonSquarePixelAspectRatio ? { id: 21690 /* DisplayHeight */, data: trackData.info.aspectRatio.den } : null,
-        hasNonSquarePixelAspectRatio ? { id: 21682 /* DisplayUnit */, data: 3 } : null,
-        // 3 = display aspect ratio
-        trackData.info.alphaMode ? { id: 21440 /* AlphaMode */, data: 1 } : null,
-        colorSpaceIsComplete(colorSpace) ? {
-          id: 21936 /* Colour */,
-          data: [
-            {
-              id: 21937 /* MatrixCoefficients */,
-              data: MATRIX_COEFFICIENTS_MAP[colorSpace.matrix]
-            },
-            {
-              id: 21946 /* TransferCharacteristics */,
-              data: TRANSFER_CHARACTERISTICS_MAP[colorSpace.transfer]
-            },
-            {
-              id: 21947 /* Primaries */,
-              data: COLOR_PRIMARIES_MAP[colorSpace.primaries]
-            },
-            {
-              id: 21945 /* Range */,
-              data: colorSpace.fullRange ? 2 : 1
-            }
-          ]
-        } : null,
-        flippedRotation ? {
-          id: 30320 /* Projection */,
-          data: [
-            {
-              id: 30321 /* ProjectionType */,
-              data: 0
-              // rectangular
-            },
-            {
-              id: 30325 /* ProjectionPoseRoll */,
-              data: new EBMLFloat32((flippedRotation + 180) % 360 - 180)
-              // [0, 270] -> [-180, 90]
-            }
-          ]
-        } : null
-      ] };
+      const videoElement = {
+        id: 224 /* Video */, data: [
+          { id: 176 /* PixelWidth */, data: trackData.info.width },
+          { id: 186 /* PixelHeight */, data: trackData.info.height },
+          hasNonSquarePixelAspectRatio ? { id: 21680 /* DisplayWidth */, data: trackData.info.aspectRatio.num } : null,
+          hasNonSquarePixelAspectRatio ? { id: 21690 /* DisplayHeight */, data: trackData.info.aspectRatio.den } : null,
+          hasNonSquarePixelAspectRatio ? { id: 21682 /* DisplayUnit */, data: 3 } : null,
+          // 3 = display aspect ratio
+          trackData.info.alphaMode ? { id: 21440 /* AlphaMode */, data: 1 } : null,
+          colorSpaceIsComplete(colorSpace) ? {
+            id: 21936 /* Colour */,
+            data: [
+              {
+                id: 21937 /* MatrixCoefficients */,
+                data: MATRIX_COEFFICIENTS_MAP[colorSpace.matrix]
+              },
+              {
+                id: 21946 /* TransferCharacteristics */,
+                data: TRANSFER_CHARACTERISTICS_MAP[colorSpace.transfer]
+              },
+              {
+                id: 21947 /* Primaries */,
+                data: COLOR_PRIMARIES_MAP[colorSpace.primaries]
+              },
+              {
+                id: 21945 /* Range */,
+                data: colorSpace.fullRange ? 2 : 1
+              }
+            ]
+          } : null,
+          flippedRotation ? {
+            id: 30320 /* Projection */,
+            data: [
+              {
+                id: 30321 /* ProjectionType */,
+                data: 0
+                // rectangular
+              },
+              {
+                id: 30325 /* ProjectionPoseRoll */,
+                data: new EBMLFloat32((flippedRotation + 180) % 360 - 180)
+                // [0, 270] -> [-180, 90]
+              }
+            ]
+          } : null
+        ]
+      };
       elements.push(videoElement);
       return elements;
     }
@@ -23593,11 +23623,13 @@ var Mediabunny = (() => {
           id: 25506 /* CodecPrivate */,
           data: toUint8Array(trackData.info.decoderConfig.description)
         } : null,
-        { id: 225 /* Audio */, data: [
-          { id: 181 /* SamplingFrequency */, data: new EBMLFloat32(trackData.info.sampleRate) },
-          { id: 159 /* Channels */, data: trackData.info.numberOfChannels },
-          pcmInfo ? { id: 25188 /* BitDepth */, data: 8 * pcmInfo.sampleSize } : null
-        ] }
+        {
+          id: 225 /* Audio */, data: [
+            { id: 181 /* SamplingFrequency */, data: new EBMLFloat32(trackData.info.sampleRate) },
+            { id: 159 /* Channels */, data: trackData.info.numberOfChannels },
+            pcmInfo ? { id: 25188 /* BitDepth */, data: 8 * pcmInfo.sampleSize } : null
+          ]
+        }
       ];
     }
     subtitleSpecificTrackInfo(trackData) {
@@ -23608,10 +23640,12 @@ var Mediabunny = (() => {
     maybeCreateTags() {
       const simpleTags = [];
       const addSimpleTag = (key, value) => {
-        simpleTags.push({ id: 26568 /* SimpleTag */, data: [
-          { id: 17827 /* TagName */, data: new EBMLUnicodeString(key) },
-          typeof value === "string" ? { id: 17543 /* TagString */, data: new EBMLUnicodeString(value) } : { id: 17541 /* TagBinary */, data: value }
-        ] });
+        simpleTags.push({
+          id: 26568 /* SimpleTag */, data: [
+            { id: 17827 /* TagName */, data: new EBMLUnicodeString(key) },
+            typeof value === "string" ? { id: 17543 /* TagString */, data: new EBMLUnicodeString(value) } : { id: 17541 /* TagBinary */, data: value }
+          ]
+        });
       };
       const metadataTags = this.output._metadataTags;
       const writtenTags = /* @__PURE__ */ new Set();
@@ -23728,13 +23762,17 @@ var Mediabunny = (() => {
       }
       this.tagsElement = {
         id: 307544935 /* Tags */,
-        data: [{ id: 29555 /* Tag */, data: [
-          { id: 25536 /* Targets */, data: [
-            { id: 26826 /* TargetTypeValue */, data: 50 },
-            { id: 25546 /* TargetType */, data: "MOVIE" }
-          ] },
-          ...simpleTags
-        ] }]
+        data: [{
+          id: 29555 /* Tag */, data: [
+            {
+              id: 25536 /* Targets */, data: [
+                { id: 26826 /* TargetTypeValue */, data: 50 },
+                { id: 25546 /* TargetType */, data: "MOVIE" }
+              ]
+            },
+            ...simpleTags
+          ]
+        }]
       };
     }
     maybeCreateAttachments() {
@@ -24064,31 +24102,31 @@ ${cue.notes ?? ""}`;
         return;
       }
       outer:
-        while (true) {
-          let trackWithMinTimestamp = null;
-          let minTimestamp = Infinity;
-          for (const trackData of this.trackDatas) {
-            if (!isFinalCall && trackData.chunkQueue.length === 0 && !trackData.track.source._closed) {
-              break outer;
-            }
-            if (trackData.chunkQueue.length > 0 && trackData.chunkQueue[0].timestamp < minTimestamp) {
-              trackWithMinTimestamp = trackData;
-              minTimestamp = trackData.chunkQueue[0].timestamp;
-            }
+      while (true) {
+        let trackWithMinTimestamp = null;
+        let minTimestamp = Infinity;
+        for (const trackData of this.trackDatas) {
+          if (!isFinalCall && trackData.chunkQueue.length === 0 && !trackData.track.source._closed) {
+            break outer;
           }
-          if (!trackWithMinTimestamp) {
-            break;
+          if (trackData.chunkQueue.length > 0 && trackData.chunkQueue[0].timestamp < minTimestamp) {
+            trackWithMinTimestamp = trackData;
+            minTimestamp = trackData.chunkQueue[0].timestamp;
           }
-          const chunk = trackWithMinTimestamp.chunkQueue.shift();
-          this.writeBlock(trackWithMinTimestamp, chunk);
         }
+        if (!trackWithMinTimestamp) {
+          break;
+        }
+        const chunk = trackWithMinTimestamp.chunkQueue.shift();
+        this.writeBlock(trackWithMinTimestamp, chunk);
+      }
       if (!isFinalCall) {
         await this.writer.flush();
       }
     }
     /**
      * Due to [a bug in Chromium](https://bugs.chromium.org/p/chromium/issues/detail?id=1377842), VP9 streams often
-    	 * lack color space information. This method patches in that information.
+       * lack color space information. This method patches in that information.
      */
     fixVP9ColorSpace(trackData, chunk) {
       if (chunk.type !== "key") return;
@@ -24165,30 +24203,40 @@ ${cue.notes ?? ""}`;
       const msDuration = Math.round(1e3 * chunk.duration);
       if (!chunk.additions) {
         view2.setUint8(3, Number(chunk.type === "key") << 7);
-        const simpleBlock = { id: 163 /* SimpleBlock */, data: [
-          prelude,
-          chunk.data
-        ] };
-        this.ebmlWriter.writeEBML(simpleBlock);
-      } else {
-        const blockGroup = { id: 160 /* BlockGroup */, data: [
-          { id: 161 /* Block */, data: [
+        const simpleBlock = {
+          id: 163 /* SimpleBlock */, data: [
             prelude,
             chunk.data
-          ] },
-          chunk.type === "delta" ? {
-            id: 251 /* ReferenceBlock */,
-            data: new EBMLSignedInt(trackData.lastWrittenMsTimestamp - msTimestamp)
-          } : null,
-          chunk.additions ? { id: 30113 /* BlockAdditions */, data: [
-            { id: 166 /* BlockMore */, data: [
-              { id: 238 /* BlockAddID */, data: 1 },
-              // Some players expect BlockAddID to come first
-              { id: 165 /* BlockAdditional */, data: chunk.additions }
-            ] }
-          ] } : null,
-          msDuration > 0 ? { id: 155 /* BlockDuration */, data: msDuration } : null
-        ] };
+          ]
+        };
+        this.ebmlWriter.writeEBML(simpleBlock);
+      } else {
+        const blockGroup = {
+          id: 160 /* BlockGroup */, data: [
+            {
+              id: 161 /* Block */, data: [
+                prelude,
+                chunk.data
+              ]
+            },
+            chunk.type === "delta" ? {
+              id: 251 /* ReferenceBlock */,
+              data: new EBMLSignedInt(trackData.lastWrittenMsTimestamp - msTimestamp)
+            } : null,
+            chunk.additions ? {
+              id: 30113 /* BlockAdditions */, data: [
+                {
+                  id: 166 /* BlockMore */, data: [
+                    { id: 238 /* BlockAddID */, data: 1 },
+                    // Some players expect BlockAddID to come first
+                    { id: 165 /* BlockAdditional */, data: chunk.additions }
+                  ]
+                }
+              ]
+            } : null,
+            msDuration > 0 ? { id: 155 /* BlockDuration */, data: msDuration } : null
+          ]
+        };
         this.ebmlWriter.writeEBML(blockGroup);
       }
       this.duration = Math.max(this.duration, msTimestamp + msDuration);
@@ -24245,16 +24293,20 @@ ${cue.notes ?? ""}`;
       const groupedAndSortedByTimestamp = [...groupedByTimestamp.entries()].sort((a, b) => a[0] - b[0]);
       for (const [msTimestamp, trackDatas] of groupedAndSortedByTimestamp) {
         assert(this.cues);
-        this.cues.data.push({ id: 187 /* CuePoint */, data: [
-          { id: 179 /* CueTime */, data: msTimestamp },
-          // Create CueTrackPositions for each track that starts at this timestamp
-          ...trackDatas.map((trackData) => {
-            return { id: 183 /* CueTrackPositions */, data: [
-              { id: 247 /* CueTrack */, data: trackData.track.id },
-              { id: 241 /* CueClusterPosition */, data: clusterOffsetFromSegment }
-            ] };
-          })
-        ] });
+        this.cues.data.push({
+          id: 187 /* CuePoint */, data: [
+            { id: 179 /* CueTime */, data: msTimestamp },
+            // Create CueTrackPositions for each track that starts at this timestamp
+            ...trackDatas.map((trackData) => {
+              return {
+                id: 183 /* CueTrackPositions */, data: [
+                  { id: 247 /* CueTrack */, data: trackData.track.id },
+                  { id: 241 /* CueClusterPosition */, data: clusterOffsetFromSegment }
+                ]
+              };
+            })
+          ]
+        });
       }
     }
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
@@ -24687,25 +24739,25 @@ ${cue.notes ?? ""}`;
         this.bosPagesWritten = true;
       }
       outer:
-        while (true) {
-          let trackWithMinTimestamp = null;
-          let minTimestamp = Infinity;
-          for (const trackData of this.trackDatas) {
-            if (!isFinalCall && trackData.packetQueue.length <= 1 && !trackData.track.source._closed) {
-              break outer;
-            }
-            if (trackData.packetQueue.length > 0 && trackData.packetQueue[0].timestampInSamples < minTimestamp) {
-              trackWithMinTimestamp = trackData;
-              minTimestamp = trackData.packetQueue[0].timestampInSamples;
-            }
+      while (true) {
+        let trackWithMinTimestamp = null;
+        let minTimestamp = Infinity;
+        for (const trackData of this.trackDatas) {
+          if (!isFinalCall && trackData.packetQueue.length <= 1 && !trackData.track.source._closed) {
+            break outer;
           }
-          if (!trackWithMinTimestamp) {
-            break;
+          if (trackData.packetQueue.length > 0 && trackData.packetQueue[0].timestampInSamples < minTimestamp) {
+            trackWithMinTimestamp = trackData;
+            minTimestamp = trackData.packetQueue[0].timestampInSamples;
           }
-          const packet = trackWithMinTimestamp.packetQueue.shift();
-          const isFinalPacket = trackWithMinTimestamp.packetQueue.length === 0;
-          this.writePacket(trackWithMinTimestamp, packet, isFinalPacket);
         }
+        if (!trackWithMinTimestamp) {
+          break;
+        }
+        const packet = trackWithMinTimestamp.packetQueue.shift();
+        const isFinalPacket = trackWithMinTimestamp.packetQueue.length === 0;
+        this.writePacket(trackWithMinTimestamp, packet, isFinalPacket);
+      }
       if (!isFinalCall) {
         await this.writer.flush();
       }
@@ -25138,24 +25190,24 @@ ${cue.notes ?? ""}`;
         this.writeTables();
       }
       outer:
-        while (true) {
-          let trackWithMinTimestamp = null;
-          let minTimestamp = Infinity;
-          for (const trackData of this.trackDatas) {
-            if (!isFinalCall && trackData.packetQueue.length === 0 && !trackData.track.source._closed) {
-              break outer;
-            }
-            if (trackData.packetQueue.length > 0 && trackData.packetQueue[0].presentationTimestamp < minTimestamp) {
-              trackWithMinTimestamp = trackData;
-              minTimestamp = trackData.packetQueue[0].presentationTimestamp;
-            }
+      while (true) {
+        let trackWithMinTimestamp = null;
+        let minTimestamp = Infinity;
+        for (const trackData of this.trackDatas) {
+          if (!isFinalCall && trackData.packetQueue.length === 0 && !trackData.track.source._closed) {
+            break outer;
           }
-          if (!trackWithMinTimestamp) {
-            break;
+          if (trackData.packetQueue.length > 0 && trackData.packetQueue[0].presentationTimestamp < minTimestamp) {
+            trackWithMinTimestamp = trackData;
+            minTimestamp = trackData.packetQueue[0].presentationTimestamp;
           }
-          const queuedPacket = trackWithMinTimestamp.packetQueue.shift();
-          this.writePesPacket(trackWithMinTimestamp, queuedPacket);
         }
+        if (!trackWithMinTimestamp) {
+          break;
+        }
+        const queuedPacket = trackWithMinTimestamp.packetQueue.shift();
+        this.writePesPacket(trackWithMinTimestamp, queuedPacket);
+      }
       if (!isFinalCall) {
         await this.writer.flush();
       }
@@ -29868,4 +29920,4 @@ The @mediabunny/mp3-encoder extension package provides support for encoding MP3.
   globalThis[MEDIABUNNY_LOADED_SYMBOL] = true;
   return __toCommonJS(index_exports);
 })();
-if (typeof module === "object" && typeof module.exports === "object") Object.assign(module.exports, Mediabunny)
+if (typeof module === "object" && typeof module.exports === "object") Object.assign(module.exports, Mediabunny);

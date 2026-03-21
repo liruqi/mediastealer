@@ -369,7 +369,7 @@ function updateItemStatus(itemId, status, downloadId, muxedDownloadId) {
 }
 
 // Message Listeners
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+self.handleBackgroundMessage = (message, sender, sendResponse) => {
   if (message.type === "GET_LOGS") {
     sendResponse({ logs: capturedLogs });
   } else if (message.type === "MERGE_PROGRESS") {
@@ -445,4 +445,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   } else if (message.type === "GET_PLUGINS") {
     sendResponse({ plugins: self.pluginEngine.getPlugins() });
   }
-});
+};
+
+chrome.runtime.onMessage.addListener(self.handleBackgroundMessage);
