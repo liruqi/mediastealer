@@ -102,7 +102,6 @@ jobs:
             2. Go to `about:debugging` → **This Firefox** → **Load Temporary Add-on…**.
             3. Select `manifest.json` from the extracted folder.
 
-            > **Note:** HLS/m3u8 merging (Offscreen API) is a Chrome-only feature.
           files: |
             ${{ env.CHROME_ZIP }}
             ${{ env.FIREFOX_ZIP }}
