@@ -123,16 +123,16 @@ document.addEventListener('DOMContentLoaded', () => {
       mediaList.classList.remove('hidden');
 
       items.forEach(item => {
+        const displayBadge = item.streamType || item.tag;
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>
             <div class="filename-container">
               <span class="filename" title="${item.url}">${item.filename}</span>
-              ${item.streamType ? `<span class="badge badge-${item.streamType}">${item.streamType.toUpperCase()}</span>` : ''}
+              ${displayBadge ? `<span class="badge badge-${displayBadge}">${displayBadge.toUpperCase()}</span>` : ''}
             </div>
           </td>
           <td class="type">${(item.type || '').split(';')[0]}</td>
-          <td>${item.tag ? `<span class="badge badge-${item.tag}">${item.tag}</span>` : ''}</td>
           <td>${formatBytes(item.size)}</td>
           <td>
             <div class="btn-group">
