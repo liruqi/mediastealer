@@ -1,61 +1,199 @@
 {
-  "appName": { "message": "ธารเงา" },
-  "appDesc": { "message": "ช่วยให้คุณดาวน์โหลดสื่อสตรีมมิ่งได้อย่างง่ายดาย" },
-  "btn_download_all": { "message": "ดาวน์โหลดทั้งหมด" },
-  "tt_download_all": { "message": "ดาวน์โหลดไฟล์สื่อทั้งหมดที่ตรวจพบ" },
-  "btn_popout": { "message": "เปิดหน้าต่างแยก" },
-  "tt_popout": { "message": "เปิดในหน้าต่างแยกส่วนตัว" },
-  "btn_clear_logs": { "message": "ล้างบันทึก" },
-  "btn_clear_downloads": { "message": "ล้างรายการดาวน์โหลด" },
-  "label_debug": { "message": "แก้ไขจุดบกพร่อง" },
-  "tt_clear_all": { "message": "ล้างรายการทั้งหมด" },
-  "tt_options": { "message": "การตั้งค่า" },
-  "title_captured_media": { "message": "สื่อที่ตรวจพบ" },
-  "th_filename": { "message": "ชื่อไฟล์" },
-  "th_type": { "message": "ประเภท" },
-  "th_size": { "message": "ขนาด" },
-  "th_action": { "message": "ดำเนินการ" },
-  "title_logs": { "message": "บันทึกการทำงาน" },
-  "no_media": { "message": "ยังไม่มีสื่อที่ตรวจพบในขณะนี้" },
-  "btn_download": { "message": "ดาวน์โหลด" },
-  "btn_open": { "message": "เปิด" },
-  "btn_downloading": { "message": "กำลังดาวน์โหลด" },
-  "btn_merge": { "message": "ผสาน" },
-  "options_title": { "message": "การตั้งค่า ธารเงา" },
-  "card_general": { "message": "การตั้งค่าทั่วไป" },
-  "opt_enable": { "message": "เปิดใช้งาน ธารเงา" },
-  "opt_auto_download": { "message": "ดาวน์โหลดอัตโนมัติ" },
-  "opt_auto_download_desc": { "message": "ดาวน์โหลดไฟล์สื่อที่ดักจับได้โดยอัตโนมัติ (โปรดระวัง อาจมีการดาวน์โหลดไฟล์จำนวนมาก)" },
-  "opt_filter_size": { "message": "ตัวกรองขนาดไฟล์ (KB)" },
-  "lbl_min_size": { "message": "ขนาดต่ำสุด:" },
-  "lbl_max_size": { "message": "ขนาดสูงสุด:" },
-  "size_no_limit": { "message": "(0 สำหรับไม่จำกัด)" },
-  "size_tips": { "message": "แนะนำ: ~800KB สำหรับวิดีโอ, ~200KB สำหรับรูปภาพ" },
-  "opt_ignore_zero": { "message": "ละเว้นไฟล์ขนาด 0 ไบต์" },
-  "opt_deduplicate": { "message": "ดาวน์โหลดไม่ซ้ำ" },
-  "opt_deduplicate_desc": { "message": "ไม่ดาวน์โหลดไฟล์เดิมซ้ำภายใน 24 ชั่วโมง" },
-  "opt_auto_clean": { "message": "ล้างประวัติและไฟล์อัตโนมัติ (24 ชม.)" },
-  "opt_auto_clean_desc": { "message": "ลบประวัติและไฟล์สื่อที่ดาวน์โหลดไว้หลังจาก 24 ชั่วโมงเพื่อประหยัดพื้นที่" },
-  "card_rules": { "message": "กฎการดักจับ (Regex)" },
-  "opt_rules_desc": { "message": "กำหนด URL และ Content-Type ที่ต้องการดักจับ" },
-  "title_ignored_extensions": { "message": "นามสกุลไฟล์ที่เพิกเฉย" },
-  "opt_ignored_extensions_desc": { "message": "รายการนามสกุลไฟล์ที่ต้องการข้ามการดักจับ" },
-  "th_extension": { "message": "นามสกุล" },
-  "ph_extension": { "message": ".gif, .svg, .ico" },
-  "btn_add_extension": { "message": "เพิ่มนามสกุล" },
-  "th_rule_enabled": { "message": "เปิดใช้งาน" },
-  "th_url_pattern": { "message": "รูปแบบ URL" },
-  "th_content_type": { "message": "Content-Type" },
-  "btn_delete": { "message": "ลบ" },
-  "title_add_rule": { "message": "เพิ่มกฎใหม่" },
-  "ph_url": { "message": "URL Regex (เช่น .*\\.mp4)" },
-  "ph_ct": { "message": "Content-Type Regex (เช่น video/.*)" },
-  "btn_add_rule": { "message": "เพิ่มกฎ" },
-  "log_enabled": { "message": "ธารเงา เปิดใช้งานแล้ว" },
-  "log_disabled": { "message": "ธารเงา ปิดใช้งานแล้ว" },
-  "log_intercepted": { "message": "ดักจับไฟล์: $FILENAME$", "placeholders": { "FILENAME": { "content": "$1" } } },
-  "log_auto_download": { "message": "เริ่มดาวน์โหลดอัตโนมัติ: $FILENAME$", "placeholders": { "FILENAME": { "content": "$1" } } },
-  "log_skipping": { "message": "ข้ามการดาวน์โหลด: ดาวน์โหลดไปแล้วในช่วง 24 ชั่วโมงที่ผ่านมา" },
-  "log_failed": { "message": "การดาวน์โหลดล้มเหลว: $ERROR$", "placeholders": { "ERROR": { "content": "$1" } } },
-  "log_ignored_duplicate": { "message": "ละเว้น URL ซ้ำ: $URL$", "placeholders": { "URL": { "content": "$1" } } }
+  "appName": {
+    "message": "ธารเงา"
+  },
+  "appDesc": {
+    "message": "ช่วยให้คุณดาวน์โหลดสื่อสตรีมมิ่งได้อย่างง่ายดาย"
+  },
+  "btn_download_all": {
+    "message": "ดาวน์โหลดทั้งหมด"
+  },
+  "tt_download_all": {
+    "message": "ดาวน์โหลดไฟล์สื่อทั้งหมดที่ตรวจพบ"
+  },
+  "btn_popout": {
+    "message": "เปิดหน้าต่างแยก"
+  },
+  "tt_popout": {
+    "message": "เปิดในหน้าต่างแยกส่วนตัว"
+  },
+  "btn_clear_logs": {
+    "message": "ล้างบันทึก"
+  },
+  "btn_clear_downloads": {
+    "message": "ล้างรายการดาวน์โหลด"
+  },
+  "label_debug": {
+    "message": "แก้ไขจุดบกพร่อง"
+  },
+  "tt_clear_all": {
+    "message": "ล้างรายการทั้งหมด"
+  },
+  "tt_options": {
+    "message": "การตั้งค่า"
+  },
+  "title_captured_media": {
+    "message": "สื่อที่ตรวจพบ"
+  },
+  "th_filename": {
+    "message": "ชื่อไฟล์"
+  },
+  "th_type": {
+    "message": "ประเภท"
+  },
+  "th_size": {
+    "message": "ขนาด"
+  },
+  "th_action": {
+    "message": "ดำเนินการ"
+  },
+  "title_logs": {
+    "message": "บันทึกการทำงาน"
+  },
+  "no_media": {
+    "message": "ยังไม่มีสื่อที่ตรวจพบในขณะนี้"
+  },
+  "btn_download": {
+    "message": "ดาวน์โหลด"
+  },
+  "btn_open": {
+    "message": "เปิด"
+  },
+  "btn_downloading": {
+    "message": "กำลังดาวน์โหลด"
+  },
+  "btn_merge": {
+    "message": "ผสาน"
+  },
+  "options_title": {
+    "message": "การตั้งค่า ธารเงา"
+  },
+  "card_general": {
+    "message": "การตั้งค่าทั่วไป"
+  },
+  "opt_enable": {
+    "message": "เปิดใช้งาน ธารเงา"
+  },
+  "opt_auto_download": {
+    "message": "ดาวน์โหลดอัตโนมัติ"
+  },
+  "opt_auto_download_desc": {
+    "message": "ดาวน์โหลดไฟล์สื่อที่ดักจับได้โดยอัตโนมัติ (โปรดระวัง อาจมีการดาวน์โหลดไฟล์จำนวนมาก)"
+  },
+  "opt_filter_size": {
+    "message": "ตัวกรองขนาดไฟล์ (KB)"
+  },
+  "lbl_min_size": {
+    "message": "ขนาดต่ำสุด:"
+  },
+  "lbl_max_size": {
+    "message": "ขนาดสูงสุด:"
+  },
+  "size_no_limit": {
+    "message": "(0 สำหรับไม่จำกัด)"
+  },
+  "size_tips": {
+    "message": "แนะนำ: ~800KB สำหรับวิดีโอ, ~200KB สำหรับรูปภาพ"
+  },
+  "opt_ignore_zero": {
+    "message": "ละเว้นไฟล์ขนาด 0 ไบต์"
+  },
+  "opt_deduplicate": {
+    "message": "ดาวน์โหลดไม่ซ้ำ"
+  },
+  "opt_deduplicate_desc": {
+    "message": "ไม่ดาวน์โหลดไฟล์เดิมซ้ำภายใน 24 ชั่วโมง"
+  },
+  "opt_auto_clean": {
+    "message": "ล้างประวัติและไฟล์อัตโนมัติ (24 ชม.)"
+  },
+  "opt_auto_clean_desc": {
+    "message": "ลบประวัติและไฟล์สื่อที่ดาวน์โหลดไว้หลังจาก 24 ชั่วโมงเพื่อประหยัดพื้นที่"
+  },
+  "card_rules": {
+    "message": "กฎการดักจับ"
+  },
+  "opt_rules_desc": {
+    "message": "กำหนด URL และ Content-Type ที่ต้องการดักจับ ใช้<a href=\"https://th.wikipedia.org/wiki/%E0%B8%99%E0%B8%B4%E0%B8%9E%E0%B8%88%E0%B8%99%E0%B9%8C%E0%B8%9B%E0%B8%A3%E0%B8%81%E0%B8%95%E0%B8%B4\" target=\"_blank\">นิพจน์ปกติ</a>"
+  },
+  "title_ignored_extensions": {
+    "message": "นามสกุลไฟล์ที่เพิกเฉย"
+  },
+  "opt_ignored_extensions_desc": {
+    "message": "รายการนามสกุลไฟล์ที่ต้องการข้ามการดักจับ"
+  },
+  "th_extension": {
+    "message": "นามสกุล"
+  },
+  "ph_extension": {
+    "message": ".gif, .svg, .ico"
+  },
+  "btn_add_extension": {
+    "message": "เพิ่มนามสกุล"
+  },
+  "th_rule_enabled": {
+    "message": "เปิดใช้งาน"
+  },
+  "th_url_pattern": {
+    "message": "รูปแบบ URL"
+  },
+  "th_content_type": {
+    "message": "Content-Type"
+  },
+  "btn_delete": {
+    "message": "ลบ"
+  },
+  "title_add_rule": {
+    "message": "เพิ่มกฎใหม่"
+  },
+  "ph_url": {
+    "message": "URL Regex (เช่น .*\\.mp4)"
+  },
+  "ph_ct": {
+    "message": "Content-Type Regex (เช่น video/.*)"
+  },
+  "btn_add_rule": {
+    "message": "เพิ่มกฎ"
+  },
+  "log_enabled": {
+    "message": "ธารเงา เปิดใช้งานแล้ว"
+  },
+  "log_disabled": {
+    "message": "ธารเงา ปิดใช้งานแล้ว"
+  },
+  "log_intercepted": {
+    "message": "ดักจับไฟล์: $FILENAME$",
+    "placeholders": {
+      "FILENAME": {
+        "content": "$1"
+      }
+    }
+  },
+  "log_auto_download": {
+    "message": "เริ่มดาวน์โหลดอัตโนมัติ: $FILENAME$",
+    "placeholders": {
+      "FILENAME": {
+        "content": "$1"
+      }
+    }
+  },
+  "log_skipping": {
+    "message": "ข้ามการดาวน์โหลด: ดาวน์โหลดไปแล้วในช่วง 24 ชั่วโมงที่ผ่านมา"
+  },
+  "log_failed": {
+    "message": "การดาวน์โหลดล้มเหลว: $ERROR$",
+    "placeholders": {
+      "ERROR": {
+        "content": "$1"
+      }
+    }
+  },
+  "log_ignored_duplicate": {
+    "message": "ละเว้น URL ซ้ำ: $URL$",
+    "placeholders": {
+      "URL": {
+        "content": "$1"
+      }
+    }
+  }
 }

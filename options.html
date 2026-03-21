@@ -176,10 +176,12 @@
       <input type="checkbox" id="autoClean">
       <label for="autoClean"><strong data-i18n="opt_auto_clean">Auto-clean history and files (24h)</strong></label>
     </div>
+  </div>
+
   <div class="card">
     <h2 data-i18n="card_rules">Capture Rules</h2>
-    <p class="setting-desc" data-i18n="opt_rules_desc">Configure which URLs and Content-Types should be intercepted.
-      Uses regular expressions.</p>
+    <p class="setting-desc" data-i18n="opt_rules_desc">Configure which URLs and Content-Type patterns should be intercepted.
+      Uses <a href="https://en.wikipedia.org/wiki/Regular_expression" target="_blank">regular expressions (regex)</a>.</p>
 
     <table id="rules-table">
       <thead>

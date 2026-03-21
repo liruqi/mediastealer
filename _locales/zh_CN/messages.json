@@ -111,10 +111,10 @@
     "message": "24 小时后自动删除已捕获的记录及其下载的本地文件。"
   },
   "card_rules": {
-    "message": "捕获规则 (Regex)"
+    "message": "捕获规则"
   },
   "opt_rules_desc": {
-    "message": "配置需要拦截的 URL 和 Content-Type。"
+    "message": "配置需要拦截的 URL 和 Content-Type。支持<a href=\"https://zh.wikipedia.org/wiki/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F\" target=\"_blank\">正则表达式 (regex)</a>。"
   },
   "title_ignored_extensions": {
     "message": "忽略的扩展名"

@@ -111,10 +111,10 @@
     "message": "Remove captured media records and their downloaded files after 24 hours."
   },
   "card_rules": {
-    "message": "Capture Rules (Regex)"
+    "message": "Capture Rules"
   },
   "opt_rules_desc": {
-    "message": "Configure which URLs and Content-Type patterns should be intercepted."
+    "message": "Configure which URLs and Content-Type patterns should be intercepted. Uses <a href=\"https://en.wikipedia.org/wiki/Regular_expression\" target=\"_blank\">regular expressions</a>."
   },
   "title_ignored_extensions": {
     "message": "Ignored Extensions"

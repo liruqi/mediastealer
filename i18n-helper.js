@@ -7,7 +7,7 @@ function translateUI() {
     const key = element.getAttribute('data-i18n');
     const message = chrome.i18n.getMessage(key);
     if (message) {
-      element.textContent = message;
+      element.innerHTML = message;
     }
   });
 
