@@ -58,7 +58,8 @@ jobs:
         run: |
           VERSION="${{ steps.version.outputs.VERSION }}"
           # Patch offscreen permission into manifest for Chrome
-          jq '.permissions += ["offscreen"]' manifest.json > manifest.chrome.json
+          # Also remove "scripts" which is the Firefox-specific background mechanism
+          jq '.permissions += ["offscreen"] | del(.background.scripts)' manifest.json > manifest.chrome.json
           mv manifest.chrome.json manifest.json
 
           zip -r "fluxon-${VERSION}-chrome.zip" \
