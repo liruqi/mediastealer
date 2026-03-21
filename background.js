@@ -417,5 +417,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       const config = result.config || {};
       self.pluginEngine.executeHook('onAction', { pluginName, action, itemId, config });
     });
+  } else if (message.type === "GET_PLUGINS") {
+    sendResponse({ plugins: self.pluginEngine.getPlugins() });
   }
 });

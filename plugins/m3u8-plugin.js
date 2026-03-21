@@ -5,6 +5,8 @@
 
 const M3U8_PLUGIN = {
   name: "M3U8 Downloader",
+  description: "Detects HLS (.m3u8) streams and merges video/audio segments into a single MP4 file.",
+  defaultEnabled: true,
   handledUrls: new Set(),
 
   /**
