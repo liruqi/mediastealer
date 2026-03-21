@@ -1,4 +1,8 @@
-importScripts('media-db.js', 'plugin-engine.js', 'plugins/m3u8-plugin.js');
+// Chrome (service worker): load dependencies via importScripts.
+// Firefox (event page via manifest "scripts" array): files are already loaded in order, importScripts is unavailable.
+if (typeof importScripts !== 'undefined') {
+  importScripts('media-db.js', 'plugin-engine.js', 'plugins/m3u8-plugin.js');
+}
 
 const defaultRules = [
   { id: 1, enabled: true, url: ".*", ct: "video/.*", tag: "video", rtype: 1 },
@@ -127,51 +131,70 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 
 chrome.webRequest.onHeadersReceived.addListener(
   async function (details) {
+    // [FIREFOX DEBUG] Very loud log to see if it fires
+    console.error(`[FLUXON] onHeadersReceived fired for: ${details.url}`);
+    
     if (!config.enabled) return;
 
-    // Skip requests initiated by the extension itself (background/offscreen/popup)
-    if (details.initiator && details.initiator.startsWith('chrome-extension://')) {
+    // Skip requests initiated by the extension itself
+    const origin = details.initiator || details.originUrl || details.documentUrl || '';
+    if (origin.startsWith('chrome-extension://') || origin.startsWith('moz-extension://')) {
       return;
     }
 
-    if (!details.responseHeaders) return;
+    if (!details.responseHeaders) {
+      console.log(`[DEBUG] No response headers for: ${details.url}`);
+      return;
+    }
 
     let contentLength = -1; // -1 means unknown (e.g., chunked transfer)
     let contentType = "";
 
     // Firefox uses lowercase header names in details.responseHeaders, Chrome can be either
-    if (details.responseHeaders) {
-      for (let header of details.responseHeaders) {
-        if (!header || !header.name) continue;
-        let name = header.name.toLowerCase();
-        if (name === "content-length") {
-          contentLength = parseInt(header.value, 10);
-        }
-        if (name === "content-type" && header.value) {
-          contentType = header.value;
-        }
+    for (let header of details.responseHeaders) {
+      if (!header || !header.name) continue;
+      let name = header.name.toLowerCase();
+      if (name === "content-length") {
+        contentLength = parseInt(header.value, 10);
+      }
+      if (name === "content-type" && header.value) {
+        contentType = header.value;
       }
     }
 
-    // addLog(`Inspecting HTTP response: ${details.url}`);
-    // addLog(`Content-Type: ${contentType}, Content-Length: ${contentLength}`);
+    // [DEBUG LOG]
+    addLog(`[DEBUG] Headers: ${contentType} (${contentLength}) for ${details.url.substring(0, 50)}...`);
 
     // Plugin Interception Hook
     const pluginResult = await self.pluginEngine.executeHook('onIntercept', { details, contentType, config });
-    if (pluginResult.skip) return;
+    if (pluginResult.skip) {
+      addLog(`[DEBUG] Plugin skip: ${details.url.substring(0, 50)}...`);
+      return;
+    }
 
     if (!pluginResult.ignoreSize) {
-      if (config.nozerofiles && contentLength === 0) return;
+      if (config.nozerofiles && contentLength === 0) {
+        return;
+      }
       if (config.nosmallfiles && contentLength > 0) {
         const sizeKB = contentLength / 1024;
-        if (sizeKB < config.minSize) return;
-        if (config.maxSize > 0 && sizeKB > config.maxSize) return;
+        if (sizeKB < config.minSize) {
+          addLog(`[DEBUG] Too small skip (${sizeKB.toFixed(1)}KB): ${details.url.substring(0, 50)}...`);
+          return;
+        }
+        if (config.maxSize > 0 && sizeKB > config.maxSize) {
+          addLog(`[DEBUG] Too large skip (${sizeKB.toFixed(1)}KB): ${details.url.substring(0, 50)}...`);
+          return;
+        }
       }
     }
 
     let matched = false;
+    let matchedTag = '';
+
     if (pluginResult.isPluginHandled) {
       matched = true;
+      matchedTag = pluginResult.tag || '';
     } else {
       for (let rule of config.rules) {
         if (!rule.enabled) continue;
@@ -181,9 +204,9 @@ chrome.webRequest.onHeadersReceived.addListener(
           let ctRegex = new RegExp(rule.ct, "i");
 
           if (urlRegex.test(details.url) && ctRegex.test(contentType)) {
-            addLog(`MATCHED RULE (url=${rule.url}, ct=${rule.ct}): ${details.url}`);
+            addLog(`MATCHED RULE (url=${rule.url}, ct=${rule.ct}): ${details.url.substring(0, 50)}...`);
             matched = true;
-            var matchedTag = rule.tag || '';
+            matchedTag = rule.tag || '';
             break;
           }
         } catch (e) {
@@ -257,14 +280,14 @@ chrome.webRequest.onHeadersReceived.addListener(
         };
 
         if (config.automaticdownload) {
-           mediaItem.status = 'Downloading';
+          mediaItem.status = 'Downloading';
         }
 
         // Handle Auto-download OR Plugin Download OR just Manual Ready
         const handleCapture = async () => {
           // 4. Plugin Download Hook
           const preDownloadResult = await self.pluginEngine.executeHook('onPreDownload', { item: mediaItem, config });
-          
+
           if (preDownloadResult.handled) {
             mediaItem.status = 'Complete';
             if (preDownloadResult.downloadId) mediaItem.downloadId = preDownloadResult.downloadId;
@@ -301,7 +324,8 @@ chrome.webRequest.onHeadersReceived.addListener(
     }
   },
   { urls: ["<all_urls>"] },
-  ["responseHeaders", "extraHeaders"]
+  // "extraHeaders" is Chrome-only; omitting it keeps the listener working on Firefox
+  ["responseHeaders"]
 );
 
 async function startDownload(mediaItem) {
@@ -388,7 +412,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true; // Keep channel open for async callback
   } else if (message.type === "WAIT_FOR_DOWNLOAD") {
     const { downloadId } = message.data;
-    
+
     // Check current state first (it might be already complete if skipped)
     chrome.downloads.search({ id: downloadId }, (results) => {
       const current = results && results[0];

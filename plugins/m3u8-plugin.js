@@ -270,6 +270,12 @@ const M3U8_PLUGIN = {
   },
 
   async ensureOffscreen() {
+    // chrome.offscreen is Chrome-only; skip gracefully on Firefox
+    if (!chrome.offscreen) {
+      console.warn('M3U8 Plugin: chrome.offscreen not available (Firefox?). HLS merging requires Chrome.');
+      throw new Error('Offscreen API not available in this browser.');
+    }
+
     if (this._offscreenPromise) return this._offscreenPromise;
 
     this._offscreenPromise = (async () => {

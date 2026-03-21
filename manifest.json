@@ -20,6 +20,9 @@
   "background": {
     "service_worker": "background.js",
     "scripts": [
+      "media-db.js",
+      "plugin-engine.js",
+      "plugins/m3u8-plugin.js",
       "background.js"
     ]
   },

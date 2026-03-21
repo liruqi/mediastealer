@@ -16,17 +16,45 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Install jq
+        run: sudo apt-get install -y jq
+
       - name: Get version from tag
         id: version
         run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
 
-      - name: Build extension zip
+      - name: Build Firefox zip
         run: |
           VERSION="${{ steps.version.outputs.VERSION }}"
-          ZIP_NAME="fluxon-${VERSION}.zip"
+          # Firefox uses the base manifest (no windows/offscreen)
+          zip -r "fluxon-${VERSION}-firefox.zip" \
+            manifest.json \
+            background.js \
+            offscreen.html \
+            offscreen.js \
+            popup.html \
+            popup.css \
+            popup.js \
+            options.html \
+            options.js \
+            plugin-engine.js \
+            mux.js \
+            media-db.js \
+            mediabunny.cjs \
+            i18n-helper.js \
+            icons/ \
+            _locales/ \
+            plugins/
+          echo "FIREFOX_ZIP=fluxon-${VERSION}-firefox.zip" >> "$GITHUB_ENV"
 
-          # Collect all extension files, excluding dev/CI artifacts
-          zip -r "$ZIP_NAME" \
+      - name: Build Chrome zip
+        run: |
+          VERSION="${{ steps.version.outputs.VERSION }}"
+          # Patch offscreen permission into manifest for Chrome
+          jq '.permissions += ["offscreen"]' manifest.json > manifest.chrome.json
+          mv manifest.chrome.json manifest.json
+
+          zip -r "fluxon-${VERSION}-chrome.zip" \
             manifest.json \
             background.js \
             offscreen.html \
@@ -45,7 +73,9 @@ jobs:
             _locales/ \
             plugins/
 
-          echo "ZIP_NAME=$ZIP_NAME" >> "$GITHUB_ENV"
+          # Restore original manifest
+          git checkout manifest.json
+          echo "CHROME_ZIP=fluxon-${VERSION}-chrome.zip" >> "$GITHUB_ENV"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -54,15 +84,19 @@ jobs:
           body: |
             ## Installation
 
-            ### Chrome / Edge
-            1. Download `fluxon-${{ steps.version.outputs.VERSION }}.zip` and extract it.
+            ### Chrome / Edge — download `fluxon-${{ steps.version.outputs.VERSION }}-chrome.zip`
+            1. Extract the zip.
             2. Go to `chrome://extensions`, enable **Developer mode**.
             3. Click **Load unpacked** and select the extracted folder.
 
-            ### Firefox
-            1. Download `fluxon-${{ steps.version.outputs.VERSION }}.zip` and extract it.
+            ### Firefox — download `fluxon-${{ steps.version.outputs.VERSION }}-firefox.zip`
+            1. Extract the zip.
             2. Go to `about:debugging` → **This Firefox** → **Load Temporary Add-on…**.
             3. Select `manifest.json` from the extracted folder.
-          files: ${{ env.ZIP_NAME }}
+
+            > **Note:** HLS/m3u8 merging (Offscreen API) is a Chrome-only feature.
+          files: |
+            ${{ env.CHROME_ZIP }}
+            ${{ env.FIREFOX_ZIP }}
           draft: false
           prerelease: false
