@@ -229,5 +229,53 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // ── Plugin Settings ────────────────────────────────────────
+  const pluginsList = document.getElementById('plugins-list');
+
+  function renderPlugins(pluginsMeta, pluginsConfig) {
+    pluginsList.innerHTML = '';
+    if (!pluginsMeta || pluginsMeta.length === 0) {
+      pluginsList.innerHTML = '<p class="setting-desc" style="margin:0">No plugins registered.</p>';
+      return;
+    }
+    pluginsMeta.forEach(plugin => {
+      const cfg = pluginsConfig[plugin.name];
+      const isEnabled = cfg ? cfg.enabled !== false : plugin.defaultEnabled;
+      const id = `plugin-toggle-${plugin.name.replace(/\s+/g, '-')}`;
+
+      const row = document.createElement('div');
+      row.className = 'toggle-row';
+      row.innerHTML = `
+        <label class="toggle-switch" title="${isEnabled ? 'Enabled' : 'Disabled'}">
+          <input type="checkbox" id="${id}" ${isEnabled ? 'checked' : ''}>
+          <span class="toggle-slider"></span>
+        </label>
+        <div class="plugin-info">
+          <div class="plugin-name">${plugin.name}</div>
+          ${plugin.description ? `<div class="plugin-desc">${plugin.description}</div>` : ''}
+        </div>
+      `;
+      pluginsList.appendChild(row);
+
+      row.querySelector('input[type="checkbox"]').addEventListener('change', (e) => {
+        chrome.storage.local.get(['pluginsConfig'], (res) => {
+          const updated = res.pluginsConfig || {};
+          updated[plugin.name] = { enabled: e.target.checked };
+          chrome.storage.local.set({ pluginsConfig: updated });
+        });
+      });
+    });
+  }
+
+  function loadPlugins() {
+    chrome.runtime.sendMessage({ type: 'GET_PLUGINS' }, (response) => {
+      const pluginsMeta = response?.plugins || [];
+      chrome.storage.local.get(['pluginsConfig'], (res) => {
+        renderPlugins(pluginsMeta, res.pluginsConfig || {});
+      });
+    });
+  }
+
   loadConfig();
+  loadPlugins();
 });
