@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ── Logging ──────────────────────────────────────────────────────────────
   function addLogToUI(logStr) {
+    if (!debugPolling && logStr.includes('[DEBUG]')) return;
     const div = document.createElement('div');
     div.className = 'log-entry';
     div.textContent = logStr;
@@ -14,7 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function renderLogs(logs) {
     logsContainer.innerHTML = '';
-    logs.forEach(log => {
+    const filtered = debugPolling ? logs : logs.filter(l => !l.includes('[DEBUG]'));
+    filtered.forEach(log => {
       const div = document.createElement('div');
       div.className = 'log-entry';
       div.textContent = log;
@@ -291,6 +293,12 @@ document.addEventListener('DOMContentLoaded', () => {
       debugPolling = debugChk.checked;
       chrome.storage.local.set({ debugPolling });
       addLogToUI(`Debug polling: ${debugPolling ? 'ON' : 'OFF'}`);
+      
+      // Re-fetch and re-render logs to apply the new filter
+      chrome.runtime.sendMessage({ type: "GET_LOGS" }, (response) => {
+        if (chrome.runtime.lastError) return;
+        if (response && response.logs) renderLogs(response.logs);
+      });
     });
   }
 
