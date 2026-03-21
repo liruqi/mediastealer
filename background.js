@@ -355,13 +355,14 @@ async function startDownload(mediaItem) {
   }
 }
 
-function updateItemStatus(itemId, status, downloadId) {
+function updateItemStatus(itemId, status, downloadId, muxedDownloadId) {
   chrome.storage.local.get(['capturedMedia'], (result) => {
     const media = result.capturedMedia || [];
     const item = media.find(m => m.id === itemId);
     if (item) {
       item.status = status;
       if (downloadId) item.downloadId = downloadId;
+      if (muxedDownloadId) item.muxedDownloadId = muxedDownloadId;
       chrome.storage.local.set({ capturedMedia: media });
     }
   });
@@ -433,8 +434,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     });
     return true;
   } else if (message.type === "UPDATE_ITEM_STATUS") {
-    const { itemId, status, downloadId } = message.data;
-    updateItemStatus(itemId, status, downloadId);
+    const { itemId, status, downloadId, muxedDownloadId } = message.data;
+    updateItemStatus(itemId, status, downloadId, muxedDownloadId);
   } else if (message.type === "TRIGGER_PLUGIN_ACTION") {
     const { pluginName, action, itemId } = message;
     chrome.storage.local.get(['config'], (result) => {

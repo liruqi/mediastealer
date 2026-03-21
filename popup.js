@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.classList.remove('merged-btn', 'merging-btn');
     btn.disabled = false;
     const status = item.status || 'Ready';
-    if (status === 'Complete' && item.downloadId) {
+    if (status === 'Complete' && item.muxedDownloadId) {
       btn.textContent = chrome.i18n.getMessage('btn_merged') || 'Merged';
       btn.classList.add('merged-btn');
       btn.title = 'Click to reveal master.mp4';
@@ -131,7 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!items) items = [];
 
     // Quick performance check: if data hasn't changed, don't rebuild DOM
-    const currentJson = JSON.stringify(items.map(m => ({ id: m.id, url: m.url, status: m.status, downloadId: m.downloadId })));
+    const currentJson = JSON.stringify(items.map(m => ({ id: m.id, url: m.url, status: m.status, muxedDownloadId: m.muxedDownloadId })));
     if (currentJson === lastRenderedJson) return;
     lastRenderedJson = currentJson;
 
@@ -195,7 +195,7 @@ document.addEventListener('DOMContentLoaded', () => {
               chrome.storage.local.get(['capturedMedia'], (result) => {
                 const media = result.capturedMedia || [];
                 const item = media.find(m => m.id === id);
-                if (item && item.downloadId) chrome.downloads.show(item.downloadId);
+                if (item && item.muxedDownloadId) chrome.downloads.show(item.muxedDownloadId);
               });
               return;
             }

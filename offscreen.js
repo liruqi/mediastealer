@@ -342,7 +342,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             if (itemId) chrome.runtime.sendMessage({ type: 'UPDATE_ITEM_STATUS', data: { itemId, status: 'Error' } });
           } else {
             chrome.runtime.sendMessage({ type: 'MERGE_PROGRESS', data: { filename, status: `[COMPLETE] MUX saved (${finalMB} MB)` } });
-            if (itemId && resp?.downloadId) chrome.runtime.sendMessage({ type: 'UPDATE_ITEM_STATUS', data: { itemId, status: 'Complete', downloadId: resp.downloadId } });
+            if (itemId && resp?.downloadId) chrome.runtime.sendMessage({ type: 'UPDATE_ITEM_STATUS', data: { itemId, status: 'Complete', muxedDownloadId: resp.downloadId } });
           }
           setTimeout(() => {
             URL.revokeObjectURL(blobUrl);
