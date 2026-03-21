@@ -86,7 +86,7 @@ th, td {
 th:nth-child(1), td:nth-child(1) { width: auto; }
 th:nth-child(2), td:nth-child(2) { width: 80px; }
 th:nth-child(3), td:nth-child(3) { width: 80px; }
-th:nth-child(4), td:nth-child(4) { width: 120px; }
+th:nth-child(4), td:nth-child(4) { width: 160px; }
 
 th {
   background-color: #f5f5f5;
@@ -101,13 +101,34 @@ tr:last-child td {
   border-bottom: none;
 }
 
+.filename-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+}
+
 .filename {
   max-width: 300px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  display: inline-block;
 }
+
+.badge {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 4px;
+  border-radius: 3px;
+  color: white;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.badge-master { background-color: #ff5722; } /* Deep Orange */
+.badge-video { background-color: #2196f3; } /* Blue */
+.badge-audio { background-color: #9c27b0; } /* Purple */
+.badge-hls { background-color: #607d8b; }   /* Blue Grey */
 
 body.is-popout .filename {
   max-width: 50vw;
@@ -147,6 +168,20 @@ body.is-popout .filename {
   background-color: #6c757d;
   cursor: not-allowed;
   opacity: 0.8;
+}
+
+.btn-group {
+  display: flex;
+  gap: 4px;
+}
+
+.action-btn.merge-btn {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.action-btn.merge-btn:hover {
+  background-color: #e0a800;
 }
 
 .empty-state {

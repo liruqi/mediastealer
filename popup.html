@@ -45,8 +45,13 @@
   <div class="logs-section">
     <div class="logs-header">
       <h4 data-i18n="title_logs">Extension Logs</h4>
-      <button id="clear-logs-btn" data-i18n="btn_clear_logs" style="font-size: 10px; padding: 2px 6px;">Clear
-        Logs</button>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <label style="font-size: 10px; display: flex; align-items: center; gap: 4px; cursor: pointer;">
+          <input type="checkbox" id="debug-polling-chk"> <span data-i18n="label_debug">Debug</span>
+        </label>
+        <button id="clear-logs-btn" data-i18n="btn_clear_logs" style="font-size: 10px; padding: 2px 6px;">Clear
+          Logs</button>
+      </div>
     </div>
     <div id="logs-container" class="logs-container">
       <!-- Logs populate here -->
