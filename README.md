@@ -4,8 +4,30 @@ Fluxon is a browser extension that helps you save any resources on a webpage eas
 
 ## Installation
 
-1. Download the latest release from [GitHub Releases](https://github.com/liruqi/fluxon/releases).
+### Chrome / Edge / Chromium
+
+**From the Chrome Web Store** *(recommended)*: coming soon.
+
+**Manual (unpacked) install:**
+
+1. Download the latest `fluxon-*.zip` from [GitHub Releases](https://github.com/liruqi/fluxon/releases) and extract it.
+2. Open Chrome and navigate to `chrome://extensions`.
+3. Enable **Developer mode** (toggle in the top-right corner).
+4. Click **Load unpacked**.
+5. Select the extracted folder (the one containing `manifest.json`).
+
+The Fluxon icon will appear in your toolbar. Pin it for easy access.
+
+### Firefox
+
+1. Download the latest `fluxon-*.zip` from [GitHub Releases](https://github.com/liruqi/fluxon/releases) and extract it.
 2. Open Firefox and navigate to `about:debugging`.
-3. Click on "This Firefox".
-4. Click "Load Temporary Add-on...".
+3. Click **This Firefox**.
+4. Click **Load Temporary Add-on…**.
 5. Select the `manifest.json` file from the extracted folder.
+
+> **Note:** Temporary add-ons are removed when Firefox restarts. For persistent installation, the extension must be signed by Mozilla.
+
+## Usage
+
+After installing, navigate to any page with downloadable media. Click the Fluxon icon in the toolbar to see detected resources, then click **Download** or **Merge** (for HLS/m3u8 streams).

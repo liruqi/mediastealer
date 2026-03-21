@@ -1,0 +1,68 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Build extension zip
+        run: |
+          VERSION="${{ steps.version.outputs.VERSION }}"
+          ZIP_NAME="fluxon-${VERSION}.zip"
+
+          # Collect all extension files, excluding dev/CI artifacts
+          zip -r "$ZIP_NAME" \
+            manifest.json \
+            background.js \
+            offscreen.html \
+            offscreen.js \
+            popup.html \
+            popup.css \
+            popup.js \
+            options.html \
+            options.js \
+            plugin-engine.js \
+            mux.js \
+            media-db.js \
+            mediabunny.cjs \
+            i18n-helper.js \
+            icons/ \
+            _locales/ \
+            plugins/
+
+          echo "ZIP_NAME=$ZIP_NAME" >> "$GITHUB_ENV"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "Fluxon v${{ steps.version.outputs.VERSION }}"
+          body: |
+            ## Installation
+
+            ### Chrome / Edge
+            1. Download `fluxon-${{ steps.version.outputs.VERSION }}.zip` and extract it.
+            2. Go to `chrome://extensions`, enable **Developer mode**.
+            3. Click **Load unpacked** and select the extracted folder.
+
+            ### Firefox
+            1. Download `fluxon-${{ steps.version.outputs.VERSION }}.zip` and extract it.
+            2. Go to `about:debugging` → **This Firefox** → **Load Temporary Add-on…**.
+            3. Select `manifest.json` from the extracted folder.
+          files: ${{ env.ZIP_NAME }}
+          draft: false
+          prerelease: false
