@@ -74,7 +74,7 @@ const M3U8_PLUGIN = {
     }
   },
 
-  async triggerMerge(item, depth = 0, parentFolder = null, options = {}) {
+  async triggerMerge(item, depth = 0, options = {}) {
     if (depth > 3) {
       console.error('M3U8 Plugin: Max playlist depth reached');
       return { success: false, error: 'Depth exceeded' };
@@ -88,17 +88,12 @@ const M3U8_PLUGIN = {
       const m3u8Content = await resp.text();
       const baseUrl = item.url.substring(0, item.url.lastIndexOf('/') + 1);
       const lines = m3u8Content.split(/\r?\n/);
-      
+
       const urlBase = item.url.split('/').pop().split('?')[0].replace(/\.m3u8$/i, '').replace(/\./g, '_');
-      let folderName;
-      if (parentFolder) {
-        folderName = `${parentFolder}/${urlBase}_hls`;
-      } else {
-        const datePart = item.dateFolder || 'FLX-Unknown';
-        const domainPart = item.domain || 'unknown';
-        folderName = `${datePart}/${domainPart}/${urlBase}_hls`;
-      }
-      
+      const datePart = item.dateFolder || 'FLX-Unknown';
+      const domainPart = item.domain || 'unknown';
+      const basePath = `${datePart}/${domainPart}/${urlBase}`;
+
       const variants = [];
       let isMaster = false;
       for (let i = 0; i < lines.length; i++) {
@@ -125,7 +120,7 @@ const M3U8_PLUGIN = {
       if (isMaster && variants.length > 0) {
         variants.sort((a, b) => b.bandwidth - a.bandwidth);
         const bestVariant = variants[0];
-        
+
         // Search for associated audio track across variants
         let bestAudioUrl = null;
         const audioGroupIdMatch = bestVariant.info.match(/AUDIO="([^"]+)"/);
@@ -142,43 +137,41 @@ const M3U8_PLUGIN = {
 
         const muxId = `mux_${Date.now()}`;
         const videoMergePromise = this.triggerMerge(
-          { ...item, url: bestVariant.url, type: 'video' }, 
-          depth + 1, 
-          folderName, 
+          { ...item, url: bestVariant.url, type: 'video' },
+          depth + 1,
           { shouldSaveToDB: true, muxKey: `${muxId}_v` }
         );
-        
+
         let audioMergePromise = Promise.resolve({ success: true, muxKey: null });
         console.log(`M3U8 Plugin: Coordinating Master Merge. Video: ${bestVariant.url}, Audio: ${bestAudioUrl || 'none'}`);
         dispatchToBackground({
           type: 'MERGE_PROGRESS',
           data: { filename: item.url, status: `[MASTER] Coordinating Video & Audio tracks...` }
         });
-        
+
         if (bestAudioUrl) {
           audioMergePromise = this.triggerMerge(
-            { ...item, url: bestAudioUrl, type: 'audio' }, 
-            depth + 1, 
-            folderName, 
+            { ...item, url: bestAudioUrl, type: 'audio' },
+            depth + 1,
             { shouldSaveToDB: true, muxKey: `${muxId}_a` }
           );
         }
 
         const [vRes, aRes] = await Promise.all([videoMergePromise, audioMergePromise]);
-        
+
         if (vRes?.success && vRes.muxKey) {
-           console.log(`M3U8 Plugin: Video track ready for MUX.`);
-           dispatchToBackground({ type: 'MERGE_PROGRESS', data: { filename: item.url, status: `[MASTER] Video track ready.` } });
+          console.log(`M3U8 Plugin: Video track ready for MUX.`);
+          dispatchToBackground({ type: 'MERGE_PROGRESS', data: { filename: item.url, status: `[MASTER] Video track ready.` } });
         }
         if (bestAudioUrl && aRes?.success && aRes.muxKey) {
-           console.log(`M3U8 Plugin: Audio track ready for MUX.`);
-           dispatchToBackground({ type: 'MERGE_PROGRESS', data: { filename: item.url, status: `[MASTER] Audio track ready.` } });
+          console.log(`M3U8 Plugin: Audio track ready for MUX.`);
+          dispatchToBackground({ type: 'MERGE_PROGRESS', data: { filename: item.url, status: `[MASTER] Audio track ready.` } });
         }
-        
+
         if (vRes?.success && vRes.muxKey && (!bestAudioUrl || (aRes?.success && aRes.muxKey))) {
-          const finalFilename = `${folderName}/master.mp4`;
+          const finalFilename = `${basePath}_hls.mp4`;
           console.log(`M3U8 Plugin: Coordination complete, triggering MUX: ${finalFilename}`);
-          
+
           await this.ensureOffscreen();
           const muxMsg = {
             type: 'MUX_MEDIA',
@@ -202,9 +195,9 @@ const M3U8_PLUGIN = {
         return { success: true };
       }
 
-      const isAudio = item.url.includes('/aud/') || item.url.includes('mp4a') || 
-                      (!m3u8Content.includes('RESOLUTION=') && !m3u8Content.includes('avc1'));
-      
+      const isAudio = item.url.includes('/aud/') || item.url.includes('mp4a') ||
+        (!m3u8Content.includes('RESOLUTION=') && !m3u8Content.includes('avc1'));
+
       const segments = [];
       let mapUrl = null;
       let currentKey = null;
@@ -229,7 +222,7 @@ const M3U8_PLUGIN = {
         } else if (!line.startsWith('#')) {
           try {
             segments.push({ url: new URL(line, baseUrl).href, key: currentKey ? { ...currentKey } : null });
-          } catch (e) {}
+          } catch (e) { }
         }
       }
 
@@ -239,7 +232,7 @@ const M3U8_PLUGIN = {
 
       const isFMP4 = !!mapUrl || segments.some(s => s.url.includes('.m4s'));
       const ext = isFMP4 ? (isAudio ? 'm4a' : 'mp4') : 'ts';
-      const finalFilename = `${folderName}/merged_${isAudio ? 'audio' : 'video'}.${ext}`;
+      const finalFilename = `${basePath}_${isAudio ? 'audio' : 'video'}.${ext}`;
 
       return new Promise((resolve) => {
         const msg = {
@@ -252,16 +245,15 @@ const M3U8_PLUGIN = {
             sequenceStart: sequenceStart,
             mapUrl: mapUrl,
             filename: finalFilename,
-            folderName: folderName,
             ...options
           }
         };
 
         const callback = (response) => {
           if (response && response.success) {
-             resolve({ success: true, muxKey: response.muxKey });
+            resolve({ success: true, muxKey: response.muxKey });
           } else {
-             resolve({ success: false, error: response?.error });
+            resolve({ success: false, error: response?.error });
           }
         };
 
@@ -311,19 +303,19 @@ const M3U8_PLUGIN = {
 
 function dispatchToBackground(msg, cb) {
   if (!chrome.offscreen && typeof self.handleBackgroundMessage === 'function') {
-    self.handleBackgroundMessage(msg, {}, cb || (() => {}));
+    self.handleBackgroundMessage(msg, {}, cb || (() => { }));
   } else {
     if (cb) chrome.runtime.sendMessage(msg, cb);
-    else chrome.runtime.sendMessage(msg).catch(() => {});
+    else chrome.runtime.sendMessage(msg).catch(() => { });
   }
 }
 
 function dispatchToOffscreen(msg, cb) {
   if (!chrome.offscreen && typeof self.handleOffscreenMessage === 'function') {
-    self.handleOffscreenMessage(msg, {}, cb || (() => {}));
+    self.handleOffscreenMessage(msg, {}, cb || (() => { }));
   } else {
     if (cb) chrome.runtime.sendMessage(msg, cb);
-    else chrome.runtime.sendMessage(msg).catch(() => {});
+    else chrome.runtime.sendMessage(msg).catch(() => { });
   }
 }
 
