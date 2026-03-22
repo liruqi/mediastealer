@@ -23,7 +23,6 @@ self.handleOffscreenMessage = (message, sender, sendResponse) => {
     (async () => {
       try {
         const keyCache = new Map(); // url -> CryptoKey
-        const downloadQueue = [];
         const segmentBuffers = new Array(segments.length + (mapUrl ? 1 : 0));
         const CONCURRENCY = 5;
         let completed = 0;
@@ -127,15 +126,6 @@ self.handleOffscreenMessage = (message, sender, sendResponse) => {
           });
           const mapBuf = await fetchWithRetry(mapUrl);
           segmentBuffers[0] = mapBuf;
-
-          if (folderName) {
-            const mapExt = mapUrl.split('?')[0].split('.').pop() || 'mp4';
-            downloadQueue.push({
-              sourceUrl: mapUrl,
-              data: mapBuf,
-              filename: `${folderName}/init.${mapExt}`
-            });
-          }
         }
 
         // 2. Process Segments
@@ -148,17 +138,6 @@ self.handleOffscreenMessage = (message, sender, sendResponse) => {
               const buffer = await fetchWithRetry(seg.url);
               const decrypted = await decryptSegment(buffer, seg.key, index);
               segmentBuffers[mapUrl ? index + 1 : index] = decrypted;
-
-              if (folderName) {
-                let ext = seg.url.split('?')[0].split('.').pop() || 'ts';
-                if (isFMP4 && (ext === 'm4s' || ext === 'mp4')) ext = 'mp4';
-
-                downloadQueue.push({
-                  sourceUrl: seg.url,
-                  data: decrypted,
-                  filename: `${folderName}/fragment_${String(index + 1).padStart(3, '0')}.${ext}`
-                });
-              }
 
               completed++;
               dispatchToBackground({
@@ -184,28 +163,9 @@ self.handleOffscreenMessage = (message, sender, sendResponse) => {
         const blob = new Blob(segmentBuffers, { type: contentType });
         const blobUrl = URL.createObjectURL(blob);
 
-        if (folderName) {
-          // Playlist
-          if (message.data.m3u8Content) {
-            const m3u8Blob = new Blob([message.data.m3u8Content], { type: 'application/vnd.apple.mpegurl' });
-            const m3u8BlobUrl = URL.createObjectURL(m3u8Blob);
-            await downloadViaBackground(m3u8BlobUrl, `${folderName}/playlist.m3u8`, false);
-            setTimeout(() => URL.revokeObjectURL(m3u8BlobUrl), 10000);
-          }
-
-          // Fragments
-          for (const itemToDownload of downloadQueue) {
-            const fragBlob = new Blob([itemToDownload.data], { type: contentType });
-            const fragUrl = URL.createObjectURL(fragBlob);
-            await downloadViaBackground(fragUrl, itemToDownload.filename, false);
-            setTimeout(() => URL.revokeObjectURL(fragUrl), 2000);
-          }
-        }
-
         if (message.data.shouldSaveToDB && message.data.muxKey) {
-          dispatchToBackground({ type: 'MERGE_PROGRESS', data: { filename, status: `[CACHED] Saving to Disk & MediaDB: ${filename}` } });
+          dispatchToBackground({ type: 'MERGE_PROGRESS', data: { filename, status: `[CACHED] Saving to MediaDB: ${filename}` } });
           await MediaDB.saveBlob(message.data.muxKey, blob);
-          await downloadViaBackground(blobUrl, filename, false);
           sendResponse({ success: true, muxKey: message.data.muxKey });
         } else {
           dispatchToBackground({ type: 'MERGE_PROGRESS', data: { filename, status: `Finalizing merge & saving: ${filename}` } });
