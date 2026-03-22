@@ -339,9 +339,15 @@ async function startDownload(mediaItem) {
     if (!safeFilename || safeFilename === "_") safeFilename = "downloaded_media";
     const downloadPath = `${mediaItem.dateFolder}/${mediaItem.domain}/${safeFilename}`;
 
+    const isAndroid = /Android/i.test(navigator.userAgent);
+    let finalPath = downloadPath;
+    if (isAndroid) {
+      finalPath = downloadPath.split('/').pop();
+    }
+
     const downloadId = await chrome.downloads.download({
       url: mediaItem.url,
-      filename: downloadPath,
+      filename: finalPath,
       saveAs: false
     });
 
@@ -392,9 +398,15 @@ self.handleBackgroundMessage = (message, sender, sendResponse) => {
         return;
       }
 
+      const isAndroid = /Android/i.test(navigator.userAgent);
+      let finalName = filename;
+      if (isAndroid) {
+        finalName = filename.split('/').pop();
+      }
+
       chrome.downloads.download({
         url: url,
-        filename: filename,
+        filename: finalName,
         saveAs: false
       }, (downloadId) => {
         const err = chrome.runtime.lastError ? chrome.runtime.lastError.message : null;
