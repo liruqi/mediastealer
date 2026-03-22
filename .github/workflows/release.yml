@@ -90,17 +90,24 @@ jobs:
         with:
           name: "Fluxon v${{ steps.version.outputs.VERSION }}"
           body: |
+            ## What's New
+            - **Firefox Support**: Integrated native HLS/m3u8 merging (no offscreen API required).
+            - **Performance**: Cleaned up debug logs and optimized background process.
+            - **Security**: Reduced extension permissions (removed unused `tabs` and `windows`).
+
             ## Installation
 
-            ### Chrome / Edge — download `fluxon-${{ steps.version.outputs.VERSION }}-chrome.zip`
-            1. Extract the zip.
-            2. Go to `chrome://extensions`, enable **Developer mode**.
+            ### Chrome / Edge
+            1. Download and extract `fluxon-${{ steps.version.outputs.VERSION }}-chrome.zip`.
+            2. Open `chrome://extensions` and enable **Developer mode**.
             3. Click **Load unpacked** and select the extracted folder.
 
-            ### Firefox — download `fluxon-${{ steps.version.outputs.VERSION }}-firefox.zip`
-            1. Extract the zip.
-            2. Go to `about:debugging` → **This Firefox** → **Load Temporary Add-on…**.
-            3. Select `manifest.json` from the extracted folder.
+            ### Firefox
+            1. Download and extract `fluxon-${{ steps.version.outputs.VERSION }}-firefox.zip`.
+            2. Open `about:debugging#/runtime/this-firefox`.
+            3. Click **Load Temporary Add-on…** and select `manifest.json` from the extracted folder.
+            
+            *Note: Firefox temporary add-ons are removed when the browser restarts. For permanent installation, use [Fluxon on AMO](https://addons.mozilla.org/en-US/firefox/addon/fluxon/).*
 
           files: |
             ${{ env.CHROME_ZIP }}

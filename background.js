@@ -131,9 +131,6 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 
 chrome.webRequest.onHeadersReceived.addListener(
   async function (details) {
-    // [FIREFOX DEBUG] Very loud log to see if it fires
-    console.error(`[FLUXON] onHeadersReceived fired for: ${details.url}`);
-    
     if (!config.enabled) return;
 
     // Skip requests initiated by the extension itself
