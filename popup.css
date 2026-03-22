@@ -1,6 +1,8 @@
 body {
   width: 600px;
+  max-width: 100vw;
   height: 600px;
+  max-height: 100vh;
   display: flex;
   flex-direction: column;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -9,6 +11,23 @@ body {
   color: #333;
   background-color: #f9f9f9;
   overflow: hidden;
+}
+
+@media (max-width: 600px) {
+  body {
+    width: 100vw;
+    height: 100vh;
+  }
+  
+  /* Hide non-essential columns on mobile to save space */
+  th:nth-child(2), td:nth-child(2),
+  th:nth-child(3), td:nth-child(3) {
+    display: none;
+  }
+  
+  .filename {
+    max-width: 60vw;
+  }
 }
 
 body.is-popout {
