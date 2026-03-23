@@ -279,34 +279,43 @@ const M3U8_PLUGIN = {
   },
 
   async ensureOffscreen() {
-    // chrome.offscreen is Chrome-only
-    if (!chrome.offscreen) {
-      if (typeof self.handleOffscreenMessage === 'function') {
-        // We are successfully running in a context where offscreen logic is directly available (Firefox background)
-        return;
-      }
-      console.warn('M3U8 Plugin: chrome.offscreen not available. HLS merging requires Chrome.');
-      throw new Error('Offscreen API not available in this browser.');
+    // If successfully running in a context where offscreen logic is directly available (Firefox background)
+    if (typeof self.handleOffscreenMessage === 'function') {
+      return;
     }
 
-    if (this._offscreenPromise) return this._offscreenPromise;
+    if (chrome.offscreen) {
+      if (this._offscreenPromise) return this._offscreenPromise;
+      this._offscreenPromise = (async () => {
+        try {
+          if (await chrome.offscreen.hasDocument()) return;
+          await chrome.offscreen.createDocument({
+            url: 'offscreen.html',
+            reasons: ['BLOBS'],
+            justification: 'Merging video segments into a single file.'
+          });
+        } catch (e) {
+          console.error('Failed to create offscreen document:', e);
+          this._offscreenPromise = null;
+          throw e;
+        }
+      })();
+      return this._offscreenPromise;
+    }
 
-    this._offscreenPromise = (async () => {
-      try {
-        if (await chrome.offscreen.hasDocument()) return;
-        await chrome.offscreen.createDocument({
-          url: 'offscreen.html',
-          reasons: ['BLOBS'],
-          justification: 'Merging video segments into a single file.'
-        });
-      } catch (e) {
-        console.error('Failed to create offscreen document:', e);
-        this._offscreenPromise = null;
-        throw e;
-      }
-    })();
-
-    return this._offscreenPromise;
+    // Fallback for Safari / other browsers without offscreen API
+    if (this._fallbackTabPromise) return this._fallbackTabPromise;
+    this._fallbackTabPromise = new Promise((resolve, reject) => {
+      chrome.tabs.create({ url: chrome.runtime.getURL('offscreen.html'), active: false }, (tab) => {
+        if (chrome.runtime.lastError) {
+          this._fallbackTabPromise = null;
+          reject(new Error(chrome.runtime.lastError.message));
+        } else {
+          resolve();
+        }
+      });
+    });
+    return this._fallbackTabPromise;
   }
 };
 

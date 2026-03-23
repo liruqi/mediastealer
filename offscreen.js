@@ -170,7 +170,21 @@ self.handleOffscreenMessage = (message, sender, sendResponse) => {
         } else {
           dispatchToBackground({ type: 'MERGE_PROGRESS', data: { filename, status: `Finalizing merge & saving: ${filename}` } });
           const result = await downloadViaBackground(blobUrl, filename, true);
-          sendResponse({ success: result.success, downloadId: result.downloadId, error: result.error });
+          if (!result.success) {
+            try {
+              const a = document.createElement('a');
+              a.href = blobUrl;
+              a.download = filename;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              sendResponse({ success: true });
+            } catch (fallbackErr) {
+              sendResponse({ success: false, error: result.error + ' | Fallback err: ' + fallbackErr.message });
+            }
+          } else {
+            sendResponse({ success: result.success, downloadId: result.downloadId, error: result.error });
+          }
         }
         setTimeout(() => URL.revokeObjectURL(blobUrl), 15000);
 
@@ -310,8 +324,19 @@ self.handleOffscreenMessage = (message, sender, sendResponse) => {
         }, (resp) => {
           const err = resp?.error || chrome.runtime.lastError?.message;
           if (err) {
-            dispatchToBackground({ type: 'MERGE_PROGRESS', data: { filename, status: `[ERROR] MUX download failed: ${err}` } });
-            if (itemId) dispatchToBackground({ type: 'UPDATE_ITEM_STATUS', data: { itemId, status: 'Error' } });
+            try {
+              const a = document.createElement('a');
+              a.href = blobUrl;
+              a.download = filename;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              dispatchToBackground({ type: 'MERGE_PROGRESS', data: { filename, status: `[COMPLETE] MUX saved via fallback (${finalMB} MB)` } });
+              if (itemId) dispatchToBackground({ type: 'UPDATE_ITEM_STATUS', data: { itemId, status: 'Complete' } });
+            } catch (fallbackErr) {
+              dispatchToBackground({ type: 'MERGE_PROGRESS', data: { filename, status: `[ERROR] MUX download failed: ${err} | Fallback: ${fallbackErr.message}` } });
+              if (itemId) dispatchToBackground({ type: 'UPDATE_ITEM_STATUS', data: { itemId, status: 'Error' } });
+            }
           } else {
             dispatchToBackground({ type: 'MERGE_PROGRESS', data: { filename, status: `[COMPLETE] MUX saved (${finalMB} MB)` } });
             if (itemId && resp?.downloadId) dispatchToBackground({ type: 'UPDATE_ITEM_STATUS', data: { itemId, status: 'Complete', muxedDownloadId: resp.downloadId } });

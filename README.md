@@ -31,6 +31,18 @@ The Fluxon icon will appear in your toolbar. Pin it for easy access.
 
 > **Note:** Temporary add-ons are removed when Firefox restarts. For persistent installation, use the official **Firefox Add-ons** link above.
 
+### Safari (macOS & iOS)
+
+1. Ensure you have **Xcode** installed on your Mac.
+2. Open Terminal and run the Safari Web Extension Converter:
+   ```bash
+   xcrun safari-web-extension-converter . --project-location ../FluxonSafari
+   ```
+   *(Run this inside the extracted `fluxon` directory)*
+3. Safari Web Extension Converter will generate an Xcode project and open it.
+4. In Xcode, select your target (macOS or iOS) and click the **Run** (Play) button to build and install the app.
+5. Once installed, open Safari Preferences (or **Settings > Safari > Extensions** on iOS) and enable the **Fluxon** extension.
+
 ## Usage
 
 After installing, navigate to any page with downloadable media. Click the Fluxon icon in the toolbar to see detected resources, then click **Download** or **Merge** (for HLS/m3u8 streams).
