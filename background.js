@@ -61,8 +61,15 @@ let capturedLogs = [];
 let downloadHistory = {}; // { url: timestamp }
 let capturedUrls = new Set(); // For faster deduplication lookups
 
-// ... other code ...
+let cachedPlatformOS = 'mac'; // default fallback
+const extUrl = (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.getURL) ? chrome.runtime.getURL('') : '';
+const isSafariBrowser = extUrl.startsWith('safari');
 
+if (chrome.runtime && chrome.runtime.getPlatformInfo) {
+  chrome.runtime.getPlatformInfo((info) => {
+    if (info && info.os) cachedPlatformOS = info.os;
+  });
+}
 function addLog(message) {
   const logStr = `[${new Date().toLocaleTimeString()}] ${message}`;
   console.log(logStr);
@@ -347,7 +354,7 @@ async function startDownload(mediaItem) {
     if (!safeFilename || safeFilename === "_") safeFilename = "downloaded_media";
     const downloadPath = `${mediaItem.dateFolder}/${mediaItem.domain}/${safeFilename}`;
 
-    const isAndroid = /Android/i.test(navigator.userAgent);
+    const isAndroid = cachedPlatformOS === 'android';
     let finalPath = downloadPath;
     if (isAndroid) {
       finalPath = downloadPath.split('/').pop();
@@ -413,7 +420,7 @@ self.handleBackgroundMessage = (message, sender, sendResponse) => {
         return;
       }
 
-      const isAndroid = /Android/i.test(navigator.userAgent);
+      const isAndroid = cachedPlatformOS === 'android';
       let finalName = filename;
       if (isAndroid) {
         finalName = filename.split('/').pop();
