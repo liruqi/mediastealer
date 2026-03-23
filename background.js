@@ -390,6 +390,11 @@ function updateItemStatus(itemId, status, downloadId, muxedDownloadId) {
 
 // Message Listeners
 self.handleBackgroundMessage = (message, sender, sendResponse) => {
+  // Messages intended for the offscreen document — let them pass through
+  if (message.type === 'MERGE_M3U8' || message.type === 'MUX_MEDIA') {
+    return false;
+  }
+
   if (message.type === "GET_LOGS") {
     sendResponse({ logs: capturedLogs });
   } else if (message.type === "MERGE_PROGRESS") {

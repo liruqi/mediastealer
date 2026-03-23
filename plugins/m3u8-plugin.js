@@ -305,7 +305,8 @@ const M3U8_PLUGIN = {
 
   async ensureOffscreen() {
     // If successfully running in a context where offscreen logic is directly available (Firefox background)
-    if (typeof self.handleOffscreenMessage === 'function') {
+    // We check for URL.createObjectURL because it's required for Blob handling but missing in Chrome SW.
+    if (typeof URL.createObjectURL === 'function' && typeof self.handleOffscreenMessage === 'function') {
       return;
     }
 
@@ -319,8 +320,6 @@ const M3U8_PLUGIN = {
             reasons: ['BLOBS'],
             justification: 'Merging video segments into a single file.'
           });
-          // Give the offscreen script some time to load (fixes race condition)
-          await new Promise(r => setTimeout(r, 500));
         } catch (e) {
           console.error('Failed to create offscreen document:', e);
           this._offscreenPromise = null;
@@ -338,8 +337,7 @@ const M3U8_PLUGIN = {
           this._fallbackTabPromise = null;
           reject(new Error(chrome.runtime.lastError.message));
         } else {
-          // Give the tab and its scripts some time to initialize (critical for Safari)
-          setTimeout(resolve, 1000);
+          resolve();
         }
       });
     });
@@ -351,7 +349,7 @@ const M3U8_PLUGIN = {
 // Intercepts m3u8 and ts requests, generates download links for master list
 
 function dispatchToBackground(msg, cb) {
-  if (!chrome.offscreen && typeof self.handleBackgroundMessage === 'function') {
+  if (typeof self.handleBackgroundMessage === 'function') {
     self.handleBackgroundMessage(msg, {}, cb || (() => { }));
   } else {
     if (cb) chrome.runtime.sendMessage(msg, cb);
@@ -360,7 +358,8 @@ function dispatchToBackground(msg, cb) {
 }
 
 function dispatchToOffscreen(msg, cb) {
-  if (!chrome.offscreen && typeof self.handleOffscreenMessage === 'function') {
+  // Use direct call ONLY if we have a DOM context (URL.createObjectURL exists)
+  if (typeof URL.createObjectURL === 'function' && typeof self.handleOffscreenMessage === 'function') {
     self.handleOffscreenMessage(msg, {}, cb || (() => { }));
   } else {
     if (cb) chrome.runtime.sendMessage(msg, cb);

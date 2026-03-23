@@ -6,8 +6,8 @@
  */
 
 function dispatchToBackground(msg, callback) {
-  // If we're inside the background context (Firefox) and handleBackgroundMessage is available
-  if (typeof self.handleBackgroundMessage === 'function' && !chrome.offscreen) {
+  // If we're inside the background context (Firefox or Chrome via importScripts) and handleBackgroundMessage is available
+  if (typeof self.handleBackgroundMessage === 'function') {
     self.handleBackgroundMessage(msg, {}, callback || (() => { }));
   } else {
     if (callback) chrome.runtime.sendMessage(msg, callback);
