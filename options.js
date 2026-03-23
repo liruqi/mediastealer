@@ -13,6 +13,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const extensionsTableBody = document.querySelector('#extensions-table tbody');
   const addExtensionBtn = document.getElementById('add-extension-btn');
   const newExtensionInput = document.getElementById('new-extension');
+  const downloadToFolderInput = document.getElementById('downloadToFolder');
+  const downloadToFolderRow = document.getElementById('downloadToFolderRow');
+  const downloadToFolderDesc = document.getElementById('downloadToFolderDesc');
+
+  const isSafariBrowser = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+  const isMobileOS = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const isPcChromeOrFirefox = !isSafariBrowser && !isMobileOS;
+
+  if (!isPcChromeOrFirefox) {
+    if (downloadToFolderRow) downloadToFolderRow.style.display = 'none';
+    if (downloadToFolderDesc) downloadToFolderDesc.style.display = 'none';
+  }
 
   let currentConfig = {};
 
@@ -36,7 +48,8 @@ document.addEventListener('DOMContentLoaded', () => {
         autoClean: true,
         minSize: 800,
         maxSize: 0,
-        ignoredExtensions: [".gif", ".svg", ".ico"]
+        ignoredExtensions: [".gif", ".svg", ".ico"],
+        downloadToFolder: true
       };
       currentConfig = result.config ? { ...defaults, ...result.config } : defaults;
 
@@ -48,6 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
       autoCleanInput.checked = currentConfig.autoClean !== false;
       minSizeInput.value = currentConfig.minSize || 800;
       maxSizeInput.value = currentConfig.maxSize || 0;
+      downloadToFolderInput.checked = currentConfig.downloadToFolder !== false;
 
       toggleSizeRangeVisibility();
       renderRules(currentConfig.rules);
@@ -214,7 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
   noSmallFilesInput.addEventListener('change', toggleSizeRangeVisibility);
 
   // Save main settings automatically on change
-  [enabledInput, autoDownloadInput, noSmallFilesInput, noZeroFilesInput, deduplicateInput, autoCleanInput, minSizeInput, maxSizeInput].forEach(el => {
+  [enabledInput, autoDownloadInput, noSmallFilesInput, noZeroFilesInput, deduplicateInput, autoCleanInput, minSizeInput, maxSizeInput, downloadToFolderInput].forEach(el => {
     el.addEventListener('change', () => {
       currentConfig.enabled = enabledInput.checked;
       currentConfig.automaticdownload = autoDownloadInput.checked;
@@ -224,6 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
       currentConfig.autoClean = autoCleanInput.checked;
       currentConfig.minSize = parseInt(minSizeInput.value, 10) || 0;
       currentConfig.maxSize = parseInt(maxSizeInput.value, 10) || 0;
+      currentConfig.downloadToFolder = downloadToFolderInput.checked;
       saveConfigSilently();
       if (el === noSmallFilesInput) toggleSizeRangeVisibility();
     });

@@ -238,45 +238,49 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (currentStatus === 'Ready' || currentStatus === 'interrupted') {
               const url = btn.getAttribute('data-url');
               const filename = btn.getAttribute('data-filename');
-              let downloadPath = filename;
-              if (item.dateFolder && item.domain) {
-                downloadPath = `${item.dateFolder}/${item.domain}/${filename}`;
-              }
 
-              // Android compatibility: Strip folders
-              const isAndroid = /Android/i.test(navigator.userAgent);
-              if (isAndroid) {
-                downloadPath = filename.split('/').pop();
-              }
+              chrome.storage.local.get(['config'], (configResult) => {
+                const config = configResult.config || {};
+                const isSafariBrowser = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+                const isMobileOS = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+                const downloadToFolder = config.downloadToFolder !== false && !isSafariBrowser && !isMobileOS;
+                
+                let downloadPath = filename;
+                if (item.dateFolder && item.domain) {
+                  downloadPath = downloadToFolder 
+                    ? `${item.dateFolder}/${item.domain}/${filename}` 
+                    : `${item.dateFolder}_${item.domain}_${filename}`;
+                }
 
-              item.status = 'Downloading';
-              chrome.storage.local.set({ capturedMedia: media });
-              applyBtnState(btn, 'Downloading');
- 
-              const dlAPI = getDownloadsAPI();
-              if (dlAPI) {
-                dlAPI.download({
-                  url: url,
-                  filename: downloadPath,
-                  saveAs: false
-                }, (downloadId) => {
-                  const err = chrome.runtime.lastError ? chrome.runtime.lastError.message : null;
-                  if (err) {
-                    console.error('Download failed:', err);
-                    item.status = 'Ready';
-                    chrome.storage.local.set({ capturedMedia: media });
-                    applyBtnState(btn, 'Ready');
-                  } else {
-                    item.downloadId = downloadId;
-                    chrome.storage.local.set({ capturedMedia: media });
-                  }
-                });
-              } else {
-                console.error('Downloads API not available');
-                item.status = 'Ready';
+                item.status = 'Downloading';
                 chrome.storage.local.set({ capturedMedia: media });
-                applyBtnState(btn, 'Ready');
-              }
+                applyBtnState(btn, 'Downloading');
+   
+                const dlAPI = getDownloadsAPI();
+                if (dlAPI) {
+                  dlAPI.download({
+                    url: url,
+                    filename: downloadPath,
+                    saveAs: false
+                  }, (downloadId) => {
+                    const err = chrome.runtime.lastError ? chrome.runtime.lastError.message : null;
+                    if (err) {
+                      console.error('Download failed:', err);
+                      item.status = 'Ready';
+                      chrome.storage.local.set({ capturedMedia: media });
+                      applyBtnState(btn, 'Ready');
+                    } else {
+                      item.downloadId = downloadId;
+                      chrome.storage.local.set({ capturedMedia: media });
+                    }
+                  });
+                } else {
+                  console.error('Downloads API not available');
+                  item.status = 'Ready';
+                  chrome.storage.local.set({ capturedMedia: media });
+                  applyBtnState(btn, 'Ready');
+                }
+              });
             }
           });
         });
@@ -404,13 +408,20 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('download-all-btn').addEventListener('click', () => {
-    chrome.storage.local.get(['capturedMedia'], (result) => {
+    chrome.storage.local.get(['capturedMedia', 'config'], (result) => {
       const items = result.capturedMedia || [];
+      const config = result.config || {};
+      const isSafariBrowser = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+      const isMobileOS = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      const downloadToFolder = config.downloadToFolder !== false && !isSafariBrowser && !isMobileOS;
+
       items.forEach(item => {
         if (item.status === 'Complete' || item.status === 'Downloading') return;
         let downloadPath = item.filename;
         if (item.dateFolder && item.domain) {
-          downloadPath = `${item.dateFolder}/${item.domain}/${item.filename}`;
+          downloadPath = downloadToFolder 
+            ? `${item.dateFolder}/${item.domain}/${item.filename}` 
+            : `${item.dateFolder}_${item.domain}_${item.filename}`;
         }
         const dlAPI = getDownloadsAPI();
         if (dlAPI) dlAPI.download({ url: item.url, filename: downloadPath, saveAs: false });

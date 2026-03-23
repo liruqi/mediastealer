@@ -63,7 +63,7 @@ const M3U8_PLUGIN = {
     if (config.automaticdownload) {
       setTimeout(() => {
         if (!this.handledUrls.has(item.url)) {
-          this.triggerMerge(item);
+          this.triggerMerge(item, 0, { config });
         }
       }, 500);
       return { handled: true };
@@ -80,7 +80,7 @@ const M3U8_PLUGIN = {
         const media = result.capturedMedia || [];
         const item = media.find(m => m.id === itemId);
         if (item) {
-          this.triggerMerge(item);
+          this.triggerMerge(item, 0, { config });
         }
       });
     }
@@ -104,7 +104,14 @@ const M3U8_PLUGIN = {
       const urlBase = item.url.split('/').pop().split('?')[0].replace(/\.m3u8$/i, '').replace(/\./g, '_');
       const datePart = item.dateFolder || 'FLX-Unknown';
       const domainPart = item.domain || 'unknown';
-      const basePath = `${datePart}/${domainPart}/${urlBase}`;
+      const isSafariBrowser = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+      const isMobileOS = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      const configObj = options.config || {};
+      const downloadToFolder = configObj.downloadToFolder !== false && !isSafariBrowser && !isMobileOS;
+      
+      const basePath = downloadToFolder 
+        ? `${datePart}/${domainPart}/${urlBase}`
+        : `${datePart}_${domainPart}_${urlBase}`;
 
       const variants = [];
       let isMaster = false;
@@ -151,7 +158,7 @@ const M3U8_PLUGIN = {
         const videoMergePromise = this.triggerMerge(
           { ...item, url: bestVariant.url, type: 'video' },
           depth + 1,
-          { shouldSaveToDB: true, muxKey: `${muxId}_v` }
+          { config: options.config, shouldSaveToDB: true, muxKey: `${muxId}_v` }
         );
 
         let audioMergePromise = Promise.resolve({ success: true, muxKey: null });
@@ -165,7 +172,7 @@ const M3U8_PLUGIN = {
           audioMergePromise = this.triggerMerge(
             { ...item, url: bestAudioUrl, type: 'audio' },
             depth + 1,
-            { shouldSaveToDB: true, muxKey: `${muxId}_a` }
+            { config: options.config, shouldSaveToDB: true, muxKey: `${muxId}_a` }
           );
         }
 
