@@ -17,14 +17,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const downloadToFolderRow = document.getElementById('downloadToFolderRow');
   const downloadToFolderDesc = document.getElementById('downloadToFolderDesc');
 
-  const isSafariBrowser = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-  const isMobileOS = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-  const isPcChromeOrFirefox = !isSafariBrowser && !isMobileOS;
+  const isSafariBrowser = chrome.runtime.getURL('').startsWith('safari');
+  let isMobileOS = false;
+  let isPcChromeOrFirefox = true;
 
-  if (!isPcChromeOrFirefox) {
-    if (downloadToFolderRow) downloadToFolderRow.style.display = 'none';
-    if (downloadToFolderDesc) downloadToFolderDesc.style.display = 'none';
-  }
+  chrome.runtime.getPlatformInfo((info) => {
+    isMobileOS = ['android', 'ios'].includes(info.os);
+    isPcChromeOrFirefox = !isSafariBrowser && !isMobileOS;
+    if (!isPcChromeOrFirefox) {
+      if (downloadToFolderRow) downloadToFolderRow.style.display = 'none';
+      if (downloadToFolderDesc) downloadToFolderDesc.style.display = 'none';
+    }
+  });
 
   let currentConfig = {};
 

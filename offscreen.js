@@ -8,10 +8,52 @@
 function dispatchToBackground(msg, callback) {
   // If we're inside the background context (Firefox) and handleBackgroundMessage is available
   if (typeof self.handleBackgroundMessage === 'function' && !chrome.offscreen) {
-    self.handleBackgroundMessage(msg, {}, callback || (() => {}));
+    self.handleBackgroundMessage(msg, {}, callback || (() => { }));
   } else {
     if (callback) chrome.runtime.sendMessage(msg, callback);
-    else chrome.runtime.sendMessage(msg).catch(() => {});
+    else chrome.runtime.sendMessage(msg).catch(() => { });
+  }
+}
+
+async function sendToNativeApp(blob, safeFilename, filename) {
+  try {
+    const buffer = await blob.arrayBuffer();
+    const chunkSize = 1048576; // 1 MB
+    const totalChunks = Math.ceil(buffer.byteLength / chunkSize);
+    const fileId = 'file_' + Date.now();
+
+    function arrayBufferToBase64(buf) {
+      let binary = '';
+      const bytes = new Uint8Array(buf);
+      for (let i = 0; i < bytes.byteLength; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      return btoa(binary);
+    }
+
+    for (let i = 0; i < totalChunks; i++) {
+      const chunk = buffer.slice(i * chunkSize, (i + 1) * chunkSize);
+      const chunkBase64 = arrayBufferToBase64(chunk);
+      dispatchToBackground({ type: 'MERGE_PROGRESS', data: { filename, status: `[NATIVE] Appending chunk ${i+1}/${totalChunks}...` } });
+
+      await new Promise((resolve, reject) => {
+        const msg = { type: "save_chunk", fileId, fileName: safeFilename, data: chunkBase64, isLast: (i === totalChunks - 1) };
+        if (typeof browser !== 'undefined' && browser.runtime && browser.runtime.sendNativeMessage) {
+          browser.runtime.sendNativeMessage("application.id", msg).then(resolve).catch(reject);
+        } else if (chrome.runtime && chrome.runtime.sendNativeMessage) {
+          chrome.runtime.sendNativeMessage("application.id", msg, (resp) => {
+            if (chrome.runtime.lastError) reject(chrome.runtime.lastError);
+            else resolve(resp);
+          });
+        } else {
+          reject(new Error("sendNativeMessage not available"));
+        }
+      });
+    }
+    return true;
+  } catch (e) {
+    console.error("Native send error:", e);
+    return false;
   }
 }
 
@@ -171,20 +213,41 @@ self.handleOffscreenMessage = (message, sender, sendResponse) => {
           dispatchToBackground({ type: 'MERGE_PROGRESS', data: { filename, status: `Finalizing merge & saving: ${filename}` } });
           const result = await downloadViaBackground(blobUrl, filename, true);
           if (!result.success) {
-            try {
-              const a = document.createElement('a');
-              a.href = blobUrl;
-              a.download = filename;
-              document.body.appendChild(a);
-              a.click();
-              document.body.removeChild(a);
-              sendResponse({ success: true });
-            } catch (fallbackErr) {
-              sendResponse({ success: false, error: result.error + ' | Fallback err: ' + fallbackErr.message });
+              const safeFilename = filename.split('/').pop();
+              dispatchToBackground({ type: 'MERGE_PROGRESS', data: { filename, status: `[FALLBACK] Sending file to Native App for ${safeFilename}...` } });
+              
+              // Try native app transmission for Safari
+              const isSafariBrowser = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+              let nativeSuccess = false;
+              if (isSafariBrowser || !result.success) {
+                // We have a blob URL here, unfortunately we need the actual blob
+                // It's a bit hard to reconstruct it here so we'll fetch it from the blobUrl
+                try {
+                  const blobFetch = await fetch(blobUrl);
+                  const fetchedBlob = await blobFetch.blob();
+                  nativeSuccess = await sendToNativeApp(fetchedBlob, safeFilename, filename);
+                } catch(e) { console.error('Error sending native:', e); }
+              }
+
+              if (nativeSuccess) {
+                sendResponse({ success: true, viaNative: true });
+              } else {
+                try {
+                  dispatchToBackground({ type: 'MERGE_PROGRESS', data: { filename, status: `[FALLBACK] Native failed. Attempting <a> download...` } });
+                  const a = document.createElement('a');
+                  a.href = blobUrl;
+                  a.download = safeFilename;
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+                  sendResponse({ success: true });
+                } catch (fallbackErr) {
+                  sendResponse({ success: false, error: result.error + ' | Fallback err: ' + fallbackErr.message });
+                }
+              }
+            } else {
+              sendResponse({ success: result.success, downloadId: result.downloadId, error: result.error });
             }
-          } else {
-            sendResponse({ success: result.success, downloadId: result.downloadId, error: result.error });
-          }
         }
         setTimeout(() => URL.revokeObjectURL(blobUrl), 15000);
 
@@ -318,24 +381,67 @@ self.handleOffscreenMessage = (message, sender, sendResponse) => {
 
         if (itemId) dispatchToBackground({ type: 'UPDATE_ITEM_STATUS', data: { itemId, status: 'Muxing…' } });
 
+        // Attempt to download via background, then fallback to native, then <a> tag
+        const safeFilename = filename.split('/').pop();
+        console.log(`Offscreen: [DEBUG] Using background messaging for download...`);
         dispatchToBackground({
           type: 'DOWNLOAD_INTERNAL',
           data: { url: blobUrl, filename, showFile: true }
-        }, (resp) => {
+        }, async (resp) => {
           const err = resp?.error || chrome.runtime.lastError?.message;
           if (err) {
-            try {
-              const a = document.createElement('a');
-              a.href = blobUrl;
-              a.download = filename;
-              document.body.appendChild(a);
-              a.click();
-              document.body.removeChild(a);
-              dispatchToBackground({ type: 'MERGE_PROGRESS', data: { filename, status: `[COMPLETE] MUX saved via fallback (${finalMB} MB)` } });
+            const isSafariBrowser = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+            let nativeSuccess = false;
+            if (isSafariBrowser || err) {
+              dispatchToBackground({ type: 'MERGE_PROGRESS', data: { filename, status: `[FALLBACK] Sending video to Native App...` } });
+              nativeSuccess = await sendToNativeApp(finalBlob, safeFilename, filename);
+            }
+
+            if (nativeSuccess) {
+              dispatchToBackground({ type: 'MERGE_PROGRESS', data: { filename, status: `[COMPLETE] MUX Native Save Complete` } });
               if (itemId) dispatchToBackground({ type: 'UPDATE_ITEM_STATUS', data: { itemId, status: 'Complete' } });
-            } catch (fallbackErr) {
-              dispatchToBackground({ type: 'MERGE_PROGRESS', data: { filename, status: `[ERROR] MUX download failed: ${err} | Fallback: ${fallbackErr.message}` } });
-              if (itemId) dispatchToBackground({ type: 'UPDATE_ITEM_STATUS', data: { itemId, status: 'Error' } });
+            } else {
+              try {
+                dispatchToBackground({ type: 'MERGE_PROGRESS', data: { filename, status: `[FALLBACK] Native failed. Attempting <a> download...` } });
+                const a = document.createElement('a');
+                a.href = blobUrl;
+                a.download = safeFilename;
+                a.target = '_blank'; // Sometimes helps in Safari
+                document.body.appendChild(a);
+                a.click();
+                
+                setTimeout(() => {
+                  if (document.body.contains(a)) document.body.removeChild(a);
+                }, 1000);
+
+                dispatchToBackground({ type: 'MERGE_PROGRESS', data: { filename, status: `[COMPLETE] MUX saved via fallback (Check browser's native download list)` } });
+                if (itemId) dispatchToBackground({ type: 'UPDATE_ITEM_STATUS', data: { itemId, status: 'Complete' } });
+
+                // Show manual button too if we are in a tab (Safari fallback)
+                if (typeof document !== 'undefined') {
+                  const statusDiv = document.getElementById('status');
+                  const btn = document.getElementById('downloadBtn');
+                  if (statusDiv) statusDiv.textContent = `Merge complete. If download did not start, click below:`;
+                  if (btn) {
+                    btn.href = blobUrl;
+                    btn.download = safeFilename;
+                    btn.style.display = 'inline-block';
+                  }
+                  // Bring tab to foreground on Safari if auto-download might have failed
+                  if (chrome.tabs && chrome.tabs.getCurrent) {
+                    chrome.tabs.getCurrent((tab) => {
+                      if (tab && !tab.active) {
+                        chrome.tabs.update(tab.id, { active: true });
+                        chrome.windows.update(tab.windowId, { focused: true });
+                      }
+                    });
+                  }
+                }
+              } catch (fallbackErr) {
+                console.error('Offscreen: [MUX] Fallback download failed:', fallbackErr);
+                dispatchToBackground({ type: 'MERGE_PROGRESS', data: { filename, status: `[ERROR] MUX download failed: ${err} | Fallback: ${fallbackErr.message}` } });
+                if (itemId) dispatchToBackground({ type: 'UPDATE_ITEM_STATUS', data: { itemId, status: 'Error' } });
+              }
             }
           } else {
             dispatchToBackground({ type: 'MERGE_PROGRESS', data: { filename, status: `[COMPLETE] MUX saved (${finalMB} MB)` } });
