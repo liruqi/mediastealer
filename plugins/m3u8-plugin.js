@@ -319,6 +319,8 @@ const M3U8_PLUGIN = {
             reasons: ['BLOBS'],
             justification: 'Merging video segments into a single file.'
           });
+          // Give the offscreen script some time to load (fixes race condition)
+          await new Promise(r => setTimeout(r, 500));
         } catch (e) {
           console.error('Failed to create offscreen document:', e);
           this._offscreenPromise = null;
@@ -336,7 +338,8 @@ const M3U8_PLUGIN = {
           this._fallbackTabPromise = null;
           reject(new Error(chrome.runtime.lastError.message));
         } else {
-          resolve();
+          // Give the tab and its scripts some time to initialize (critical for Safari)
+          setTimeout(resolve, 1000);
         }
       });
     });
