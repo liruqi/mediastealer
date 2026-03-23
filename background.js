@@ -298,20 +298,20 @@ chrome.webRequest.onHeadersReceived.addListener(
             }
           }
 
-          // 5. Save to storage
-          chrome.storage.local.get(['capturedMedia'], (stored) => {
-            const freshMedia = stored.capturedMedia || [];
-            // Re-check for duplicates just in case
-            if (!freshMedia.find(m => m.url === mediaItem.url)) {
-              freshMedia.unshift(mediaItem);
-              if (freshMedia.length > 100) freshMedia.pop();
-              capturedMedia = freshMedia;
-              chrome.storage.local.set({ capturedMedia: freshMedia });
-              if (mediaItem.downloadId) {
-                addLog(`Media captured & download started: ${mediaItem.filename}`);
-              } else {
-                addLog(chrome.i18n.getMessage("log_intercepted", [mediaItem.filename]));
-              }
+          // 5. Update in-memory state immediately
+          capturedMedia.unshift(mediaItem);
+          if (capturedMedia.length > 100) {
+            const removed = capturedMedia.pop();
+            capturedUrls.delete(removed.url);
+          }
+          capturedUrls.add(mediaItem.url);
+
+          // 6. Save to storage reliably
+          chrome.storage.local.set({ capturedMedia: capturedMedia }, () => {
+            if (mediaItem.downloadId) {
+              addLog(`Media captured & download started: ${mediaItem.filename}`);
+            } else {
+              addLog(chrome.i18n.getMessage("log_intercepted", [mediaItem.filename]));
             }
           });
         };
