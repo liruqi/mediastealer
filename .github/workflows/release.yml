@@ -91,9 +91,9 @@ jobs:
           name: "Fluxon v${{ steps.version.outputs.VERSION }}"
           body: |
             ## What's New
-            - **Firefox Support**: Integrated native HLS/m3u8 merging (no offscreen API required).
-            - **Performance**: Cleaned up debug logs and optimized background process.
-            - **Security**: Reduced extension permissions (removed unused `tabs` and `windows`).
+            - **Cleaner Downloads**: HLS segments and intermediate tracks are now merged in-memory or via IndexedDB. No more cluttered `_hls` folders or fragmented files in your Downloads.
+            - **Android Compatibility**: Optimized downloading logic for Firefox on Android by automatically stripping folder paths that aren't supported on mobile.
+            - **Security**: Minimized extension permissions (removed unused `tabs` and `windows`).
 
             ## Installation
 
