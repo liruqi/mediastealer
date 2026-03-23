@@ -21,12 +21,28 @@ const M3U8_PLUGIN = {
    * Intercept hook: Detect .m3u8 and ignore size rules.
    */
   async onIntercept({ details, contentType, config, pluginConfig }) {
-    const url = details.url.toLowerCase();
-    const isM3u8 = url.includes('.m3u8') ||
-      contentType.toLowerCase().includes('application/vnd.apple.mpegurl') ||
-      contentType.toLowerCase().includes('application/x-mpegurl');
+    const ct = (contentType || '').toLowerCase();
+    
+    // Skip obvious non-media/playlist types to avoid false positives (e.g. tracking logs with .m3u8 in params)
+    if (ct.includes('image/') || ct.includes('text/html') || ct.includes('application/json')) {
+      return null;
+    }
+
+    let isM3u8 = false;
+    try {
+      const urlObj = new URL(details.url);
+      isM3u8 = urlObj.pathname.toLowerCase().endsWith('.m3u8');
+    } catch (e) {
+      isM3u8 = details.url.toLowerCase().split('?')[0].endsWith('.m3u8');
+    }
+
+    if (!isM3u8) {
+      isM3u8 = ct.includes('application/vnd.apple.mpegurl') ||
+               ct.includes('application/x-mpegurl');
+    }
 
     if (isM3u8) {
+      const url = details.url.toLowerCase();
       let streamType = 'hls';
       if (url.includes('master')) streamType = 'master';
       else if (url.includes('/vid/') || url.includes('avc1')) streamType = 'video';
