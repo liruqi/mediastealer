@@ -7,12 +7,20 @@ const M3U8_PLUGIN = {
   name: "M3U8 Downloader",
   description: "Detects HLS (.m3u8) streams and merges video/audio segments into a single MP4 file.",
   defaultEnabled: true,
+  options: [
+    {
+      id: "displayNonHls",
+      label: "Display specific variant playlists (master, audio, video m3u8) in capture list",
+      type: "checkbox",
+      defaultValue: false
+    }
+  ],
   handledUrls: new Set(),
 
   /**
    * Intercept hook: Detect .m3u8 and ignore size rules.
    */
-  async onIntercept({ details, contentType, config }) {
+  async onIntercept({ details, contentType, config, pluginConfig }) {
     const url = details.url.toLowerCase();
     const isM3u8 = url.includes('.m3u8') ||
       contentType.toLowerCase().includes('application/vnd.apple.mpegurl') ||
@@ -23,6 +31,10 @@ const M3U8_PLUGIN = {
       if (url.includes('master')) streamType = 'master';
       else if (url.includes('/vid/') || url.includes('avc1')) streamType = 'video';
       else if (url.includes('/aud/') || url.includes('mp4a')) streamType = 'audio';
+
+      if (streamType !== 'hls' && !(pluginConfig?.options?.displayNonHls)) {
+        return { skip: true };
+      }
 
       return {
         ignoreSize: true,

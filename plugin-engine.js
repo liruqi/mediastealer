@@ -20,7 +20,8 @@ function getPlugins() {
   return plugins.map(p => ({
     name: p.name || 'unnamed',
     description: p.description || '',
-    defaultEnabled: p.defaultEnabled !== false
+    defaultEnabled: p.defaultEnabled !== false,
+    options: p.options || []
   }));
 }
 
@@ -50,7 +51,8 @@ async function executeHook(hookName, arg) {
 
     if (plugin[hookName] && typeof plugin[hookName] === 'function') {
       try {
-        const hookResult = await plugin[hookName](arg);
+        const hookArg = (typeof arg === 'object' && arg !== null) ? { ...arg, pluginConfig: cfg || {} } : arg;
+        const hookResult = await plugin[hookName](hookArg);
         if (hookResult) {
           result = { ...result, ...hookResult };
         }

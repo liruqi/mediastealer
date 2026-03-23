@@ -232,6 +232,42 @@ document.addEventListener('DOMContentLoaded', () => {
   // ── Plugin Settings ────────────────────────────────────────
   const pluginsList = document.getElementById('plugins-list');
 
+  function renderPluginOptionsHtml(plugin, cfg) {
+    if (!plugin.options || plugin.options.length === 0) return '';
+    const pluginOpts = (cfg && cfg.options) ? cfg.options : {};
+    let html = '<div class="plugin-options" style="margin-top: 10px; margin-left: 0;">';
+    for (const opt of plugin.options) {
+      const val = pluginOpts[opt.id] !== undefined ? pluginOpts[opt.id] : opt.defaultValue;
+      if (opt.type === 'checkbox') {
+        html += `
+          <div class="setting-row" style="margin-bottom: 5px;">
+            <input type="checkbox" id="plugin-opt-${plugin.name.replace(/\s+/g, '-')}-${opt.id}" data-opt="${opt.id}" ${val ? 'checked' : ''}>
+            <label for="plugin-opt-${plugin.name.replace(/\s+/g, '-')}-${opt.id}" style="font-size: 13px;">${opt.label}</label>
+          </div>
+        `;
+      }
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function bindPluginOptionsEvents(row, plugin) {
+    if (!plugin.options || plugin.options.length === 0) return;
+    row.querySelectorAll('input[type="checkbox"][data-opt]').forEach(chk => {
+      chk.addEventListener('change', (e) => {
+        chrome.storage.local.get(['pluginsConfig'], (res) => {
+          const updated = res.pluginsConfig || {};
+          if (!updated[plugin.name]) {
+            updated[plugin.name] = { enabled: plugin.defaultEnabled !== false, options: {} };
+          }
+          if (!updated[plugin.name].options) updated[plugin.name].options = {};
+          updated[plugin.name].options[e.target.dataset.opt] = e.target.checked;
+          chrome.storage.local.set({ pluginsConfig: updated });
+        });
+      });
+    });
+  }
+
   function renderPlugins(pluginsMeta, pluginsConfig) {
     pluginsList.innerHTML = '';
     if (!pluginsMeta || pluginsMeta.length === 0) {
@@ -253,14 +289,18 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="plugin-info">
           <div class="plugin-name">${plugin.name}</div>
           ${plugin.description ? `<div class="plugin-desc">${plugin.description}</div>` : ''}
+          ${renderPluginOptionsHtml(plugin, cfg)}
         </div>
       `;
       pluginsList.appendChild(row);
 
-      row.querySelector('input[type="checkbox"]').addEventListener('change', (e) => {
+      bindPluginOptionsEvents(row, plugin);
+
+      row.querySelector(`input#${id}`).addEventListener('change', (e) => {
         chrome.storage.local.get(['pluginsConfig'], (res) => {
           const updated = res.pluginsConfig || {};
-          updated[plugin.name] = { enabled: e.target.checked };
+          const existing = updated[plugin.name] || {};
+          updated[plugin.name] = { ...existing, enabled: e.target.checked };
           chrome.storage.local.set({ pluginsConfig: updated });
         });
       });
