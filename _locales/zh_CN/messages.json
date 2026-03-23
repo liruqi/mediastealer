@@ -162,7 +162,7 @@
     "message": "流影已禁用"
   },
   "log_intercepted": {
-    "message": "已拦截: $FILENAME$",
+    "message": "已捕获: $FILENAME$",
     "placeholders": {
       "FILENAME": {
         "content": "$1"

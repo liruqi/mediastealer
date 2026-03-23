@@ -225,9 +225,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 chrome.downloads.show(item.downloadId);
               }
             } else if (currentStatus === 'Ready' || currentStatus === 'interrupted') {
+              const url = btn.getAttribute('data-url');
+              const filename = btn.getAttribute('data-filename');
               let downloadPath = filename;
               if (item.dateFolder && item.domain) {
                 downloadPath = `${item.dateFolder}/${item.domain}/${filename}`;
+              }
+
+              // Android compatibility: Strip folders
+              const isAndroid = /Android/i.test(navigator.userAgent);
+              if (isAndroid) {
+                downloadPath = filename.split('/').pop();
               }
 
               item.status = 'Downloading';
@@ -238,13 +246,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 url: url,
                 filename: downloadPath,
                 saveAs: false
-              }).then(downloadId => {
-                item.downloadId = downloadId;
-                chrome.storage.local.set({ capturedMedia: media });
-              }).catch(() => {
-                item.status = 'Ready';
-                chrome.storage.local.set({ capturedMedia: media });
-                applyBtnState(btn, 'Ready');
+              }, (downloadId) => {
+                const err = chrome.runtime.lastError ? chrome.runtime.lastError.message : null;
+                if (err) {
+                  console.error('Download failed:', err);
+                  item.status = 'Ready';
+                  chrome.storage.local.set({ capturedMedia: media });
+                  applyBtnState(btn, 'Ready');
+                } else {
+                  item.downloadId = downloadId;
+                  chrome.storage.local.set({ capturedMedia: media });
+                }
               });
             }
           });

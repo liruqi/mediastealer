@@ -162,7 +162,7 @@
     "message": "Fluxon disabled"
   },
   "log_intercepted": {
-    "message": "Intercepted: $FILENAME$",
+    "message": "Captured: $FILENAME$",
     "placeholders": {
       "FILENAME": {
         "content": "$1"

@@ -162,7 +162,7 @@
     "message": "ธารเงา ปิดใช้งานแล้ว"
   },
   "log_intercepted": {
-    "message": "ดักจับไฟล์: $FILENAME$",
+    "message": "ตรวจพบไฟล์: $FILENAME$",
     "placeholders": {
       "FILENAME": {
         "content": "$1"
