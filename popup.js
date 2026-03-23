@@ -1,4 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
+  /** Robustly gets the downloads API for Chrome, Firefox, and Safari. */
+  function getDownloadsAPI() {
+    if (typeof chrome !== 'undefined' && chrome.downloads) return chrome.downloads;
+    if (typeof browser !== 'undefined' && browser.downloads) return browser.downloads;
+    return null;
+  }
+
   const tbody = document.getElementById('media-tbody');
   const emptyState = document.getElementById('empty-state');
   const mediaList = document.getElementById('media-list');
@@ -91,7 +98,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /** Checks actual download state via chrome.downloads API and corrects stored status / button */
   function checkDownloadStatus(downloadId, itemId) {
-    chrome.downloads.search({ id: downloadId }, (results) => {
+    const dlAPI = getDownloadsAPI();
+    if (!dlAPI) return;
+    dlAPI.search({ id: downloadId }, (results) => {
       if (!results || !results[0]) return;
       const download = results[0];
 
@@ -197,7 +206,8 @@ document.addEventListener('DOMContentLoaded', () => {
               chrome.storage.local.get(['capturedMedia'], (result) => {
                 const media = result.capturedMedia || [];
                 const item = media.find(m => m.id === id);
-                if (item && item.muxedDownloadId) chrome.downloads.show(item.muxedDownloadId);
+                const dlAPI = getDownloadsAPI();
+                if (item && item.muxedDownloadId && dlAPI) dlAPI.show(item.muxedDownloadId);
               });
               return;
             }
@@ -222,7 +232,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (currentStatus === 'Complete') {
               if (item.downloadId) {
-                chrome.downloads.show(item.downloadId);
+                const dlAPI = getDownloadsAPI();
+                if (dlAPI) dlAPI.show(item.downloadId);
               }
             } else if (currentStatus === 'Ready' || currentStatus === 'interrupted') {
               const url = btn.getAttribute('data-url');
@@ -241,23 +252,31 @@ document.addEventListener('DOMContentLoaded', () => {
               item.status = 'Downloading';
               chrome.storage.local.set({ capturedMedia: media });
               applyBtnState(btn, 'Downloading');
-
-              chrome.downloads.download({
-                url: url,
-                filename: downloadPath,
-                saveAs: false
-              }, (downloadId) => {
-                const err = chrome.runtime.lastError ? chrome.runtime.lastError.message : null;
-                if (err) {
-                  console.error('Download failed:', err);
-                  item.status = 'Ready';
-                  chrome.storage.local.set({ capturedMedia: media });
-                  applyBtnState(btn, 'Ready');
-                } else {
-                  item.downloadId = downloadId;
-                  chrome.storage.local.set({ capturedMedia: media });
-                }
-              });
+ 
+              const dlAPI = getDownloadsAPI();
+              if (dlAPI) {
+                dlAPI.download({
+                  url: url,
+                  filename: downloadPath,
+                  saveAs: false
+                }, (downloadId) => {
+                  const err = chrome.runtime.lastError ? chrome.runtime.lastError.message : null;
+                  if (err) {
+                    console.error('Download failed:', err);
+                    item.status = 'Ready';
+                    chrome.storage.local.set({ capturedMedia: media });
+                    applyBtnState(btn, 'Ready');
+                  } else {
+                    item.downloadId = downloadId;
+                    chrome.storage.local.set({ capturedMedia: media });
+                  }
+                });
+              } else {
+                console.error('Downloads API not available');
+                item.status = 'Ready';
+                chrome.storage.local.set({ capturedMedia: media });
+                applyBtnState(btn, 'Ready');
+              }
             }
           });
         });
@@ -331,7 +350,9 @@ document.addEventListener('DOMContentLoaded', () => {
           return;
         }
 
-        chrome.downloads.search({ id: item.downloadId }, (results) => {
+        const dlAPI = getDownloadsAPI();
+        if (!dlAPI) return;
+        dlAPI.search({ id: item.downloadId }, (results) => {
           if (debugPolling) {
             const found = (results && results[0]) ? `found (state=${results[0].state})` : 'NOT found';
             addLogToUI(`Search ID ${item.downloadId} (${item.filename}): ${found}`);
@@ -345,7 +366,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (dl.state === 'interrupted') {
               newStatus = 'Ready';
             }
-
+ 
             if (newStatus && newStatus !== item.status) {
               const currentOrder = STATUS_ORDER[item.status] ?? 0;
               const newOrder = STATUS_ORDER[newStatus] ?? 0;
@@ -391,7 +412,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (item.dateFolder && item.domain) {
           downloadPath = `${item.dateFolder}/${item.domain}/${item.filename}`;
         }
-        chrome.downloads.download({ url: item.url, filename: downloadPath, saveAs: false });
+        const dlAPI = getDownloadsAPI();
+        if (dlAPI) dlAPI.download({ url: item.url, filename: downloadPath, saveAs: false });
       });
     });
   });

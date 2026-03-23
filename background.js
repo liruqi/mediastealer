@@ -1,7 +1,14 @@
 // Chrome (service worker): load dependencies via importScripts.
 // Firefox (event page via manifest "scripts" array): files are already loaded in order, importScripts is unavailable.
 if (typeof importScripts !== 'undefined') {
-  importScripts('media-db.js', 'plugin-engine.js', 'plugins/m3u8-plugin.js');
+  importScripts('media-db.js', 'plugin-engine.js', 'mediabunny.js', 'offscreen.js', 'plugins/m3u8-plugin.js');
+}
+
+/** Robustly gets the downloads API for Chrome, Firefox, and Safari. */
+function getDownloadsAPI() {
+  if (typeof chrome !== 'undefined' && chrome.downloads) return chrome.downloads;
+  if (typeof browser !== 'undefined' && browser.downloads) return browser.downloads;
+  return null;
 }
 
 const defaultRules = [
@@ -99,12 +106,13 @@ function performCleanup() {
     // We process items to be removed
     const itemsToRemove = capturedMedia.filter(item => (now - item.timestamp) > ONE_DAY);
 
-    if (itemsToRemove.length > 0) {
+    const dlAPI = getDownloadsAPI();
+    if (itemsToRemove.length > 0 && dlAPI) {
       itemsToRemove.forEach(item => {
         if (item.downloadId) {
           // Attempt to delete physical file and record from browser history
-          chrome.downloads.removeFile(item.downloadId).catch(() => { });
-          chrome.downloads.erase({ id: item.downloadId }).catch(() => { });
+          dlAPI.removeFile(item.downloadId).catch(() => { });
+          dlAPI.erase({ id: item.downloadId }).catch(() => { });
         }
       });
 
@@ -345,7 +353,9 @@ async function startDownload(mediaItem) {
       finalPath = downloadPath.split('/').pop();
     }
 
-    const downloadId = await chrome.downloads.download({
+    const dlAPI = getDownloadsAPI();
+    if (!dlAPI) throw new Error('Downloads API not available');
+    const downloadId = await dlAPI.download({
       url: mediaItem.url,
       filename: finalPath,
       saveAs: false
@@ -384,10 +394,15 @@ self.handleBackgroundMessage = (message, sender, sendResponse) => {
     }
   } else if (message.type === "DOWNLOAD_INTERNAL") {
     const { url, filename, showFile } = message.data;
+    const dlAPI = getDownloadsAPI();
+    if (!dlAPI) {
+      sendResponse({ success: false, error: 'Downloads API not available' });
+      return true;
+    }
     const relativePath = filename.replace(/\\/g, '/');
-    chrome.downloads.search({ state: 'complete' }, (results) => {
+    dlAPI.search({ state: 'complete' }, (results) => {
       const existing = results.find(item => {
-        const itemPath = item.filename.replace(/\\/g, '/');
+        const itemPath = item.filename ? item.filename.replace(/\\/g, '/') : '';
         // Check if path matches AND file still exists on disk
         return itemPath.endsWith(relativePath) && item.exists !== false;
       });
@@ -404,7 +419,7 @@ self.handleBackgroundMessage = (message, sender, sendResponse) => {
         finalName = filename.split('/').pop();
       }
 
-      chrome.downloads.download({
+      dlAPI.download({
         url: url,
         filename: finalName,
         saveAs: false
@@ -414,7 +429,7 @@ self.handleBackgroundMessage = (message, sender, sendResponse) => {
           addLog(`Download trigger failed for ${filename}: ${err}`);
         }
         if (downloadId && !err && showFile) {
-          chrome.downloads.show(downloadId);
+          dlAPI.show(downloadId);
         }
         sendResponse({ success: !err, downloadId, error: err });
       });
@@ -422,9 +437,14 @@ self.handleBackgroundMessage = (message, sender, sendResponse) => {
     return true; // Keep channel open for async callback
   } else if (message.type === "WAIT_FOR_DOWNLOAD") {
     const { downloadId } = message.data;
+    const dlAPI = getDownloadsAPI();
+    if (!dlAPI) {
+      sendResponse({ state: 'interrupted' });
+      return true;
+    }
 
     // Check current state first (it might be already complete if skipped)
-    chrome.downloads.search({ id: downloadId }, (results) => {
+    dlAPI.search({ id: downloadId }, (results) => {
       const current = results && results[0];
       if (current && (current.state === 'complete' || current.state === 'interrupted')) {
         sendResponse({ state: current.state });
@@ -434,12 +454,13 @@ self.handleBackgroundMessage = (message, sender, sendResponse) => {
       const checkStatus = (delta) => {
         if (delta.id === downloadId && delta.state) {
           if (delta.state.current === 'complete' || delta.state.current === 'interrupted') {
-            chrome.downloads.onChanged.removeListener(checkStatus);
+            const api = getDownloadsAPI();
+            if (api) api.onChanged.removeListener(checkStatus);
             sendResponse({ state: delta.state.current });
           }
         }
       };
-      chrome.downloads.onChanged.addListener(checkStatus);
+      dlAPI.onChanged.addListener(checkStatus);
     });
     return true;
   } else if (message.type === "UPDATE_ITEM_STATUS") {
