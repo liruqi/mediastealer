@@ -23,26 +23,27 @@ const M3U8_PLUGIN = {
   async onIntercept({ details, contentType, config, pluginConfig }) {
     const ct = (contentType || '').toLowerCase();
     
-    // Skip obvious non-media/playlist types to avoid false positives (e.g. tracking logs with .m3u8 in params)
+    // Skip obvious non-playlist types to avoid false positives (e.g. tracking logs with .m3u8 in params)
     if (ct.includes('image/') || ct.includes('text/html') || ct.includes('application/json')) {
       return null;
     }
 
-    let isM3u8 = false;
+    const url = details.url.toLowerCase();
+    let urlObj;
     try {
-      const urlObj = new URL(details.url);
-      isM3u8 = urlObj.pathname.toLowerCase().endsWith('.m3u8');
+      urlObj = new URL(details.url);
     } catch (e) {
-      isM3u8 = details.url.toLowerCase().split('?')[0].endsWith('.m3u8');
+      return null;
     }
 
-    if (!isM3u8) {
-      isM3u8 = ct.includes('application/vnd.apple.mpegurl') ||
-               ct.includes('application/x-mpegurl');
-    }
+    const path = urlObj.pathname.toLowerCase();
+
+    // 1. Detect M3U8 Playlist (Path-based or Content-Type based)
+    let isM3u8 = path.endsWith('.m3u8') ||
+                 ct.includes('application/vnd.apple.mpegurl') ||
+                 ct.includes('application/x-mpegurl');
 
     if (isM3u8) {
-      const url = details.url.toLowerCase();
       let streamType = 'hls';
       if (url.includes('master')) streamType = 'master';
       else if (url.includes('/vid/') || url.includes('avc1')) streamType = 'video';
@@ -61,8 +62,9 @@ const M3U8_PLUGIN = {
       };
     }
 
-    // Block individual fragments (TS, M4S, etc.)
-    if (url.includes('.ts') || url.includes('.m4s') || url.includes('.m4v') || url.includes('.m4a')) {
+    // 2. Block individual fragments (TS, M4S, AAC, fMP4, etc.)
+    const fragmentExts = ['.ts', '.m4s', '.m4v', '.m4a', '.f4s', '.m4f', '.aac'];
+    if (fragmentExts.some(ext => path.endsWith(ext))) {
       return { skip: true };
     }
 
