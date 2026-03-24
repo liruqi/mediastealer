@@ -276,7 +276,7 @@ self.handleOffscreenMessage = (message, sender, sendResponse) => {
         const audioArrayBuffer = audioBlob ? await audioBlob.arrayBuffer() : null;
 
         const {
-          Input, Mp4InputFormat, BufferSource,
+          Input, Mp4InputFormat, MpegTsInputFormat, BufferSource,
           Output, Mp4OutputFormat, BufferTarget,
           EncodedVideoPacketSource, EncodedAudioPacketSource,
           EncodedPacketSink
@@ -284,11 +284,11 @@ self.handleOffscreenMessage = (message, sender, sendResponse) => {
 
         // ── Open source files with mediabunny Input ────────────────────────
         const videoInput = new Input({
-          formats: [new Mp4InputFormat()],
+          formats: [new Mp4InputFormat(), new MpegTsInputFormat()],
           source: new BufferSource(videoArrayBuffer)
         });
         const audioInput = audioArrayBuffer ? new Input({
-          formats: [new Mp4InputFormat()],
+          formats: [new Mp4InputFormat(), new MpegTsInputFormat()],
           source: new BufferSource(audioArrayBuffer)
         }) : null;
 
