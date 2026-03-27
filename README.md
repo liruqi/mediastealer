@@ -6,6 +6,9 @@ Fluxon is a browser extension that helps you save any resources on a webpage eas
 
 ### Chrome / Edge / Chromium
 
+**From the Chrome Web Store** *(recommended)*:
+[Download Fluxon on Chrome Web Store](https://chromewebstore.google.com/detail/fluxon/pbblhfiljejncchohkhhckojliddnpff)
+
 **Manual (unpacked) install:**
 
 1. Download the latest `fluxon-*.zip` from [GitHub Releases](https://github.com/liruqi/fluxon/releases) and extract it.
