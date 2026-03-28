@@ -91,7 +91,7 @@ jobs:
           name: "Fluxon v${{ steps.version.outputs.VERSION }}"
           body: |
             ## What's New
-            - **Android Compatibility**: Implementing Android Capture Fix
+            - Minor bug fix
 
             ## Installation
 

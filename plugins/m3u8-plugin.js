@@ -233,7 +233,8 @@ const M3U8_PLUGIN = {
       }
 
       const isAudio = item.url.includes('/aud/') || item.url.includes('mp4a') ||
-        (!m3u8Content.includes('RESOLUTION=') && !m3u8Content.includes('avc1'));
+        (m3u8Content.includes('#EXT-X-MEDIA') && m3u8Content.includes('TYPE=AUDIO')) ||
+        (!m3u8Content.includes('RESOLUTION=') && !m3u8Content.includes('avc1') && !m3u8Content.includes('#EXTINF'));
 
       const segments = [];
       let mapUrl = null;

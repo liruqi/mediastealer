@@ -46,11 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.classList.remove('open-btn', 'downloading-btn', 'deleted-btn');
     btn.disabled = false;
 
-    // Also handle sister merge-btn if present
-    const row = btn.closest('tr');
-    const mergeBtn = row ? row.querySelector('.merge-btn') : null;
-    if (mergeBtn) mergeBtn.disabled = false;
-
     switch (status) {
       case 'Complete':
         btn.textContent = chrome.i18n.getMessage('btn_open') || 'Open';
@@ -60,13 +55,11 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.textContent = chrome.i18n.getMessage('btn_downloading') || 'Downloading';
         btn.classList.add('downloading-btn');
         btn.disabled = true;
-        if (mergeBtn) mergeBtn.disabled = true;
         break;
       case 'Deleted':
         btn.textContent = chrome.i18n.getMessage('btn_deleted') || 'Deleted';
         btn.classList.add('deleted-btn');
         btn.disabled = true;
-        if (mergeBtn) mergeBtn.disabled = true;
         break;
       default: // 'Ready' or anything else
         btn.textContent = chrome.i18n.getMessage('btn_download') || 'Download';
@@ -83,8 +76,8 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.textContent = chrome.i18n.getMessage('btn_merged') || 'Merged';
       btn.classList.add('merged-btn');
       btn.title = 'Click to reveal master.mp4';
-    } else if (['Muxing\u2026', 'Muxing...', 'Merging\u2026', 'Downloading'].includes(status)) {
-      btn.textContent = status === 'Downloading' ? 'Merging\u2026' : status;
+    } else if (['Muxing\u2026', 'Muxing...', 'Merging\u2026'].includes(status)) {
+      btn.textContent = status;
       btn.classList.add('merging-btn');
       btn.disabled = true;
     } else {
