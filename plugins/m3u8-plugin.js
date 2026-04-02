@@ -78,7 +78,7 @@ const M3U8_PLUGIN = {
     if (item.type !== 'm3u8') return null;
     if (this.handledUrls.has(item.url)) return { handled: true };
 
-    if (item.autoDownload) {
+    if (item.autoDownload || config.automaticdownload) {
       setTimeout(() => {
         if (!this.handledUrls.has(item.url)) {
           this.triggerMerge(item, 0, { config });
