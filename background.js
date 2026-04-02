@@ -21,7 +21,6 @@ const defaultRules = [
 let config = {
   enabled: true,
   rules: defaultRules,
-  automaticdownload: false,
   nosmallfiles: true,
   nozerofiles: true,
   deduplicate: true,
@@ -203,6 +202,7 @@ chrome.webRequest.onHeadersReceived.addListener(
 
     let matched = false;
     let matchedTag = '';
+    let matchedRule = null;
 
     if (pluginResult.isPluginHandled) {
       matched = true;
@@ -219,6 +219,7 @@ chrome.webRequest.onHeadersReceived.addListener(
             addLog(`MATCHED RULE (url=${rule.url}, ct=${rule.ct}): ${details.url.substring(0, 50)}...`);
             matched = true;
             matchedTag = rule.tag || '';
+            matchedRule = rule; // 保存匹配的规则
             break;
           }
         } catch (e) {
@@ -288,10 +289,11 @@ chrome.webRequest.onHeadersReceived.addListener(
           status: 'Ready',
           tag: typeof matchedTag !== 'undefined' ? matchedTag : '',
           pluginType: pluginResult.type || 'generic',
-          streamType: pluginResult.streamType || null
+          streamType: pluginResult.streamType || null,
+          autoDownload: matchedRule ? matchedRule.autoDownload : false
         };
 
-        if (config.automaticdownload) {
+        if (matchedRule && matchedRule.autoDownload) {
           mediaItem.status = 'Downloading';
         }
 
@@ -303,7 +305,7 @@ chrome.webRequest.onHeadersReceived.addListener(
           if (preDownloadResult.handled) {
             mediaItem.status = 'Complete';
             if (preDownloadResult.downloadId) mediaItem.downloadId = preDownloadResult.downloadId;
-          } else if (config.automaticdownload) {
+          } else if (matchedRule && matchedRule.autoDownload) {
             // Initiate download BEFORE saving to storage to ensure we have the ID
             const downloadResult = await startDownload(mediaItem);
             if (downloadResult.success) {

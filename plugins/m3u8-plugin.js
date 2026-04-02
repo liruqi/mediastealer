@@ -22,7 +22,7 @@ const M3U8_PLUGIN = {
    */
   async onIntercept({ details, contentType, config, pluginConfig }) {
     const ct = (contentType || '').toLowerCase();
-    
+
     // Skip obvious non-playlist types to avoid false positives (e.g. tracking logs with .m3u8 in params)
     if (ct.includes('image/') || ct.includes('text/html') || ct.includes('application/json')) {
       return null;
@@ -40,8 +40,8 @@ const M3U8_PLUGIN = {
 
     // 1. Detect M3U8 Playlist (Path-based or Content-Type based)
     let isM3u8 = path.endsWith('.m3u8') ||
-                 ct.includes('application/vnd.apple.mpegurl') ||
-                 ct.includes('application/x-mpegurl');
+      ct.includes('application/vnd.apple.mpegurl') ||
+      ct.includes('application/x-mpegurl');
 
     if (isM3u8) {
       let streamType = 'hls';
@@ -78,7 +78,7 @@ const M3U8_PLUGIN = {
     if (item.type !== 'm3u8') return null;
     if (this.handledUrls.has(item.url)) return { handled: true };
 
-    if (config.automaticdownload) {
+    if (item.autoDownload) {
       setTimeout(() => {
         if (!this.handledUrls.has(item.url)) {
           this.triggerMerge(item, 0, { config });
@@ -126,8 +126,8 @@ const M3U8_PLUGIN = {
       const isMobileOS = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
       const configObj = options.config || {};
       const downloadToFolder = configObj.downloadToFolder !== false && !isSafariBrowser && !isMobileOS;
-      
-      const basePath = downloadToFolder 
+
+      const basePath = downloadToFolder
         ? `${datePart}/${domainPart}/${urlBase}`
         : `${datePart}_${domainPart}_${urlBase}`;
 

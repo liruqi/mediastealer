@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
   const enabledInput = document.getElementById('enabled');
-  const autoDownloadInput = document.getElementById('automaticdownload');
   const noSmallFilesInput = document.getElementById('nosmallfiles');
   const noZeroFilesInput = document.getElementById('nozerofiles');
   const deduplicateInput = document.getElementById('deduplicate');
@@ -33,10 +32,10 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentConfig = {};
 
   const defaultRules = [
-    { id: 1, enabled: true, url: ".*", ct: "video/.*", tag: "video", rtype: 1 },
-    { id: 2, enabled: true, url: ".*", ct: "audio/.*", tag: "audio", rtype: 2 },
-    { id: 3, enabled: true, url: ".*", ct: "application/x-shockwave-flash", tag: "video", rtype: 3 },
-    { id: 4, enabled: true, url: ".*", ct: "image/.*", tag: "image", rtype: 4 }
+    { id: 1, autoDownload: false, url: ".*", ct: "video/.*", tag: "video", rtype: 1 },
+    { id: 2, autoDownload: false, url: ".*", ct: "audio/.*", tag: "audio", rtype: 2 },
+    { id: 3, autoDownload: false, url: ".*", ct: "application/x-shockwave-flash", tag: "video", rtype: 3 },
+    { id: 4, autoDownload: false, url: ".*", ct: "image/.*", tag: "image", rtype: 4 }
   ];
 
   // Load configuration from storage
@@ -45,7 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const defaults = {
         enabled: true,
         rules: defaultRules,
-        automaticdownload: false,
         nosmallfiles: true,
         nozerofiles: true,
         deduplicate: true,
@@ -57,8 +55,14 @@ document.addEventListener('DOMContentLoaded', () => {
       };
       currentConfig = result.config ? { ...defaults, ...result.config } : defaults;
 
+      // Ensure all rules have autoDownload property (migration)
+      if (currentConfig.rules) {
+        currentConfig.rules.forEach(rule => {
+          if (rule.autoDownload === undefined) rule.autoDownload = false;
+        });
+      }
+
       enabledInput.checked = currentConfig.enabled;
-      autoDownloadInput.checked = currentConfig.automaticdownload;
       noSmallFilesInput.checked = currentConfig.nosmallfiles;
       noZeroFilesInput.checked = currentConfig.nozerofiles;
       deduplicateInput.checked = currentConfig.deduplicate;
@@ -81,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       tr.innerHTML = `
         <td style="text-align: center;">
-          <input type="checkbox" class="rule-enable" data-index="${index}" ${rule.enabled ? 'checked' : ''}>
+          <input type="checkbox" class="rule-enable" data-index="${index}" ${rule.autoDownload ? 'checked' : ''}>
         </td>
         <td>
           <input type="text" value="${rule.url}" style="width: 100%; box-sizing: border-box;" class="rule-url" data-index="${index}">
@@ -108,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.rule-enable').forEach(el => {
       el.addEventListener('change', (e) => {
         const idx = e.target.getAttribute('data-index');
-        currentConfig.rules[idx].enabled = e.target.checked;
+        currentConfig.rules[idx].autoDownload = e.target.checked;
         saveConfigSilently();
       });
     });
@@ -189,7 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     currentConfig.rules.push({
       id: Date.now(),
-      enabled: true,
+      autoDownload: false,
       url: url,
       ct: ct,
       tag: tag,
@@ -232,10 +236,9 @@ document.addEventListener('DOMContentLoaded', () => {
   noSmallFilesInput.addEventListener('change', toggleSizeRangeVisibility);
 
   // Save main settings automatically on change
-  [enabledInput, autoDownloadInput, noSmallFilesInput, noZeroFilesInput, deduplicateInput, autoCleanInput, minSizeInput, maxSizeInput, downloadToFolderInput].forEach(el => {
+  [enabledInput, noSmallFilesInput, noZeroFilesInput, deduplicateInput, autoCleanInput, minSizeInput, maxSizeInput, downloadToFolderInput].forEach(el => {
     el.addEventListener('change', () => {
       currentConfig.enabled = enabledInput.checked;
-      currentConfig.automaticdownload = autoDownloadInput.checked;
       currentConfig.nosmallfiles = noSmallFilesInput.checked;
       currentConfig.nozerofiles = noZeroFilesInput.checked;
       currentConfig.deduplicate = deduplicateInput.checked;

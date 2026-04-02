@@ -132,7 +132,7 @@
     "message": "添加扩展名"
   },
   "th_rule_enabled": {
-    "message": "启用"
+    "message": "自动下载"
   },
   "th_url_pattern": {
     "message": "URL 正则"
