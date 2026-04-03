@@ -12,10 +12,10 @@ function getDownloadsAPI() {
 }
 
 const defaultRules = [
-  { id: 1, enabled: true, url: ".*", ct: "video/.*", tag: "video", rtype: 1 },
-  { id: 2, enabled: true, url: ".*", ct: "audio/.*", tag: "audio", rtype: 2 },
-  { id: 3, enabled: true, url: ".*", ct: "application/x-shockwave-flash", tag: "video", rtype: 3 },
-  { id: 4, enabled: true, url: ".*", ct: "image/.*", tag: "image", rtype: 4 }
+  { id: 1, autoDownload: false, url: ".*", ct: "video/.*", tag: "video", rtype: 1 },
+  { id: 2, autoDownload: false, url: ".*", ct: "audio/.*", tag: "audio", rtype: 2 },
+  { id: 3, autoDownload: false, url: ".*", ct: "application/x-shockwave-flash", tag: "video", rtype: 3 },
+  { id: 4, autoDownload: false, url: ".*", ct: "image/.*", tag: "image", rtype: 4 }
 ];
 
 let config = {
@@ -209,8 +209,6 @@ chrome.webRequest.onHeadersReceived.addListener(
       matchedTag = pluginResult.tag || '';
     } else {
       for (let rule of config.rules) {
-        if (!rule.enabled) continue;
-
         try {
           let urlRegex = new RegExp(rule.url, "i");
           let ctRegex = new RegExp(rule.ct, "i");
