@@ -91,7 +91,7 @@ jobs:
           name: "Fluxon v${{ steps.version.outputs.VERSION }}"
           body: |
             ## What's New
-            - Minor bug fix
+            - Implement per-rule auto download
 
             ## Installation
 
@@ -105,7 +105,7 @@ jobs:
             2. Open `about:debugging#/runtime/this-firefox`.
             3. Click **Load Temporary Add-on…** and select `manifest.json` from the extracted folder.
             
-            *Note: Firefox temporary add-ons are removed when the browser restarts. For permanent installation, use [Fluxon on AMO](https://addons.mozilla.org/en-US/firefox/addon/fluxon/).*
+            *Note: For permanent installation, use [Fluxon on AMO](https://addons.mozilla.org/en-US/firefox/addon/fluxon/) or [Fluxon on Chrome Web Store](https://chromewebstore.google.com/detail/fluxon/pbblhfiljejncchohkhhckojliddnpff).*
 
           files: |
             ${{ env.CHROME_ZIP }}
